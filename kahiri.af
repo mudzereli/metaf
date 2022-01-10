@@ -37,44 +37,34 @@
 ~~		prt (deprecated in VTank)														
 ~~ }																					
 
-STATE: {Default} ~~ {
+STATE: {Default} ~~{
 	IF:	Always
-		DO:	SetState {SetDefaultOptions}
-~~ }
-STATE: {SetDefaultOptions} ~~ {
-	IF:	Always
+		DO:	DoExpr {setvar[TokenName,Dark Falatacot Token of the Aura of Specialization]}
+	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
+		DO:	SetState {TurnInToken}
+	IF:	Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<5}
+		DO:	SetState {PickUpToken}
+~~}
+STATE: {PickUpToken} ~~{
+	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
+		DO:	SetState {TurnInToken}
+	IF:	Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<5}
+		DO:	ChatExpr {\/ub uselp +getvar[TokenName]}
+	IF: SecsInStateGE 3
+		DO:	SetState {PickUpToken}
+~~}
+STATE: {TurnInToken} ~~{
+	IF:	Any
+			ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
+			ChatMatch {^.* tells you\, \"You have maxxed out increases to .*\.\"}
+		DO:	SetState {AllDone}
+	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]==0}
+		DO:	SetState {PickUpToken}
+	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
 		DO:	DoAll
-				EmbedNav navNothing {Nothing}
-				SetOpt {EnableCombat} {false}
-				SetOpt {EnableBuffing} {false}
-				SetOpt {EnableNav} {true}
-				SetOpt {EnableMeta} {true}
-				SetOpt {EnableLooting} {false}
-				SetOpt {LootAllCorpses} {false}
-				SetOpt {LootFellowCorpses} {false}
-				SetOpt {LootOnlyRareCorpses} {false}
-				SetOpt {AttackDistance} {0.02}
-				SetOpt {ApproachDistance} {0.00833}
-				SetOpt {CorpseApproachRange-Min} {0.00833}
-				SetOpt {CorpseApproachRange-Max} {0.01}
-				SetOpt {NavCloseStopRange} {0.00833}
-				SetOpt {PetRangeMode} {1}
-				SetOpt {PetCustomRange} {0.042}
-				SetOpt {NavPriorityBoost} {false}
-				SetOpt {LootPriorityBoost} {false}
-				SetOpt {BuffProfile_Prots} {2}
-				SetOpt {BuffProfile_Banes} {2}
-				SetOpt {StaminaToHealthMultiplier} {1.1}
-				SetOpt {Recharge-Norm-HitP} {85}
-				SetOpt {SummonPets} {true}
-				SetOpt {DoHelp} {true}
-				SetOpt {IdlePeaceMode} {false}
-				SetOpt {DoJiggle} {false}
-	IF:	Always
-		DO:	Chat {/ibc}
-~~ }
-
+				Chat {/ub prepclick yes 5}
+				ChatExpr {\/ub givep +getvar[TokenName]+\ to Ka\'hiri}
+	IF: SecsInStateGE 3
+		DO:	SetState {TurnInToken}
+~~}
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
-
-NAV: navNothing once ~~ {
-~~ }
