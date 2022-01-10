@@ -88,7 +88,9 @@ STATE: {QuestProgressCheck} ~~ {
 		DO:	SetState {GoToJump1}
 	IF:	CellE 58670208
 		DO:	SetState {GoToEntranceFromJump1}
-	IF:	CellE 58670266
+	IF:	Any
+			CellE 58670266
+			CellE 58670269
 		DO:	SetState {GoToDoor1}
 	IF:	CellE 586702B3
 		DO:	SetState {GoToJump2}
@@ -209,7 +211,9 @@ STATE: {GoToJump1} ~~ {
 STATE: {GoToEntranceFromJump1} ~~ {
 	IF:	All
 			NavEmpty
-			CellE 58670266
+			Any
+				CellE 58670266
+				CellE 58670269
 		DO:	SetState {GoToDoor1}
 	IF:	Always
 		DO:	DoAll		
