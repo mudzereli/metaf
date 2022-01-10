@@ -44,14 +44,15 @@ STATE: {Default} ~~ {
 STATE: {SetDefaultOptions} ~~ {
 	IF:	Always
 		DO:	DoAll
+				EmbedNav navNothing {Nothing}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
+				SetOpt {EnableMeta} {true}
 				SetOpt {EnableLooting} {false}
 				SetOpt {LootAllCorpses} {false}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {LootOnlyRareCorpses} {false}
-				SetOpt {EnableMeta} {true}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {ApproachDistance} {0.00833}
 				SetOpt {CorpseApproachRange-Min} {0.00833}
@@ -68,7 +69,6 @@ STATE: {SetDefaultOptions} ~~ {
 				SetOpt {IdlePeaceMode} {false}
 				SetOpt {DoJiggle} {false}
 				SetOpt {StaminaToHealthMultiplier} {1.1}
-				EmbedNav navNothing {Nothing}
 	IF:	Always
 		DO:	Chat {/ibc}
 ~~ }
