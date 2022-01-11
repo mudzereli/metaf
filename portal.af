@@ -53,20 +53,22 @@ STATE: {*SetupOptions*} ~~{
 				DoExpr {dictadditem[getvar[portal_dictionary],`Mashadar`,listcreate[`swamp gardens`,`obs rim`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Bobby Flay`,listcreate[`eo outside`,`colo`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Spraynard Kruger`,listcreate[`beach fort`,`quarry`]]}
-				SetState {WaitingForCommands}
+				SetState {ListDestinations}
 ~~}
 STATE: {WaitingForCommands} ~~{
-	IF:	All
-			Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
-			ChatMatch {^.* (say|says)\, \"whereto\"}
-		DO: DoAll
-				ChatExpr {\/+getvar[chat_channel] Primary\.\.\:\ \ +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]}
-				ChatExpr {\/+getvar[chat_channel] Secondary\:\ \ +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
-				SetState {WaitingForCommands}
+	IF:	ChatMatch {^.* (say|says)\, \"whereto\"}
+		DO: SetState {ListDestinations}
 	IF:	All
 			Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
 			ChatCapture	{^.* (say|says)\, \"(?<chat_message>.*)\"} {}
 		DO: SetState {ProcessCommand}
+~~}
+STATE: {ListDestinations} ~~{
+	IF:	Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
+		DO: DoAll
+				ChatExpr {\/+getvar[chat_channel]+\ +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]+\ \| +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
+	IF:	Always
+		DO:	SetState {WaitingForCommands}
 ~~}
 STATE: {ProcessCommand} ~~{
 	IF:	All
@@ -91,6 +93,6 @@ STATE: {SummonPortal} ~~{
 				SetWatchdog 3 3 {SummonPortal}
 	IF:	Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
 		DO:	DoAll
-				ChatExpr {\/+getvar[chat_channel] Portal Opened \-\> listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],iif[getvar[portal_type]==157,0,1]]}
+				ChatExpr {\/+getvar[chat_channel]+\ Portal Opened \-\> +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],iif[getvar[portal_type]==157,0,1]]}
 				SetState {WaitingForCommands}
 ~~}
