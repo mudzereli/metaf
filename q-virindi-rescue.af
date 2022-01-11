@@ -109,7 +109,7 @@ STATE: {RecallAphusLassel} ~~ {
 		DO:	DoAll
 				DoExpr {actiontrycastbyid[2931]}
 				SetWatchdog 3 3 {RecallAphusLassel}
-	IF:	ExitPortal
+	IF:	IntoPortal
 		DO:	SetState {GoToTownNetwork}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
@@ -151,7 +151,7 @@ STATE: {RecallPortal} ~~ {
 		DO:	DoAll
 				DoExpr {actiontrycastbyid[2645]}
 				SetWatchdog 3 3 {RecallPortal}
-	IF:	ExitPortal
+	IF:	IntoPortal
 		DO:	SetState {QuestProgressCheck}
 ~~ }
 STATE: {GoToVRF} ~~ {
@@ -205,7 +205,9 @@ STATE: {OpeningSecondDoor} ~~ {
 				SetOpt {EnableLooting} {true}
 				SetOpt {EnableCombat} {true}
 	IF:	ItemCountGE 1 {Virindi Prison Key}
-		DO:	EmbedNav navOpenSecondDoor {navOpenSecondDoor}
+		DO:	DoAll
+				EmbedNav navOpenSecondDoor {navOpenSecondDoor}
+				SetWatchdog 3 15 {OpeningSecondDoor}
 	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,^Door]]}
 		DO:	SetState {GoToThirdJailor}
 ~~ }
@@ -225,7 +227,9 @@ STATE: {OpeningThirdDoor} ~~ {
 				SetOpt {EnableLooting} {true}
 				SetOpt {EnableCombat} {true}
 	IF:	ItemCountGE 1 {Virindi Prison Key}
-		DO:	EmbedNav navOpenThirdDoor {navOpenThirdDoor}
+		DO:	DoAll
+				EmbedNav navOpenThirdDoor {navOpenThirdDoor}
+				SetWatchdog 3 15 {OpeningThirdDoor}
 	IF:	All
 			Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,^Door]]}
 			NavEmpty
@@ -287,7 +291,7 @@ STATE: {GettingEssenceOfDravann} ~~ {
 		DO:	DoAll
 				SetOpt {EnableLooting} {false}
 				Chat {/ub close corpse}
-				SetState {QuestProgressCheck}
+				SetState {RecallPortal}
 ~~ }
 STATE: {TurnInEssence} ~~ {
 	IF:	Always
@@ -301,9 +305,9 @@ STATE: {TurnInEssence} ~~ {
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
-		DO:	DoExpr {setgvar[qvrc-numcharsdone,getgvar[qvrc-numcharsdone]+1]}
-	IF:	SecsInStateGE 3
-		DO:	ChatExpr {\/f Virindi Rescue Completed\! \(+getgvar[qvrc-numcharsdone]+\)}
+		DO:	DoAll
+				DoExpr {setgvar[qvrc-numcharsdone,getgvar[qvrc-numcharsdone]+1]}
+				ChatExpr {\/f Virindi Rescue Completed\! \(+getgvar[qvrc-numcharsdone]+\)}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
