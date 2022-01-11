@@ -56,7 +56,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qcolo-numchars,0]}
 				DoExpr {setgvar[qcolo-looping,0]}
 				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
-				DoExpr {setgvar[qcolo-numcharsready,0]}
+				DoExpr {setgvar[qcolo-numcharswaiting,0]}
 				DoExpr {setvar[qcolo-started,0]}
 	IF:	SecsInStateGE 5
 		DO:	DoAll
@@ -76,14 +76,18 @@ STATE: {ProgressCheck} ~~ {
 		DO:	SetState {GoToColo}
 ~~ }
 STATE: {GoToColo} ~~ {
+	~~ we're here so stop casting
 	IF:	BlockE 00AF0000
 		DO:	SetState {ProgressCheck}
+	~~ just keep trying to equip a wand over and over, then cast the recall
 	IF:	Expr {actiontryequipanywand[]>=0}
 		DO:	DoAll
-				Chat {/mt cast colosseum recall}
+				~~ Colosseum Recall Spell ID = 4213
+				DoExpr {actiontrycastbyid[4213]}
 				SetWatchdog 3 3 {GoToColo}
 ~~ }
 STATE: {WaitingForStart} ~~ {
+	~~ this sets up all the initial variables when waiting to start
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {false}
@@ -95,65 +99,83 @@ STATE: {WaitingForStart} ~~ {
 				SetOpt {PetRangeMode} {1}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
 				DoExpr {setvar[qcolo-started,0]}
-				DoExpr {setgvar[qcolo-startbuffing,0]}
-				DoExpr {setgvar[qcolo-numcharsready,getgvar[qcolo-numcharsready]+1]}
+				DoExpr {setgvar[qcolo-fellowlocked,0]}
+				DoExpr {setgvar[qcolo-numcharswaiting,getgvar[qcolo-numcharswaiting]+1]}
+	~~ this condition puts you back into the arena if you reload the script after leaving
 	IF:	All
 			ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
 			Expr {getvar[qcolo-started]==0}
 		DO:	DoAll
 				SetState {BuffingBeforeRun}
 				DoExpr {setvar[qcolo-started,1]}
-	IF:	Expr {getgvar[qcolo-startbuffing]==1}
-		DO:	SetState {BuffingBeforeRun}
+	~~ this condition will automatically start the next run if qcolo-looping is set to 1
 	IF:	All
 			Expr {getgvar[qcolo-looping]==1}
 			ItemCountGE 1 {Colosseum Ticket}
 			SecsInStateGE 90
-			Expr {getgvar[qcolo-numcharsready]>=getgvar[qcolo-numchars]}
+			Expr {getgvar[qcolo-numcharswaiting]>=getgvar[qcolo-numchars]}
 		DO:	SetState {GettingATicket}
+	~~ this condition triggers when the ticket holder receives a ticket stub
+	IF:	Any
+			Expr {getgvar[qcolo-fellowlocked]==1}
+			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
+		DO:	SetState {BuffingBeforeRun}
+	~~ this condition is used to manually start the script [!startl in fellow] (with looping)
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!startl\"}
 		DO:	DoAll
 				SetState {GettingATicket}
-				DoExpr {setgvar[qcolo-looping,0]}
+				DoExpr {setgvar[qcolo-looping,1]}
+	~~ this condition is used to manually start the script [!start in fellow] (without looping)
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!start\"}
 		DO:	SetState {GettingATicket}
 ~~ }
 STATE: {GettingATicket} ~~ {
+	~~ if we get a ticket stub, start buffing and notify clients that it was received
 	IF:	All
 			ItemCountGE 1 {Colosseum Ticket Stub}
 			Expr {getvar[qcolo-started]==0}
 		DO:	DoAll
-				DoExpr {setgvar[qcolo-startbuffing,1]}
+				DoExpr {setgvar[qcolo-fellowlocked,1]}
+				Chat {/f Received a Colosseum Ticket Stub. Enter the first room and start buffing!}
 				SetState {BuffingBeforeRun}
+	~~ if we have a ticket but no stub, try to get a ticket
 	IF:	All
 			ItemCountGE 1 {Colosseum Ticket}
 			Not ItemCountGE 1 {Colosseum Ticket Stub}
-		DO:	Chat {/mt give Colosseum Ticket to Master Arbitrator}
+		DO:	Chat {/ub give Colosseum Ticket to Master Arbitrator}
+	~~ if we're out of tickets, we're all done
 	IF:	ItemCountLE 0 {Colosseum Ticket}
-		DO:	SetState {WaitingAround}
+		DO:	SetState {AllDone}
+	~~ keep trying to get a ticket until an arena frees up
 	IF:	Any
-			SecsInStateGE 1
+			SecsInStateGE 10
 			ChatMatch {^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"}
 		DO:	SetState {GettingATicket}
 ~~ }
 STATE: {BuffingBeforeRun} ~~ {
-	IF:	Any
-			SecsInStateGE 180
-			ChatMatch {^You cast Blackmoor.*s Favor on yourself}
-		DO:	DoExpr {setgvar[qcolo-numcharsbuffed,getgvar[qcolo-numcharsbuffed]+1]}
-	IF:	Expr {getgvar[qcolo-numcharsbuffed]>=getgvar[qcolo-numchars]}
-		DO:	SetState {StartFirstRoom}
+	~~ first lets go into the arena, so that we can start our timer
 	IF:	NavEmpty
 		DO: DoAll
-				Chat {/mt use Advanced Colosseum Arena}
+				Chat {/ub usel Advanced Colosseum Arena}
 				SetWatchdog 3 3 {BuffingBeforeRun}
+	~~ ok we zoned into the arena, and we're actually going to start buffing
 	IF:	IntoPortal
 		DO:	DoAll
 				Chat {/vt forcebuff}
 				SetOpt {EnableBuffing} {true}
-				DoExpr {setgvar[qcolo-numcharsready,0]}
+				DoExpr {setgvar[qcolo-numcharswaiting,0]}
+				ClearWatchdog
+	~~ if we've been buffing for 3 minutes, or we finished by casting Blackmoor's Favor, then we're good to go.. probably
+	IF:	Any
+			SecsInStateGE 180
+			ChatMatch {^You cast Blackmoor.*s Favor on yourself}
+		DO:	DoExpr {setgvar[qcolo-numcharsbuffed,getgvar[qcolo-numcharsbuffed]+1]}
+	~~ if everyones probably good to go.. then lets go
+	IF:	Expr {getgvar[qcolo-numcharsbuffed]>=getgvar[qcolo-numchars]}
+		DO:	SetState {StartFirstRoom}
 ~~ }
 STATE: {StartFirstRoom} ~~ {
+	~~ do this special setup for starting the first room
 	IF:	Always
 		DO:	DoAll
 				SetOpt {attackdistance} {0.3}
@@ -161,17 +183,19 @@ STATE: {StartFirstRoom} ~~ {
 				SetOpt {navclosestoprange} {0.02}
 				SetOpt {approachdistance} {0.02}
 				DoExpr {setvar[qcolo-started,1]}
-				DoExpr {setgvar[qcolo-startbuffing,0]}
+				DoExpr {setgvar[qcolo-fellowlocked,0]}
 				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
 				Chat {/myquests}
 				SetState {StartCurrentRoom}
 ~~ }
 STATE: {StartCurrentRoom} ~~ {
+	~~ if we try to start the room, but we finished the run, then wait for our timer
 	IF:	Any
 			CellE 00AF0118
 			CellE 00AF0117
 		DO:	DoAll
 				SetState {WaitingForRewards}
+	~~ ring the bell, start killing & looting
 	IF:	Always
 		DO:	DoAll
 				SetOpt {enablecombat} {true}
@@ -185,11 +209,15 @@ STATE: {KillingCurrentRoom} ~~ {
 			ChatMatch {A Door appears on the North wall.}
 			ChatMatch {Congratulations! You have beaten the Colosseum!}
 			Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=29}
-		DO:	SetState {MoveToNextRoom}
+		DO:	DoAll
+				DoExpr {setvar[qcolo-started,1]}
+				SetState {MoveToNextRoom}
 ~~ }
 STATE: {MoveToNextRoom} ~~ {
+	~~ once we enter the portal, don't try to use it anymore
 	IF:	IntoPortal
 		DO:	SetState {MoveToNextRoomInPortal}
+	~~ turn off looting and use the nearest portal.. over and over until it works
 	IF:	Always
 		DO:	DoAll
 				SetOpt {enablelooting} {false}
@@ -197,28 +225,36 @@ STATE: {MoveToNextRoom} ~~ {
 				SetWatchdog 2 2 {MoveToNextRoom}
 ~~ }
 STATE: {MoveToNextRoomInPortal} ~~ {
+	~~ this is only to keep us from doing stuff while we're in the portal
 	IF:	ExitPortal
 		DO:	SetState {StartCurrentRoom}
 ~~ }
 STATE: {TurnInRewards} ~~ {
+	~~ this actually gets us the reward
 	IF:	Always
 		DO:	DoAll
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
 				DoExpr {setvar[qcolo-started,0]}
+	~~ once we get our rewards, go figure out what to do
 	IF:	ChatMatch {You\'ve earned .* experience\.}
 		DO:	SetState {ProgressCheck}
+	~~ if we think we're done but we're not, well keep on going.
 	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
 		DO:	SetState {StartFirstRoom}
+	~~ if we thought we did colo, but we actually didnt.. time for a fresh start
 	IF:	ChatMatch {Master Arbitrator tells you\, \"If you wish to fight as a gladiator in the Arena}
 		DO:	SetState {WaitingForStart}
 ~~ }
 STATE: {WaitingForRewards} ~~ {
+	~~ if we started colo and we're at this step, then lets see if we're ready for turn in
 	IF:	Expr {getvar[qcolo-started]==1}
 		DO:	Chat {/myquests}
+	~~ keep checking every 30 seconds
 	IF:	All
 			SecsInStateGE 30
 			Expr {getvar[qcolo-started]==1}
 		DO:	SetState {WaitingForRewards}
+	~~ if all our flags are good, we can finally turn in!
 	IF:	All
 			Not Expr {isrefreshingquests[]}
 			Expr {getqueststatus[coloarenaoneaccess]}
