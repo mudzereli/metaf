@@ -43,7 +43,7 @@ STATE: {Default} ~~ {
 ~~ }
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
-		DO:	DoExpr {setgvar[qlou-leverpuller,Mudzereli]}
+		DO:	DoExpr {setgvar[qlou-leverpuller,Porkchop]}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableBuffing} {false}
