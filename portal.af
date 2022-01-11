@@ -44,14 +44,15 @@ STATE: {Default} ~~{
 STATE: {*SetupOptions*} ~~{
 	IF:	Always
 		DO:	DoAll
+				DoExpr {setvar[chat_channel,say]}
 				DoExpr {setvar[portal_dictionary,dictcreate[]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Porkchop`,listcreate[`nexus`,`eo`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Steve Austin`,listcreate[`bdc`,`rynthid`]]}
-				DoExpr {dictadditem[getvar[portal_dictionary],`Beasthoss`,listcreate[`eaterjaw`,`bellas`]]}
+				DoExpr {dictadditem[getvar[portal_dictionary],`Beasthoss`,listcreate[`jaw`,`bellas`]]}
 				~~DoExpr {dictadditem[getvar[portal_dictionary],`Dan K Memes`,listcreate[`nexuscrawl`,`nothing`]]}
-				DoExpr {dictadditem[getvar[portal_dictionary],`Mashadar`,listcreate[`swampgardens`,`obsrim`]]}
-				DoExpr {dictadditem[getvar[portal_dictionary],`Bobby Flay`,listcreate[`eooutside`,`colo`]]}
-				DoExpr {dictadditem[getvar[portal_dictionary],`Spraynard Kruger`,listcreate[`beachfort`,`quarry`]]}
+				DoExpr {dictadditem[getvar[portal_dictionary],`Mashadar`,listcreate[`swamp gardens`,`obs rim`]]}
+				DoExpr {dictadditem[getvar[portal_dictionary],`Bobby Flay`,listcreate[`eo outside`,`colo`]]}
+				DoExpr {dictadditem[getvar[portal_dictionary],`Spraynard Kruger`,listcreate[`beach fort`,`quarry`]]}
 				SetState {WaitingForCommands}
 ~~}
 STATE: {WaitingForCommands} ~~{
@@ -59,12 +60,12 @@ STATE: {WaitingForCommands} ~~{
 			Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
 			ChatMatch {^.* (say|says)\, \"whereto\"}
 		DO: DoAll
-				ChatExpr {\/f Primary Tie\: +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]}
-				ChatExpr {\/f Secondary Tie\: +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
+				ChatExpr {\/+getvar[chat_channel] Primary\.\.\:\ \ +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]}
+				ChatExpr {\/+getvar[chat_channel] Secondary\:\ \ +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
 				SetState {WaitingForCommands}
 	IF:	All
 			Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
-			ChatCapture	{^\[Fellowship\].* (say|says)\, \"(?<chat_message>.*)\"} {}
+			ChatCapture	{^.* (say|says)\, \"(?<chat_message>.*)\"} {}
 		DO: SetState {ProcessCommand}
 ~~}
 STATE: {ProcessCommand} ~~{
@@ -89,5 +90,7 @@ STATE: {SummonPortal} ~~{
 				DoExpr {actiontrycastbyid[getvar[portal_type]]}
 				SetWatchdog 3 3 {SummonPortal}
 	IF:	Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
-		DO:	SetState {WaitingForCommands}
+		DO:	DoAll
+				ChatExpr {\/+getvar[chat_channel] Portal Opened \-\> listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],iif[getvar[portal_type]==157,0,1]]}
+				SetState {WaitingForCommands}
 ~~}
