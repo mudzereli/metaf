@@ -58,38 +58,45 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {NavPriorityBoost} {false}
 				DoExpr {setvar[qktgy-leader,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
 				DoExpr {setvar[qktgy-numchars,getfellowshipcount[]]}
-				DoExpr {setvar[qktgy-numcharsdone,0]}
+				DoExpr {setgvar[qktgy-numcharsdone,0]}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
 	IF:	All
 			CellE 482D011F
-			Expr {getvar[qktgy-numcharsdone]>=getvar[qktgy-numchars]}
+			Expr {getgvar[qktgy-numcharsdone]>=getvar[qktgy-numchars]}
 		DO:	SetState {AllDone}
 	IF:	CellE 482D011F
 		DO:	SetState {GoToKillZone}
 	IF:	CellE 482D0104
 		DO:	SetState {PickUpOrTurnInQuests}
-	IF:	Expr {getcharstringprop[1]==getvar[qktgy-leader]}
-		DO:	DoAll
-				EmbedNav navNone {None}
-				SetOpt {LootPriorityBoost} {true}
-				SetOpt {EnableLooting} {true}
-	IF:	Expr {getcharstringprop[1]!=getvar[qktgy-leader]}
-		DO:	DoAll
-				ChatExpr {\/ub follow +getvar[qktgy-leader]}
-				SetOpt {NavPriorityBoost} {true}
-				SetOpt {AttackDistance} {.29}
-				SetOpt {LootPriorityBoost} {true}
-				SetOpt {EnableLooting} {true}
 	IF:	Always
 		DO:	SetState {RecallGraveyard}
 ~~ }
 STATE: {GoToKillZone} ~~ {
 	IF:	Always
-		DO:	EmbedNav navGoToKillZone {navGoToKillZone}
-	IF:	NavEmpty
-		DO:	SetState {CompletingKillTask}
+		DO:	DoAll
+				SetOpt {NavCloseStopRange} {0.003}
+				EmbedNav navGoToKillZone {navGoToKillZone}
+	IF:	All
+			NavEmpty
+			Expr {getcharstringprop[1]==getvar[qktgy-leader]}
+		DO:	DoAll
+				EmbedNav navNone {None}
+				SetOpt {LootPriorityBoost} {true}
+				SetOpt {EnableLooting} {true}
+				SetState {CompletingKillTask}
+	IF:	All
+			NavEmpty
+			Expr {getcharstringprop[1]!=getvar[qktgy-leader]}
+		DO:	DoAll
+				ChatExpr {\/ub follow +getvar[qktgy-leader]}
+				SetOpt {NavCloseStopRange} {0.00833}
+				SetOpt {NavPriorityBoost} {true}
+				SetOpt {LootPriorityBoost} {true}
+				SetOpt {EnableLooting} {true}
+				SetOpt {AttackDistance} {0.29}
+				SetState {CompletingKillTask}
 ~~ }
 STATE: {CompletingKillTask} ~~ {
 	IF:	SecsInStateGE 60
@@ -105,8 +112,8 @@ STATE: {CompletingKillTask} ~~ {
 ~~ }
 STATE: {CompletedKillTasksWaiting} ~~ {
 	IF:	Always
-		DO:	DoExpr {setgvar[qktgy-numcharsdone,getvar[qktgy-numcharsdone]+1]}
-	IF:	Expr {getvar[qktgy-numcharsdone]>=getvar[qktgy-numchars]}
+		DO:	DoExpr {setgvar[qktgy-numcharsdone,getgvar[qktgy-numcharsdone]+1]}
+	IF:	Expr {getgvar[qktgy-numcharsdone]>=getvar[qktgy-numchars]}
 		DO:	SetState {CompletedKillTasks}
 ~~ }
 STATE: {CompletedKillTasks} ~~ {
@@ -118,12 +125,10 @@ STATE: {CompletedKillTasks} ~~ {
 				SetState {RecallGraveyard}
 ~~ }
 STATE: {RecallGraveyard} ~~ {
-	IF:	Expr {actiontryequipanywand[]>=0}
-		DO:	DoAll
-				DoExpr {actiontrycastbyid[4128]}
-				SetWatchdog 3 3 {RecallGraveyard}
 	IF:	CellE 482D0104
 		DO:	SetState {PickUpOrTurnInQuests}
+	IF:	Expr {actiontrycastbyid[4128]}
+		DO:	SetState {RecallGraveyard}
 ~~ }
 STATE: {PickUpOrTurnInQuests} ~~ {
 	IF:	Always
