@@ -60,12 +60,14 @@ STATE: {*SetupOptions*} ~~ {
 				EmbedNav navNone {navNone}
 				DoExpr {listadd[getvar[qnxc-portalsummoners],`Dan K Memes`]}
 				DoExpr {listadd[getvar[qnxc-portalsummoners],`Porkchop`]}
-	IF:	SecsInStateGE 5
+	IF:	SecsInStateGE 3
 		DO:	DoAll
 				DoExpr {setgvar[qnxc-numtoonsinprogress,getgvar[qnxc-numtoonsinprogress]+1]}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
+	IF:	CellE 7F020107
+		DO:	SetState {TurnInResonator}
 	IF:	CellE 7F02019E
 		DO:	SetState {KillingApostateMaster}
 	IF:	CellE 7F0201E8
@@ -81,7 +83,7 @@ STATE: {QuestProgressCheck} ~~ {
 	IF:	CellE F6820033
 		DO:	SetState {GoToTownNetwork}
 	IF:	Always
-		DO:	SetState {GoToAphusLassel}
+		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
 	IF:	IntoPortal
@@ -124,7 +126,7 @@ STATE: {PickedUpQuest} ~~ {
 		DO:	EmbedNav navGoToPortalSummoningZone {GoToPortalSummoningZone}
 	IF:	All
 			NavEmpty
-			Expr {listcontains[getvar[qnxcportalsummoners],getcharstringprop[1]]}
+			Expr {listcontains[getvar[qnxc-portalsummoners],getcharstringprop[1]]}
 		DO:	SetState {SummonPortalToNexus}
 	IF:	NavEmpty
 		DO:	SetState {SummonPortalToNexusWaiting}
@@ -132,9 +134,7 @@ STATE: {PickedUpQuest} ~~ {
 STATE: {SummonPortalToNexus} ~~ {
 	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
 		DO:	SetState {SummonPortalToNexusSummoned}
-	IF:	All
-			Expr {actiontrycastbyid[157]}
-			Expr {listcontains[getvar[qnxcportalsummoners],getcharstringprop[1]]}
+	IF:	Expr {actiontrycastbyid[157]}
 		DO:	SetState {SummonPortalToNexus}
 ~~ }
 STATE: {SummonPortalToNexusWaiting} ~~ {
@@ -211,7 +211,9 @@ STATE: {CheckLever} ~~ {
 			CellE 7F0201E8
 			Expr {getcharstringprop[1]==getvar[qnxc-fellowleader]}
 			Not Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
-		DO:	EmbedNav navPullLever {PullLever}
+		DO:	DoAll
+				EmbedNav navPullLever {PullLever}
+				SetWatchdog 5 5 {CheckLever}
 	IF:	All
 			CellE 7F0201E8
 			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
@@ -282,7 +284,7 @@ NAV: navDoSecondJump once ~~ {
 NAV: navPullLever once ~~ {
 	pnt -0.0181401570638021 -101.185062281291 0.0250208338101705
 	pnt -0.0171994845072428 -101.172686958313 0.0250208338101705
-	cht -0.0171994845072428 -101.172686958313 0.0250208338101705 {/mt use lever}
+	cht -0.0171994845072428 -101.172686958313 0.0250208338101705 {/ub usel Lever}
 	pau -0.0171994845072428 -101.172686958313 0.0250208338101705 2000
 ~~ }
 NAV: navAphusLasselToTownNetwork once ~~ {
@@ -303,10 +305,10 @@ NAV: navTownNetworkToZaikhal once ~~ {
 ~~ }
 NAV: navLootApostateNexusMaster once ~~ {
 	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
-	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/mt use Corpse of Apostate Nexus Master}
+	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/ub usel Corpse of Apostate Nexus Master}
 	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
 	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
-	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/mt loot Aetherium Vault Key}
+	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/ub use Aetherium Vault Key}
 	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
 ~~ }
 NAV: navUnlockAndOpenFinalDoor once ~~ {
