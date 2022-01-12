@@ -48,7 +48,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {AttackDistance} {0.3}
 				SetOpt {ApproachDistance} {0.021}
 				SetOpt {NavCloseStopRange} {0.021}
-				SetOpt {EnableCombat} {true}
+				SetOpt {EnableCombat} {false}
 				SetOpt {PetRangeMode} {0}
 				SetOpt {EnableNav} {true}
 				SetOpt {LootFellowCorpses} {false}
@@ -79,12 +79,10 @@ STATE: {GoToColo} ~~ {
 	~~ we're here so stop casting
 	IF:	BlockE 00AF0000
 		DO:	SetState {ProgressCheck}
-	~~ just keep trying to equip a wand over and over, then cast the recall
-	IF:	Expr {actiontryequipanywand[]>=0}
-		DO:	DoAll
-				~~ Colosseum Recall Spell ID = 4213
-				DoExpr {actiontrycastbyid[4213]}
-				SetWatchdog 3 3 {GoToColo}
+	~~ just keep trying to spam the spell over and over again
+	~~ Colosseum Recall Spell ID = 4213
+	IF:	Expr {actiontrycastbyid[4213]}
+		DO: SetState {GoToColo}
 ~~ }
 STATE: {WaitingForStart} ~~ {
 	~~ this sets up all the initial variables when waiting to start
@@ -158,10 +156,10 @@ STATE: {BuffingBeforeRun} ~~ {
 			IntoPortal
 			ExitPortal
 		DO:	DoAll
+				ClearWatchdog
 				Chat {/vt forcebuff}
 				SetOpt {EnableBuffing} {true}
 				DoExpr {setgvar[qcolo-numcharswaiting,0]}
-				ClearWatchdog
 	~~ first lets go into the arena, so that we can start our timer
 	IF:	NavEmpty
 		DO: DoAll
@@ -180,13 +178,13 @@ STATE: {StartFirstRoom} ~~ {
 	~~ do this special setup for starting the first room
 	IF:	Always
 		DO:	DoAll
-				SetOpt {attackdistance} {0.3}
-				SetOpt {enablecombat} {true}
-				SetOpt {navclosestoprange} {0.02}
-				SetOpt {approachdistance} {0.02}
+				SetOpt {AttackDistance} {0.3}
+				SetOpt {EnableCombat} {true}
+				SetOpt {NavCloseStopRange} {0.02}
+				SetOpt {ApproachDistance} {0.02}
 				DoExpr {setvar[qcolo-started,1]}
 				DoExpr {setgvar[qcolo-fellowlocked,0]}
-				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
+				~~DoExpr {setgvar[qcolo-numcharsbuffed,0]}
 				Chat {/myquests}
 				SetState {StartCurrentRoom}
 ~~ }
@@ -200,9 +198,9 @@ STATE: {StartCurrentRoom} ~~ {
 	~~ ring the bell, start killing & looting
 	IF:	Always
 		DO:	DoAll
-				SetOpt {enablecombat} {true}
-				SetOpt {enablelooting} {true}
-				SetOpt {attackdistance} {0.3}
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {true}
+				SetOpt {AttackDistance} {0.3}
 				Chat {/ub usel Arena Bell}
 				SetState {KillingCurrentRoom}
 ~~ }
