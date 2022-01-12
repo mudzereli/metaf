@@ -53,10 +53,10 @@ STATE: {*SetupOptions*} ~~ {
 					SetOpt {IdlePeaceMode} {false}
 					SetOpt {OpenDoors} {true}
 					DoExpr {setvar[qnxc-fellowleader,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
-					DoExpr {setvar[qnxc-numcharsdone,0]}
 					DoExpr {setvar[qnxc-portalsummoners,listcreate[]]}
 					DoExpr {setgvar[qnxc-numtoonsatmaster,0]}
 					DoExpr {setgvar[qnxc-numtoonsinprogress,0]}
+					DoExpr {setgvar[qnxc-numcharsdone,0]}
 				EmbedNav navNone {navNone}
 				DoExpr {listadd[getvar[qnxc-portalsummoners],`Dan K Memes`]}
 				DoExpr {listadd[getvar[qnxc-portalsummoners],`Porkchop`]}
@@ -68,188 +68,48 @@ STATE: {*SetupOptions*} ~~ {
 STATE: {QuestProgressCheck} ~~ {
 	IF:	CellE 7F02019E
 		DO:	SetState {KillingApostateMaster}
-	IF:	CellE 011002E1
-		DO:	SetState {Buffing}
-	IF:	Always
-		DO:	SetState {GoToAphusLassel}
-~~ }
-STATE: {AllDone} ~~ {
-	IF:	Always
-		DO:	Chat {/ub bc /ub mexec setvar[qnxcnumcharsdone,getvar[qnxcnumcharsdone]+1]}
-	IF:	SecsInStateGE 2
-		DO:	ChatExpr {\/f Nexus Crawl Completed\! \(+getvar[qnxcnumcharsdone]+\)}
-~~ }
-STATE: {AtEndOfDungeon} ~~ {
-	IF:	All
-			ItemCountGE 1 {Aetheric Resonator}
-			NoMobsInDist 5
-		DO:	Chat {/mt give Aetheric Resonator to Apostate Aetherium Deposit}
-	IF:	SecsInStateGE 9
-		DO:	DoAll
-				SetOpt {enablecombat} {true}
-				SetState {AtEndOfDungeon}
-	IF:	ItemCountLE 0 {Aetheric Resonator}
-		DO:	SetState {GoToAphusLassel}
-~~ }
-STATE: {AtFirstPortalJump} ~~ {
-	IF:	Always
-		DO:	DoAll
-				SetOpt {EnableCombat} {false}
-				EmbedNav nav0 { [None].nav}
-				SetWatchdog 5 10 {PortalRecall}
+	IF:	CellE 7F0201E8
+		DO: SetState {CheckLever}
 	IF:	CellE 7F0202A6
 		DO:	SetState {RunningToLever}
-~~ }
-STATE: {Buffing} ~~ {
-	IF:	Always
-		DO:	DoAll
-				SetOpt {EnableBuffing} {true}
-				Chat {/vt forcebuff}
-	IF:	SecsInStateGE 180
-		DO:	SetState {RunningToFirstPortal}
-~~ }
-STATE: {CheckLever} ~~ {
-	IF:	All
-			CellE 7F0201E8
-			Expr {getcharstringprop[1]==getvar[qnxcfellowleader]}
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]] == false}
-		DO:	DoAll
-				EmbedNav nav1 { [None].nav}
-	IF:	All
-			CellE 7F0201E8
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
-		DO:	SetState {RunningToApostateMaster}
-~~ }
-STATE: {GoToAphusLassel} ~~ {
+	IF:	CellE 011002E1
+		DO:	SetState {EnteredNexus}
+	IF:	CellE 80900013
+		DO:	SetState {GoToNed}
+	IF:	CellE 00070145
+		DO:	SetState {GoToZaikhal}
 	IF:	CellE F6820033
 		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontryequipanywand[]==1}
-		DO:	DoAll
-				Chat {/mt cast recall aphus lassel}
-				SetWatchdog 5 10 {GoToAphusLassel}
+	IF:	Always
+		DO:	SetState {GoToAphusLassel}
+~~ }
+STATE: {RecallAphusLassel} ~~ {
+	IF:	IntoPortal
+		DO:	SetState {GoToTownNetwork}
+	IF:	Expr {actiontrycastbyid[2931]}
+		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	CellE 00070145
 		DO:	SetState {GoToZaikhal}
-	IF:	CellE F6820033
-		DO:	EmbedNav nav3 { [None].nav}
+	IF:	Always
+		DO:	EmbedNav navAphusLasselToTownNetwork {GoToTownNetwork}
 ~~ }
 STATE: {GoToZaikhal} ~~ {
-	IF:	CellE 00070145
-		DO:	EmbedNav nav4 { [None].nav}
 	IF:	CellE 80900013
+		DO:	SetState {GoToNed}
+	IF:	Always
+		DO:	EmbedNav navTownNetworkToZaikhal {GoToZaikhal}
+~~ }
+STATE: {GoToNed} ~~ {
+	IF:	Always
+		DO:	EmbedNav navGoToNed {GoToNed}
+	IF:	NavEmpty
 		DO:	SetState {TalkToNed}
 ~~ }
-STATE: {KillingApostateMaster} ~~ {
-	IF:	Always
-		DO:	EmbedNav nav5 {}
-	IF:	Always
-		DO:	DoAll
-				SetOpt {EnableCombat} {true}
-	IF:	All
-			Expr {getobjectinternaltype[wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]] == 7}
-		DO:	EmbedNav nav6 { [None].nav}
-	IF:	All
-			Expr {getitemcountininventorybyname[Aetherium Vault Key] >= 1}
-		DO:	DoAll
-				SetOpt {EnableCombat} {false}
-				EmbedNav nav7 { [None].nav}
-	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
-		DO:	SetState {RunningToEnd}
-	IF:	SecsInStateGE 180
-		DO:	SetState {KillingApostateMaster}
-~~ }
-STATE: {PickedUpQuest} ~~ {
-	IF:	Always
-		DO:	EmbedNav nav8 { [None].nav}
-	IF:	All
-			NavEmpty
-			Expr {listcontains[getvar[qnxcportalsummoners],getcharstringprop[1]]}
-		DO:	SetState {PortalToNexus}
-	IF:	NavEmpty
-		DO:	SetState {PortalToNexusWaiting}
-~~ }
-STATE: {PortalRecall} ~~ {
-	IF:	CellE 011002E1
-		DO:	SetState {RunningToFirstPortal}
-	IF:	Expr {actiontryequipanywand[]>=0}
-		DO:	DoAll
-				Chat {/mt cast portal recall}
-				SetWatchdog 3 3 {PortalRecall}
-~~ }
-STATE: {PortalToNexus} ~~ {
-	IF:	All
-			Expr {actiontryequipanywand[]==1}
-			Expr {listcontains[getvar[qnxcportalsummoners],getcharstringprop[1]]}
-		DO:	SetState {PortalToNexusCasting}
-~~ }
-STATE: {PortalToNexusCasting} ~~ {
-	IF:	Always
-		DO:	Chat {/mt cast summon primary portal I}
-	IF:	SecsInStateGE 9
-		DO:	SetState {PortalToNexus}
-	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
-		DO:	SetState {PortalToNexusSummoned}
-~~ }
-STATE: {PortalToNexusSummoned} ~~ {
-	IF:	Always
-		DO:	Chat {/mt use closestportal}
-	IF:	SecsInStateGE 2
-		DO:	SetState {PortalToNexusSummoned}
-	IF:	CellE 011002E1
-		DO:	SetState {RunningToFirstPortal}
-~~ }
-STATE: {PortalToNexusWaiting} ~~ {
-	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
-		DO:	SetState {PortalToNexusSummoned}
-~~ }
-STATE: {RunningToApostateMaster} ~~ {
-	IF:	Always
-		DO:	EmbedNav nav9 { [None].nav}
-	IF:	CellE 7F02019E
-		DO:	SetState {WaitingForGroupApostateMaster}
-~~ }
-STATE: {RunningToEnd} ~~ {
-	IF:	All
-			CellE 7F020107
-			NavEmpty
-		DO:	SetState {AtEndOfDungeon}
-	IF:	Always
-		DO:	EmbedNav nav10 { [None].nav}
-~~ }
-STATE: {RunningToFirstPortal} ~~ {
-	IF:	All
-			CellE 011002E1
-		DO:	DoAll
-				SetOpt {NavCloseStopRange} {0.008}
-				SetOpt {OpenDoors} {true}
-				EmbedNav nav11 { [None].nav}
-				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
-				SetOpt {EnableBuffing} {true}
-				SetOpt {AttackDistance} {0.02}
-				SetOpt {ApproachDistance} {0}
-				SetOpt {NavPriorityBoost} {false}
-				SetOpt {EnableNav} {true}
-	IF:	All
-			CellE 7F0202A6
-		DO:	SetState {RunningToLever}
-	IF:	NavEmpty
-		DO:	SetState {AtFirstPortalJump}
-	IF:	Always
-		DO:	SetWatchdog 5 30 {PortalRecall}
-~~ }
-STATE: {RunningToLever} ~~ {
-	IF:	All
-			CellE 7F0202A6
-		DO:	DoAll
-				SetOpt {EnableCombat} {false}
-				SetOpt {NavCloseStopRange} {0.008333}
-				EmbedNav nav12 { [None].nav}
-~~ }
 STATE: {TalkToNed} ~~ {
-	IF:	CellE 80900013
-		DO:	EmbedNav nav14 { [None].nav}
+	IF:	Always
+		DO:	EmbedNav navTalkToNed {TalkToNed}
 	IF:	Any
 			ChatMatch {^Ned the Clever gives you Aetheric Resonator\.}
 			ChatMatch {^Ned the Clever tells you\, \"Have you placed the Aetheric resonator}
@@ -259,36 +119,178 @@ STATE: {TalkToNed} ~~ {
 			ChatMatch {^Ned the Clever tells you\, \"Please return to me later}
 		DO:	SetState {AllDone}
 ~~ }
+STATE: {PickedUpQuest} ~~ {
+	IF:	Always
+		DO:	EmbedNav navGoToPortalSummoningZone {GoToPortalSummoningZone}
+	IF:	All
+			NavEmpty
+			Expr {listcontains[getvar[qnxcportalsummoners],getcharstringprop[1]]}
+		DO:	SetState {SummonPortalToNexus}
+	IF:	NavEmpty
+		DO:	SetState {SummonPortalToNexusWaiting}
+~~ }
+STATE: {SummonPortalToNexus} ~~ {
+	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
+		DO:	SetState {SummonPortalToNexusSummoned}
+	IF:	All
+			Expr {actiontrycastbyid[157]}
+			Expr {listcontains[getvar[qnxcportalsummoners],getcharstringprop[1]]}
+		DO:	SetState {SummonPortalToNexus}
+~~ }
+STATE: {SummonPortalToNexusWaiting} ~~ {
+	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
+		DO:	SetState {SummonPortalToNexusSummoned}
+~~ }
+STATE: {SummonPortalToNexusSummoned} ~~ {
+	IF:	CellE 011002E1
+		DO:	SetState {EnteredNexus}
+	IF:	Always
+		DO:	DoExpr {actiontryuseitem[wobjectfindnearestbyobjectclass[14]]}
+	IF:	SecsInStateGE 1
+		DO:	SetState {SummonPortalToNexusSummoned}
+~~ }
+STATE: {EnteredNexus} ~~ {
+	IF:	Always
+		DO:	DoAll
+				SetOpt {NavCloseStopRange} {0.003}
+				SetOpt {OpenDoors} {true}
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
+				SetOpt {EnableBuffing} {true}
+				SetOpt {AttackDistance} {0.02}
+				SetOpt {ApproachDistance} {0}
+				SetOpt {NavPriorityBoost} {false}
+				SetOpt {EnableNav} {true}
+				SetState {GoToFirstJump}
+~~ }
+STATE: {GoToFirstJump} ~~ {
+	IF:	Always
+		DO:	EmbedNav navGoToFirstJump {GoToFirstJump}
+	IF:	NavEmpty
+		DO:	SetState {DoFirstJump}
+~~ }
+STATE: {DoFirstJump} ~~ {
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {false}
+				EmbedNav navDoFirstJump {DoFirstJump}
+				SetWatchdog 3 3 {DoFirstJump}
+	IF:	NavEmpty
+		DO:	SetState {GoToSecondJump}
+~~ }
+STATE: {GoToSecondJump} ~~ {
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				EmbedNav navGoToSecondJump {GoToSecondJump}
+	IF:	NavEmpty
+		DO:	SetState {DoSecondJump}
+~~ }
+STATE: {DoSecondJump} ~~ {
+	IF:	CellE 7F0202A6
+		DO:	SetState {RunningToLever}
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {false}
+				EmbedNav navDoSecondJump {DoSecondJump}
+				SetWatchdog 3 3 {DoSecondJump}
+~~ }
+STATE: {RunningToLever} ~~ {
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {false}
+				SetOpt {NavCloseStopRange} {0.008333}
+				EmbedNav navRunToLever {RunningToLever}
+	IF:	All
+			NavEmpty
+			CellE 7F0201E8
+		DO: SetState {CheckLever}
+~~ }
+STATE: {CheckLever} ~~ {
+	IF:	All
+			CellE 7F0201E8
+			Expr {getcharstringprop[1]==getvar[qnxc-fellowleader]}
+			Not Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	EmbedNav navPullLever {PullLever}
+	IF:	All
+			CellE 7F0201E8
+			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {RunningToApostateMaster}
+~~ }
+STATE: {RunningToApostateMaster} ~~ {
+	IF:	All
+			NavEmpty
+			CellE 7F02019E
+		DO:	SetState {WaitingForGroupApostateMaster}
+	IF:	Always
+		DO:	EmbedNav navGoToApostateMaster {RunningToApostateMaster}
+~~ }
 STATE: {WaitingForGroupApostateMaster} ~~ {
 	IF:	Always
-		DO:	Chat {/ub bc /ub mexec setvar[qnxc-numtoonsatmaster,getvar[qnxc-numtoonsatmaster]+1]}
-	IF:	Expr {getvar[qnxc-numtoonsatmaster]>=getvar[qnxc-numtoonsinprogress]}
+		DO:	DoExpr {setgvar[qnxc-numtoonsatmaster,getgvar[qnxc-numtoonsatmaster]+1]}
+	IF:	Expr {getgvar[qnxc-numtoonsatmaster]>=getgvar[qnxc-numtoonsinprogress]}
 		DO:	SetState {KillingApostateMaster}
+~~ }
+STATE: {KillingApostateMaster} ~~ {
+	IF:	Always
+		DO:	SetOpt {EnableCombat} {true}
+	IF:	Expr {getobjectinternaltype[wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]] == 7}
+		DO:	EmbedNav navLootApostateNexusMaster {LootApostateNexusMaster}
+	IF:	ItemCountGE 1 {Aetherium Vault Key}
+		DO:	DoAll
+				EmbedNav navUnlockAndOpenFinalDoor {UnlockAndOpenFinalDoor}
+				SetWatchdog 3 15 {KillingApostateMaster}
+	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {RunningToEnd}
+	IF:	SecsInStateGE 90
+		DO:	SetState {KillingApostateMaster}
+~~ }
+STATE: {RunningToEnd} ~~ {
+	IF:	All
+			CellE 7F020107
+			NavEmpty
+		DO:	SetState {TurnInResonator}
+	IF:	Always
+		DO:	EmbedNav navRunToEnd {RunningToEnd}
+~~ }
+STATE: {TurnInResonator} ~~ {
+	IF:	All
+			ItemCountGE 1 {Aetheric Resonator}
+			NoMobsInDist 5
+		DO:	Chat {/ub give Aetheric Resonator to Apostate Aetherium Deposit}
+	IF:	SecsInStateGE 9
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetState {TurnInResonator}
+	IF:	ItemCountLE 0 {Aetheric Resonator}
+		DO:	SetState {RecallAphusLassel}
+~~ }
+STATE: {AllDone} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setgvar[qnxc-numcharsdone,getgvar[qnxc-numcharsdone]+1]}
+				ChatExpr {\/f Nexus Crawl Completed\! \(+getgvar[qnxc-numcharsdone]+\)}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
-NAV: nav0 once ~~ {
-	pau -100.982918834686 -89.7567665100098 0.100020829836528 2000
-	cht -100.982918834686 -89.7567665100098 0.100020829836528 {/ub face 0}
-	pau -100.982918834686 -89.7567665100098 0.100020829836528 2000
-	cht -100.982918834686 -89.7567665100098 0.100020829836528 {/mt sjumpw 100}
-	pau -100.982918834686 -89.7567665100098 0.100020829836528 2000
+NAV: navDoSecondJump once ~~ {
+	cht -100.982918834686 -89.7567665100098 0.100020829836528 {/ub jumpsw 0 100}
 	pau -100.982918834686 -89.7567665100098 0.100020829836528 2000
 	ptl -100.982918834686 -89.7567665100098 0.100020829836528 -100.983333333333 -89.7333333333333 0.0500000007450581 37 {Apostate Nexus Gateway}
 ~~ }
-NAV: nav1 once ~~ {
+NAV: navPullLever once ~~ {
 	pnt -0.0181401570638021 -101.185062281291 0.0250208338101705
 	pnt -0.0171994845072428 -101.172686958313 0.0250208338101705
 	cht -0.0171994845072428 -101.172686958313 0.0250208338101705 {/mt use lever}
 	pau -0.0171994845072428 -101.172686958313 0.0250208338101705 2000
 ~~ }
-NAV: nav3 once ~~ {
+NAV: navAphusLasselToTownNetwork once ~~ {
 	pnt 95.4570833206177 2.25772916475932 0.24168750445048
-	pnt 95.4550523757935 2.28801414171855 0.24168750445048
-	ptl 95.4550523757935 2.28801414171855 0.24168750445048 95.4555708567301 2.31398749351501 0.242491692304611 14 {Portal to Town Network}
+	pnt 95.4576747258504 2.30202283859253 0.242775011062622
+	ptl 95.4576747258504 2.30202283859253 0.242775011062622 95.4555708567301 2.31398749351501 0.242491692304611 14 {Portal to Town Network}
 ~~ }
-NAV: nav4 once ~~ {
+NAV: navTownNetworkToZaikhal once ~~ {
 	pnt -101.658333333333 -96.6833333333333 2.08333134651184E-05
 	pnt -101.678826586405 -96.6693954467773 2.08333134651184E-05
 	pnt -101.715279595057 -96.643700504303 2.08333134651184E-05
@@ -299,7 +301,7 @@ NAV: nav4 once ~~ {
 	pnt -101.907621073723 -96.5826029936473 2.08333134651184E-05
 	ptl -101.907610054811 -96.5823128223419 2.08333134651184E-05 -101.90858749946 -96.5742208321889 -0.000262499845121056 14 {Portal to Zaikhal}
 ~~ }
-NAV: nav6 once ~~ {
+NAV: navLootApostateNexusMaster once ~~ {
 	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
 	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/mt use Corpse of Apostate Nexus Master}
 	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
@@ -307,22 +309,21 @@ NAV: nav6 once ~~ {
 	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/mt loot Aetherium Vault Key}
 	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
 ~~ }
-NAV: nav7 once ~~ {
+NAV: navUnlockAndOpenFinalDoor once ~~ {
 	pnt -0.308091974258423 -100.815521844228 0.0250208338101705
 	pnt -0.307394190629323 -100.794581667582 0.0250208338101705
 	pnt -0.308289813995361 -100.771404743195 0.0250208338101705
 	pnt -0.307383402188619 -100.746244557699 0.0250208338101705
-	cht -0.307383402188619 -100.746244557699 0.0250208338101705 {/mt use Aetherium Vault Key on Aetherium Vault}
-	pau -0.307383402188619 -100.746244557699 0.0250208338101705 2000
+	cht -0.307383402188619 -100.746244557699 0.0250208338101705 {/ub use Aetherium Vault Key on Aetherium Vault}
 ~~ }
-NAV: nav8 once ~~ {
+NAV: navGoToPortalSummoningZone once ~~ {
 	pnt 0.88147455851237 13.4004059314728 0.516687520345052
 	pnt 0.860433578491211 13.4007310072581 0.516687520345052
 	pnt 0.84504919052124 13.3918571313222 0.516687520345052
-	cht 0.84504919052124 13.3918571313222 0.516687520345052 {/mt face 180}
+	cht 0.84504919052124 13.3918571313222 0.516687520345052 {/ub face 180}
 	pau 0.84504919052124 13.3918571313222 0.516687520345052 2000
 ~~ }
-NAV: nav9 once ~~ {
+NAV: navGoToApostateMaster once ~~ {
 	pnt -0.0208717664082845 -101.184546152751 0.0250208338101705
 	pnt 0.0223437945048014 -101.184853808085 0.0250208338101705
 	pnt 0.0245234807332357 -101.222211710612 0.0250208338101705
@@ -351,7 +352,7 @@ NAV: nav9 once ~~ {
 	pnt -0.305108976364136 -100.867793750763 0.0250208338101705
 	pnt -0.310117948055267 -100.81193450292 0.0250208338101705
 ~~ }
-NAV: nav10 once ~~ {
+NAV: navRunToEnd once ~~ {
 	pnt -0.307659860452016 -100.721060593923 0.0250208338101705
 	pnt -0.308156689008077 -100.693122768402 0.0250208338101705
 	pnt -0.308695987860362 -100.658980083466 0.0250208338101705
@@ -370,19 +371,17 @@ NAV: nav10 once ~~ {
 	pnt -0.190062761306763 -100.437345465024 2.08333134651184E-05
 	pau -0.190062761306763 -100.437345465024 2.08333134651184E-05 2000
 ~~ }
-NAV: nav11 once ~~ {
+NAV: navGoToFirstJump once ~~ {
 	pnt -100.983300622304 -90.187722714742 0.100020829836528
 	pnt -100.984312740962 -90.1620869318644 0.100020829836528
 	pnt -100.983007478714 -90.1229753494263 0.100020829836528
-	cht -100.982505273819 -89.7618705113729 0.100020829836528 {/vt opt set navclosestoprange 0.003}
 	pnt -100.983414904277 -90.0900867462158 0.100020829836528
-	pau -100.982505273819 -89.7618705113729 0.100020829836528 3000
-	cht -100.982505273819 -89.7618705113729 0.100020829836528 {/ub face 360}
-	pau -100.982505273819 -89.7618705113729 0.100020829836528 2000
-	cht -100.982505273819 -89.7618705113729 0.100020829836528 {/mt jumpw 500}
-	pau -100.982505273819 -89.7618705113729 0.100020829836528 2000
-	pau -100.982505273819 -89.7618705113729 0.100020829836528 2000
-	cht -100.982505273819 -89.7618705113729 0.100020829836528 {/vt opt set navclosestoprange 0.008}
+~~ }
+NAV: navDoFirstJump once ~~ {
+	cht -100.982505273819 -89.7618705113729 0.100020829836528 {/ub jumpw 0 500}
+	pnt -100.982765642802 -90.0101150512695 0.100020829836528
+~~ }
+NAV: navGoToSecondJump once ~~ {
 	pnt -100.982765642802 -90.0101150512695 0.100020829836528
 	pnt -100.983102496465 -89.9661270777384 0.100020829836528
 	pnt -100.980925099055 -89.9469126383463 0.100020829836528
@@ -402,10 +401,9 @@ NAV: nav11 once ~~ {
 	pnt -100.986437336604 -89.8169408162435 0.100020829836528
 	pnt -100.983720223109 -89.7977053960164 0.100020829836528
 	pnt -100.98321928978 -89.7583539326986 0.100020829836528
-	cht -100.982505273819 -89.7618705113729 0.100020829836528 {/vt opt set navclosestoprange 0.003}
 	pnt -100.982780106862 -89.7549019495646 0.100020829836528
 ~~ }
-NAV: nav12 once ~~ {
+NAV: navRunToLever once ~~ {
 	pnt -0.0583266258239746 -102.474011739095 0.0750208298365275
 	pnt -0.058319886525472 -102.456341044108 0.0750208298365275
 	pnt -0.0586391448974609 -102.388431040446 0.0750208298365275
@@ -442,11 +440,10 @@ NAV: nav12 once ~~ {
 	pnt -0.0595060666402181 -101.202028274536 0.0250208338101705
 	pnt -0.0560574213663737 -101.185092290243 0.0250208338101705
 	pnt -0.0143521308898926 -101.187858009338 0.0250208338101705
-	cht -0.0212217330932617 -101.181335449219 0.0250208338101705 {/vt setmetastate CheckLever}
 ~~ }
 NAV: navNone once ~~ {
 ~~ }
-NAV: nav14 once ~~ {
+NAV: navGoToNed once ~~ {
 	pnt 0.720262495676676 13.4820291678111 0.516687520345052
 	pnt 0.753980414072673 13.4424276192983 0.516687520345052
 	pnt 0.783144505818685 13.4165069421132 0.516687520345052
@@ -454,5 +451,7 @@ NAV: nav14 once ~~ {
 	pnt 0.859506956736247 13.4021380901337 0.516687520345052
 	pnt 0.879345957438151 13.4003884792328 0.516687520345052
 	pnt 0.896125984191894 13.3982449690501 0.515437507629395
+~~ }
+NAV: navTalkToNed once ~~ {
 	tlk 0.887135950724284 13.3986779212952 0.515437507629395 0.896191660563151 13.392262506485 0.515437483787537 37 {Ned the Clever}
 ~~ }
