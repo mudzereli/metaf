@@ -51,15 +51,39 @@ STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoExpr {setvar[qrlf-chat-channel,`cg`}
 	IF:	Always
+		DO:	SetState {QuestProgressCheck}
+~~ }
+STATE: {QuestProgressCheck} ~~ {
+	IF:	CellE 1DB60016
+		DO:	SetState {GoToLoopLocation}
+	IF:	CellE 00070145
+		DO:	SetState {GoToTimaru}
+	IF:	CellE F6820033
+		DO:	SetState {GoToTownNetwork}
+	IF:	Always
+		DO:	SetState {PortalRecall}
+~~ }
+STATE: {PortalRecall} ~~ {
+	IF:	IntoPortal
+		DO:	SetState {PortalRecallCheckLocation}
+	IF:	Expr {actiontrycastbyid[2645]}
+		DO:	SetState {PortalRecall}
+~~ }
+STATE: {PortalRecallCheckLocation} ~~ {
+	IF:	All
+			ExitPortal
+			CellE 1DB60016
+		DO:	SetState {GoToLoopLocation}
+	IF:	All
+			ExitPortal
+			Not CellE 1DB60016
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
 	IF:	CellE F6820033
 		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontryequipanywand[]>=0}
-		DO:	DoAll
-				Chat {/mt cast recall aphus lassel}
-				SetWatchdog 2 2 {RecallAphusLassel}
+	IF:	Expr {actiontrycastbyid[2931]}
+		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	CellE 00070145
@@ -86,7 +110,7 @@ STATE: {LookingForRalirea} ~~ {
 		DO:	DoAll
 				EmbedNav navLookingForRalirea {LookingForRalirea}
 				SetOpt {EnableNav} {true}
-				SetWatchdog 5 10 {Default}
+				SetWatchdog 5 10 {QuestProgressCheck}
 ~~ }
 STATE: {FoundRalirea} ~~ {
 	IF:	Always
