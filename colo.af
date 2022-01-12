@@ -35,7 +35,7 @@
 ~~		pau					chk															
 ~~		cht					jmp															
 ~~		prt (deprecated in VTank)														
-~~ }																					
+~~ }
 
 STATE: {Default} ~~ {
 	IF:	Always
@@ -153,18 +153,20 @@ STATE: {GettingATicket} ~~ {
 		DO:	SetState {GettingATicket}
 ~~ }
 STATE: {BuffingBeforeRun} ~~ {
-	~~ first lets go into the arena, so that we can start our timer
-	IF:	NavEmpty
-		DO: DoAll
-				Chat {/ub usel Advanced Colosseum Arena}
-				SetWatchdog 3 3 {BuffingBeforeRun}
 	~~ ok we zoned into the arena, and we're actually going to start buffing
-	IF:	IntoPortal
+	IF:	Any
+			IntoPortal
+			ExitPortal
 		DO:	DoAll
 				Chat {/vt forcebuff}
 				SetOpt {EnableBuffing} {true}
 				DoExpr {setgvar[qcolo-numcharswaiting,0]}
 				ClearWatchdog
+	~~ first lets go into the arena, so that we can start our timer
+	IF:	NavEmpty
+		DO: DoAll
+				Chat {/ub usel Advanced Colosseum Arena}
+				SetWatchdog 3 3 {BuffingBeforeRun}
 	~~ if we've been buffing for 3 minutes, or we finished by casting Blackmoor's Favor, then we're good to go.. probably
 	IF:	Any
 			SecsInStateGE 180
@@ -221,7 +223,7 @@ STATE: {MoveToNextRoom} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {enablelooting} {false}
-				Chat {/mt use closestportal}
+				DoExpr {actiontryuseitem[wobjectfindnearestbyobjectclass[14]]}
 				SetWatchdog 2 2 {MoveToNextRoom}
 ~~ }
 STATE: {MoveToNextRoomInPortal} ~~ {
