@@ -37,99 +37,157 @@
 ~~		prt (deprecated in VTank)														
 ~~ }																					
 
-STATE: {AllDone} ~~ {
-	IF:	Always
-		DO:	DoAll
-				Chat {/f Falatacot Depot Complete!}
-				Chat {/dfo}
-~~ }
 STATE: {Default} ~~ {
 	IF:	Always
-		DO:	SetState {SetupOptions}
+		DO:	SetState {*SetupOptions*}
 ~~ }
-STATE: {EnteredFalatacotDepot} ~~ {
+STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoAll
-					SetOpt {OpenDoors} {false}
-					SetOpt {EnableCombat} {true}
-					SetOpt {EnableLooting} {false}
-					SetOpt {NavCloseStopRange} {0.003}
-					SetOpt {NavPriorityBoost} {false}
-					SetOpt {AttackDistance} {0.02}
-					DoExpr {setgvar[qfdp-toonsindungeon,getgvar[qfdp-toonsindungeon]+1]}
-				EmbedNav nav0 {[none]}
-	IF:	Expr {getgvar[qfdp-toonsindungeon]>=getgvar[qfdp-toonsinprogress]}
-		DO:	SetState {GoToForgeGuardian}
+				SetOpt {EnableBuffing} {false}
+				SetOpt {EnableNav} {true}
+				SetOpt {EnableCombat} {false}
+				SetOpt {EnableLooting} {false}
+				SetOpt {LootFellowCorpses} {false}
+				SetOpt {NavCloseStopRange} {0.00833}
+				SetOpt {ApproachDistance} {0}
+				SetOpt {CorpseApproachRange-Min} {0}
+				SetOpt {CorpseApproachRange-Max} {0}
+				SetOpt {NavPriorityBoost} {true}
+				SetOpt {LootOnlyRares} {false}
+				SetOpt {IdlePeaceMode} {false}
+				DoExpr {setgvar[qfdp-toonsindungeon,0]}
+				DoExpr {setgvar[qfdp-toonsinprogress,0]}
+				DoExpr {setgvar[qfdp-toonsinfirstroom,0]}
+				DoExpr {setgvar[qfdp-toonsinsecondroom,0]}
+				DoExpr {setgvar[qfdp-numcharsdone,0]}
+				EmbedNav navNone {None}
+	IF:	SecsInStateGE 3
+		DO:	DoAll
+				DoExpr {setgvar[qfdp-toonsinprogress,getgvar[qfdp-toonsinprogress]+1]}
+				SetState {QuestProgressCheck}
 ~~ }
-STATE: {GoToFalatacotDepot} ~~ {
+STATE: {QuestProgressCheck} ~~ {
+	~~IF:	ItemCountGE 1 {Translated Orders for Zrikux}
+	~~	DO:	SetState {LifestoneRecall}
+	IF:	Any
+			CellE 585E018E
+			CellE 585E018B
+			CellE 585E018C
+			CellE 585E018F
+		DO:	SetState {KillingAndLootingZrikux}
+	IF:	CellE E54E010A
+		DO:	SetState {TranslateOrders}
+	IF:	CellE E54E010A
+		DO:	SetState {GoToHebianToLibrary}
+	IF:	All
+			CellE 00070145
+			ItemCountGE 1 {Orders for Zrikux}
+		DO:	SetState {GoToHebianTo}
 	IF:	CellE 585E0101
 		DO:	SetState {EnteredFalatacotDepot}
-	IF:	Always
-		DO:	EmbedNav nav1 {linvak-to-falatacot-depot.nav}
-~~ }
-STATE: {GoToForgeGuardian} ~~ {
-	IF:	Always
-		DO:	EmbedNav nav2 {falatacot-depot-1-forge-guardian.nav}
-	IF:	CellE 585E0137
-		DO:	DoAll
-				SetOpt {NavPriorityBoost} {true}
-				SetOpt {EnableCombat} {false}
-	IF:	CellE 585E0138
-		DO:	DoAll
-				SetOpt {enablenav} {false}
-				DoExpr {setgvar[qfdp-toonsinfirstroom,getgvar[qfdp-toonsinfirstroom]+1]}
-	IF:	Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}
-		DO:	SetOpt {enablenav} {true}
-	IF:	NavEmpty
-		DO:	SetState {KillingForgeGuardian}
-~~ }
-STATE: {GoToHebian} ~~ {
-	IF:	CellE E64E002F
-		DO:	SetState {GoToHebianLibrary}
-	IF:	Always
-		DO:	EmbedNav nav3 { [None].nav}
-~~ }
-STATE: {GoToHebianLibrary} ~~ {
-	IF:	All
-			NavEmpty
-			CellE E54E010A
-		DO:	SetState {TranslateOrders}
-	IF:	Always
-		DO:	DoAll
-				SetOpt {OpenDoors} {true}
-				EmbedNav nav4 {hebian-to-library.nav}
-~~ }
-STATE: {GoToLinvak} ~~ {
-	IF:	CellE A21E001A
-		DO:	SetState {GoToOutsideLinvak}
-	IF:	Always
-		DO:	EmbedNav nav5 { [None].nav}
-~~ }
-STATE: {GoToOutsideLinvak} ~~ {
 	IF:	CellE A220002F
 		DO:	SetState {GoToFalatacotDepot}
+	IF:	CellE A21E001A
+		DO:	SetState {GoToOutsideLinvakTukal}
+	IF:	CellE 00070145
+		DO:	SetState {GoToLinvakTukal}
+	IF:	CellE F6820033
+		DO:	SetState {GoToTownNetwork}
 	IF:	Always
-		DO:	EmbedNav nav6 { [None].nav}
+		DO:	SetState {RecallAphusLassel}
 ~~ }
-STATE: {GoToTiatusOverseer} ~~ {
-	IF:	Always
-		DO:	EmbedNav nav7 {falatacot-depot-2-tiatus-overseer.nav}
-	IF:	All
-			NavEmpty
-			NoMobsInDist 10
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
-		DO:	SetState {GoToZrikux}
+STATE: {RecallAphusLassel} ~~ {
+	IF:	Any
+			IntoPortal
+			CellE F6820033
+		DO:	SetState {GoToTownNetwork}
+	IF:	Expr {actiontrycastbyid[2931]}
+		DO:	DoAll
+				SetOpt {EnableCombat} {false}
+				SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	All
 			CellE 00070145
 			ItemCountGE 1 {Orders for Zrikux}
-		DO:	SetState {GoToHebian}
+		DO:	SetState {GoToHebianTo}
 	IF:	CellE 00070145
-		DO:	SetState {GoToLinvak}
+		DO:	SetState {GoToLinvakTukal}
 	IF:	Always
-		DO:	EmbedNav nav8 { [None].nav}
+		DO:	EmbedNav navAphusLasselToTownNetwork {GoToTownNetwork}
+~~ }
+STATE: {GoToLinvakTukal} ~~ {
+	IF:	CellE A21E001A
+		DO:	SetState {GoToOutsideLinvakTukal}
+	IF:	Always
+		DO:	EmbedNav navTownNetworkToLinvakTukal {GoToLinvakTukal}
+~~ }
+STATE: {GoToOutsideLinvakTukal} ~~ {
+	IF:	CellE A220002F
+		DO:	SetState {GoToFalatacotDepot}
+	IF:	Always
+		DO:	EmbedNav navGoToOutsideLinvakTukal {GoToOutsideLinvakTukal}
+~~ }
+STATE: {GoToFalatacotDepot} ~~ {
+	IF:	CellE 585E0101
+		DO:	SetState {EnteredFalatacotDepot}
+	IF:	Always
+		DO:	EmbedNav navGoToFalatacotDepot {GoToFalatacotDepot}
+~~ }
+STATE: {EnteredFalatacotDepot} ~~ {
+	IF:	Always
+		DO:	DoAll
+				EmbedNav navNone {None}
+				SetOpt {OpenDoors} {false}
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
+				SetOpt {NavCloseStopRange} {0.003}
+				SetOpt {NavPriorityBoost} {false}
+				SetOpt {AttackDistance} {0.02}
+				DoExpr {setgvar[qfdp-toonsindungeon,getgvar[qfdp-toonsindungeon]+1]}
+	IF:	Expr {getgvar[qfdp-toonsindungeon]>=getgvar[qfdp-toonsinprogress]}
+		DO:	SetState {GoToForgeGuardian}
+~~ }
+STATE: {GoToForgeGuardian} ~~ {
+	IF:	Always
+		DO:	EmbedNav navGoToForgeGuardian {GoToForgeGuardian}
+	~~ turn off attacking when we get to the door
+	IF:	CellE 585E0137
+		DO:	DoAll
+				SetOpt {NavPriorityBoost} {true}
+				SetOpt {EnableCombat} {false}
+	~~ wait for everyone else
+	IF:	All
+			CellE 585E0138
+			Not Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}		
+		DO:	DoAll
+				SetOpt {EnableNav} {false}
+				DoExpr {setgvar[qfdp-toonsinfirstroom,getgvar[qfdp-toonsinfirstroom]+1]}
+	~~ everyone's here lets go!
+	IF:	Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}
+		DO:	SetOpt {EnableNav} {true}
+	~~ kill him once everyone is done with their nav
+	IF:	NavEmpty
+		DO:	SetState {KillingForgeGuardian}
+~~ }
+STATE: {KillingForgeGuardian} ~~ {
+	IF:	Always
+		DO:	SetOpt {EnableCombat} {true}
+	IF:	All
+			NavEmpty
+			NoMobsInDist 10
+			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
+		DO:	SetState {GoToTiatusOverseer}
+~~ }
+STATE: {GoToTiatusOverseer} ~~ {
+	IF:	Always
+		DO:	EmbedNav navGoToTiatusOverseer {GoToTiatusOverseer}
+	IF:	All
+			NavEmpty
+			NoMobsInDist 10
+			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
+		DO:	SetState {GoToZrikux}
 ~~ }
 STATE: {GoToZrikux} ~~ {
 	IF:	All
@@ -141,7 +199,7 @@ STATE: {GoToZrikux} ~~ {
 				CellE 585E018F
 		DO:	SetState {KillingAndLootingZrikux}
 	IF:	Always
-		DO:	EmbedNav nav9 {falatacot-depot-3-zrikux.nav}
+		DO:	EmbedNav navGoToZrikux {GoToZrikux}
 ~~ }
 STATE: {KillingAndLootingZrikux} ~~ {
 	IF:	Always
@@ -156,93 +214,56 @@ STATE: {KillingAndLootingZrikux} ~~ {
 	IF:	ItemCountGE 1 {Orders for Zrikux}
 		DO:	DoAll
 				SetOpt {EnableLooting} {false}
-				SetState {RecallAphusLassel}
 				SetOpt {EnableCombat} {false}
-				Chat {/ub close corpse}
 				SetOpt {NavCloseStopRange} {0.00833}
+				Chat {/ub close corpse}
+				SetState {RecallAphusLassel}
 ~~ }
-STATE: {KillingForgeGuardian} ~~ {
+STATE: {GoToHebianTo} ~~ {
+	IF:	CellE E64E002F
+		DO:	SetState {GoToHebianToLibrary}
 	IF:	Always
-		DO:	SetOpt {EnableCombat} {true}
+		DO:	EmbedNav navTownNetworkToHebianTo {GoToHebianTo}
+~~ }
+STATE: {GoToHebianToLibrary} ~~ {
 	IF:	All
 			NavEmpty
-			NoMobsInDist 10
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
-		DO:	SetState {GoToTiatusOverseer}
-~~ }
-STATE: {LifestoneRecall} ~~ {
-	IF:	Expr {actiontryequipanywand[]==1}
-		DO:	DoAll
-				Chat {/mt cast lifestone sending}
-				SetWatchdog 5 3 {LifestoneRecall}
-				DoExpr {actiontryuseitem[wobjectgetopencontainer[]]}
-	IF:	IntoPortal
-		DO:	SetState {AllDone}
-~~ }
-STATE: {QuestProgressCheck} ~~ {
-	IF:	ItemCountGE 1 {Translated Orders for Zrikux}
-		DO:	SetState {LifestoneRecall}
-	IF:	CellE 00070143
-		DO:	SetState {GoToTownNetwork}
-	IF:	CellE 00070145
-		DO:	SetState {GoToLinvak}
-	IF:	CellE 585E0101
-		DO:	SetState {EnteredFalatacotDepot}
-	IF:	CellE 585E018E
-		DO:	SetState {KillingAndLootingZrikux}
-	IF:	CellE E54E010A
-		DO:	SetState {GoToHebianLibrary}
-	IF:	Always
-		DO:	SetState {RecallAphusLassel}
-~~ }
-STATE: {RecallAphusLassel} ~~ {
-	IF:	CellE F6820033
-		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontryequipanywand[]==1}
-		DO:	DoAll
-				Chat {/mt cast Recall Aphus Lassel}
-				SetWatchdog 3 3 {RecallAphusLassel}
-~~ }
-STATE: {SetupOptions} ~~ {
+			CellE E54E010A
+		DO:	SetState {TranslateOrders}
 	IF:	Always
 		DO:	DoAll
-				DoAll
-					SetOpt {EnableBuffing} {false}
-					SetOpt {EnableNav} {true}
-					SetOpt {EnableCombat} {false}
-					SetOpt {EnableLooting} {false}
-					SetOpt {LootFellowCorpses} {false}
-					SetOpt {NavCloseStopRange} {0.00833}
-					SetOpt {ApproachDistance} {0}
-					SetOpt {CorpseApproachRange-Min} {0}
-					SetOpt {CorpseApproachRange-Max} {0}
-					SetOpt {NavPriorityBoost} {true}
-					SetOpt {LootOnlyRares} {false}
-					SetOpt {IdlePeaceMode} {false}
-					DoExpr {setgvar[qfdp-toonsindungeon,0]}
-					DoExpr {setgvar[qfdp-toonsinprogress,0]}
-					DoExpr {setgvar[qfdp-toonsinfirstroom,0]}
-					DoExpr {setgvar[qfdp-toonsinsecondroom,0]}
-				EmbedNav nav10 { [None].nav}
-	IF:	SecsInStateGE 3
-		DO:	DoAll
-				SetState {QuestProgressCheck}
-				DoExpr {setgvar[qfdp-toonsinprogress,getgvar[qfdp-toonsinprogress]+1]}
+				SetOpt {OpenDoors} {true}
+				EmbedNav navGoToHebianToLibrary {GoToHebianToLibrary}
 ~~ }
 STATE: {TranslateOrders} ~~ {
 	IF:	Always
-		DO:	Chat {/mt give orders for zrikux to fanzen san the translator}
+		DO:	Chat {/ub give orders for zrikux to fanzen san the translator}
 	IF:	ChatMatch {Fanzen San the Translator gives you Translated Orders for Zrikux}
-		DO:	SetState {LifestoneRecall}
+		DO:	SetState {RecallLifestoneSending}
 	IF:	SecsInStateGE 3
 		DO:	SetState {TranslateOrders}
+~~ }
+STATE: {RecallLifestoneSending} ~~ {
+	IF:	IntoPortal
+		DO:	SetState {AllDone}
+	IF:	Expr {actiontrycastbyid[1636]}
+		DO:	DoAll
+				SetOpt {EnableLooting} {false}
+				SetOpt {EnableCombat} {false}
+				SetState {RecallLifestoneSending}
+~~ }
+STATE: {AllDone} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setgvar[qfdp-numcharsdone,getgvar[qfdp-numcharsdone]+1]}
+				ChatExpr {\/f Falatacot Depot Completed\! \(+getgvar[qfdp-numcharsdone]+\)}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
-NAV: nav0 circular ~~ {
+NAV: navNone once ~~ {
 ~~ }
-NAV: nav1 once ~~ {
+NAV: navGoToFalatacotDepot once ~~ {
 	pnt 28.2769333521525 -75.7116960525513 1.34203681945801
 	pnt 28.2769333521525 -75.7116960525513 1.34203681945801
 	pnt 28.2542172114054 -75.6644971211751 1.3284912109375
@@ -346,7 +367,7 @@ NAV: nav1 once ~~ {
 	pnt 29.3200104316076 -75.399471394221 1.58414166768392
 	ptl 28.2769333521525 -75.7116960525513 1.34203681945801 29.3053916652997 -75.390257914861 1.58516454696655 14 {Falatacot Depot}
 ~~ }
-NAV: nav2 once ~~ {
+NAV: navGoToForgeGuardian once ~~ {
 	pnt -31.5274955968062 -26.9166993618011 2.08333134651184E-05
 	pnt -31.5274955968062 -26.9166993618011 2.08333134651184E-05
 	pnt -31.4886747598648 -26.9161160310109 2.08333134651184E-05
@@ -378,7 +399,7 @@ NAV: nav2 once ~~ {
 	pnt -30.8155154546102 -26.9073315938314 2.08333134651184E-05
 	pnt -30.8004047393799 -26.9583127498627 2.08333134651184E-05
 ~~ }
-NAV: nav3 once ~~ {
+NAV: navTownNetworkToHebianTo once ~~ {
 	pnt -101.658333333333 -96.6833333333333 2.08333134651184E-05
 	pnt -101.642643896739 -96.6701383590698 2.08333134651184E-05
 	pnt -101.62142051061 -96.6532965977987 2.08333134651184E-05
@@ -393,7 +414,7 @@ NAV: nav3 once ~~ {
 	pnt -101.408489545186 -96.58474706014 2.08333134651184E-05
 	ptl -101.408489545186 -96.58474706014 2.08333134651184E-05 -101.408333333333 -96.5734279155731 -0.000262499845121056 14 {Portal to Hebian-To}
 ~~ }
-NAV: nav4 once ~~ {
+NAV: navGoToHebianToLibrary once ~~ {
 	pnt 82.6152976353963 -38.8833636601766 0.0803431669871012
 	pnt 82.6039419809977 -38.8922649383545 0.0769670089085897
 	pnt 82.5642661412557 -38.9208292643229 0.0703072388966878
@@ -427,7 +448,7 @@ NAV: nav4 once ~~ {
 	pnt 81.5975670178731 -39.1890907287598 0.0500208298365275
 	pnt 81.5884203910828 -39.2074238141378 0.0500208298365275
 ~~ }
-NAV: nav5 once ~~ {
+NAV: navTownNetworkToLinvakTukal once ~~ {
 	pnt -101.657915083567 -96.6814231872559 2.08333134651184E-05
 	pnt -101.658632119497 -96.6882947603861 2.08333134651184E-05
 	pnt -101.65938946406 -96.7021851857503 2.08333134651184E-05
@@ -443,7 +464,7 @@ NAV: nav5 once ~~ {
 	pnt -101.605344072978 -96.9713803609212 2.08333134651184E-05
 	ptl -101.658333333333 -96.6833333333333 2.08333134651184E-05 -101.590654182434 -96.9749624888102 -0.000262499845121056 14 {Portal to Linvak Tukal}
 ~~ }
-NAV: nav6 once ~~ {
+NAV: navGoToOutsideLinvakTukal once ~~ {
 	pnt 28.0303675969442 -77.7678325653076 2.33399251302083
 	pnt 28.0541190783183 -77.754637781779 2.33349278767904
 	pnt 28.0656548817952 -77.7440242290497 2.33340403238932
@@ -465,7 +486,7 @@ NAV: nav6 once ~~ {
 	pnt 27.9768845240275 -77.4172229131063 2.33452606201172
 	ptl 27.9768845240275 -77.4172229131063 2.33452606201172 27.9656729062398 -77.4100708643595 2.3337287902832 14 {Outside Linvak Tukal}
 ~~ }
-NAV: nav7 once ~~ {
+NAV: navGoToTiatusOverseer once ~~ {
 	pnt -30.8012554168701 -27.0018489042918 2.08333134651184E-05
 	pnt -30.8012554168701 -27.0018489042918 2.08333134651184E-05
 	pnt -30.7965346018473 -27.0888470967611 2.08333134651184E-05
@@ -496,12 +517,12 @@ NAV: nav7 once ~~ {
 	pnt -30.2694787343343 -27.1097055753072 2.08333134651184E-05
 	pnt -30.2663678487142 -27.0500033378601 2.08333134651184E-05
 ~~ }
-NAV: nav8 once ~~ {
-	pnt 95.4566537857056 2.25641563733419 0.24168750445048
-	pnt 95.456803448995 2.30078721046448 0.24168750445048
-	ptl 95.456803448995 2.30078721046448 0.24168750445048 95.4555708567301 2.31398749351501 0.242491692304611 14 {Portal to Town Network}
+NAV: navAphusLasselToTownNetwork once ~~ {
+	pnt 95.4570833206177 2.25772916475932 0.24168750445048
+	pnt 95.4576747258504 2.30202283859253 0.242775011062622
+	ptl 95.4576747258504 2.30202283859253 0.242775011062622 95.4555708567301 2.31398749351501 0.242491692304611 14 {Portal to Town Network}
 ~~ }
-NAV: nav9 once ~~ {
+NAV: navGoToZrikux once ~~ {
 	pnt -30.2589040120443 -27.0128491560618 2.08333134651184E-05
 	pnt -30.2589040120443 -27.0128491560618 2.08333134651184E-05
 	pnt -30.2596961975098 -26.9679909706116 2.08333134651184E-05
@@ -532,6 +553,4 @@ NAV: nav9 once ~~ {
 	pnt -29.8211859385173 -27.2083401679993 2.08333134651184E-05
 	pnt -29.8376134236654 -27.2116664250692 2.08333134651184E-05
 	pnt -29.8655724843343 -27.2191162745158 2.08333134651184E-05
-~~ }
-NAV: nav10 once ~~ {
 ~~ }
