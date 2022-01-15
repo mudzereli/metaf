@@ -121,6 +121,7 @@ STATE: {QuestProgressCheck} ~~ {
 	IF:	Any
 			CellE 5867014C
 			CellE 5867013D
+			CellE 58670146
 		DO:	SetState {KillingAndLootingSimulacrum}
 	IF:	Always
 		DO:	SetState {RecallAphusLassel}
@@ -235,6 +236,7 @@ STATE: {GoToJump2} ~~ {
 		DO:	DoAll
 				SetOpt {EnableCombat} {false}
 				EmbedNav navGoToJump2 {GoToJump2}
+				SetWatchdog 3 10 {GoToJump2}
 ~~ }
 STATE: {GoToJumpPuzzle} ~~ {
 	IF:	Always
@@ -365,6 +367,8 @@ STATE: {GoToCurator} ~~ {
 		DO:	EmbedNav navGoToCurator {GoToCurator}
 ~~ }
 STATE: {KillingAndLootingSimulacrum} ~~ {
+	IF: Always
+		DO:	ClearWatchdog
 	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToDelegateJump}
 	IF:	All
@@ -375,6 +379,7 @@ STATE: {KillingAndLootingSimulacrum} ~~ {
 		DO:	DoAll
 				Chat {/ub delay 2000 /mt usep simulacrum shifter}
 				Chat {/ub delay 4000 /mt lootp door key}
+				SetWatchdog 5 30 {KillingAndLootingSimulacrum}
 	IF:	SecsInStateGE 180
 		DO:	DoAll
 				EmbedNav navTriggerSimulacrumSpawn {TriggerSimulacrumSpawn}
