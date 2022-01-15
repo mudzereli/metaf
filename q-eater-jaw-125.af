@@ -48,6 +48,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableBuffing} {true}
 				SetOpt {EnableCombat} {false}
+				Chat {/myquests}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -56,20 +57,21 @@ STATE: {QuestProgressCheck} ~~ {
 			Expr {getqueststatus[upperinsatiablejaw]==0}
 		DO:	SetState {RecallLifestoneSending}
 	IF:	All
-			Not ItemCountGE 1 {Upper Insatiable Eater Jaw}
-			ItemCountGE 1 {Insatiable Eater Jaw}
-			CellE 00070145
-		DO:	SetState {GoToFiunOutpost}
-	IF:	All
 			CellE 23DA002C
-			ItemCountGE 1 {Insatiable Eater Jaw}
 			ItemCountGE 1 {Upper Insatiable Eater Jaw}
 		DO:	SetState {GoToClemenza}
 	IF:	All
-			ItemCountGE 1 {Insatiable Eater Jaw}
-			ItemCountGE 1 {Upper Insatiable Eater Jaw}
 			CellE 00070145
+			ItemCountGE 1 {Upper Insatiable Eater Jaw}
 		DO:	SetState {GoToWestwatch}
+	IF:	All
+			CellE 38F7001B
+			ItemCountGE 1 {Insatiable Eater Jaw}
+		DO:	SetState {GoToFiunRehlyun}
+	IF:	All
+			CellE 00070145
+			ItemCountGE 1 {Insatiable Eater Jaw}
+		DO:	SetState {GoToFiunOutpost}
 	IF:	All
 			NavEmpty
 			CellE 0096013D
@@ -90,24 +92,20 @@ STATE: {QuestProgressCheck} ~~ {
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
-	IF: CellE F6820033
+	IF:	IntoPortal
 		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontryequipanywand[]>=0}
-		DO:	DoAll
-				Chat {/mt cast Recall Aphus Lassel}
-				SetWatchdog 3 3 {RecallAphusLassel}
+	IF:	Expr {actiontrycastbyid[2931]}
+		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	All
-			Not ItemCountGE 1 {Upper Insatiable Eater Jaw}
-			ItemCountGE 1 {Insatiable Eater Jaw}
-			CellE 00070145
-		DO:	SetState {GoToFiunOutpost}
-	IF:	All
-			ItemCountGE 1 {Insatiable Eater Jaw}
 			ItemCountGE 1 {Upper Insatiable Eater Jaw}
 			CellE 00070145
 		DO:	SetState {GoToWestwatch}
+	IF:	All
+			ItemCountGE 1 {Insatiable Eater Jaw}
+			CellE 00070145
+		DO:	SetState {GoToFiunOutpost}
 	IF:	CellE 00070145
 		DO:	SetState {GoToHoltburg}
 	IF:	Always
@@ -128,7 +126,7 @@ STATE: {GoToPortalBot} ~~{
 STATE: {SummonPortal} ~~{
 	IF:	CellE 00960321
 		DO:	SetState {GoToBottomOfInsatiableVault}
-	IF:	Always
+	IF:	Expr {getfellowshipstatus[]==0||getfellowshipisleader[]==1}
 		DO:	DoAll
 				Chat {/say jaw}
 				Chat {/vt echo ---Wait for Gateway and then use it!!---}
@@ -151,8 +149,12 @@ STATE: {GoToJawSpawn} ~~{
 ~~}
 STATE: {GettingEaterJaws} ~~{
 	IF:	All
-			ItemCountGE 1 {Insatiable Eater Jaw}
-			ItemCountGE 1 {Upper Insatiable Eater Jaw}
+			Any
+				Expr {getqueststatus[insatiableeaterjaw]==0}
+				ItemCountGE 1 {Insatiable Eater Jaw}
+			Any
+				ItemCountGE 1 {Upper Insatiable Eater Jaw}
+				Expr {getqueststatus[upperinsatiablejaw]==0}
 		DO:	SetState {RecallAphusLassel}
 	IF:	Always
 		DO:	DoAll
@@ -160,10 +162,7 @@ STATE: {GettingEaterJaws} ~~{
 				SetOpt {EnableLooting} {true}
 ~~}
 STATE: {GoToWestwatch} ~~{
-	IF:	All
-			CellE 23DA002C
-			ItemCountGE 1 {Insatiable Eater Jaw}
-			ItemCountGE 1 {Upper Insatiable Eater Jaw}
+	IF:	CellE 23DA002C
 		DO:	SetState {GoToClemenza}
 	IF:	Always
 		DO:	EmbedNav navTownNetworkToWestwatch {TownNetworkToWestwatch}
@@ -176,10 +175,12 @@ STATE: {GoToClemenza} ~~{
 ~~}
 STATE: {GiveEaterJawToClemenza} ~~{
 	IF:	ItemCountGE 1 {Upper Insatiable Eater Jaw}
-		DO:	Chat {/ub givep eater jaw to Clemenza}
+		DO:	Chat {/ub give Upper Insatiable Eater Jaw to Clemenza}
 	IF:	All
 			Not ItemCountGE 1 {Upper Insatiable Eater Jaw}
-			ItemCountGE 1 {Insatiable Eater Jaw}
+			Not ItemCountGE 1 {Insatiable Eater Jaw}
+		DO:	SetState {RecallLifestoneSending}
+	IF:	Not ItemCountGE 1 {Upper Insatiable Eater Jaw}
 		DO:	SetState {RecallAphusLassel}
 ~~}
 STATE: {GoToFiunOutpost} ~~{
@@ -196,22 +197,24 @@ STATE: {GoToFiunRehlyun} ~~{
 ~~}
 STATE: {GiveEaterJawToFiunRehlyun} ~~{
 	IF:	ItemCountGE 1 {Insatiable Eater Jaw}
-		DO:	Chat {/ub givep eater jaw to Fiun Rehlyun}
+		DO:	Chat {/ub givep Insatiable Eater Jaw to Fiun Rehlyun}
 	IF:	All
 			Not ItemCountGE 1 {Upper Insatiable Eater Jaw}
 			Not ItemCountGE 1 {Insatiable Eater Jaw}
+		DO:	SetState {RecallLifestoneSending}
+
+	IF:	Not ItemCountGE 1 {Insatiable Eater Jaw}
 		DO:	SetState {RecallLifestoneSending}
 ~~}
 STATE: {RecallLifestoneSending} ~~ {
 	IF:	IntoPortal
 		DO:	SetState {AllDone}
-	IF:	Expr {actiontryequipanywand[]>=0}
+	IF:	Expr {actiontrycastbyid[1636]}
 		DO:	DoAll
 				SetOpt {EnableLooting} {false}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableNav} {false}
-				Chat {/mt cast lifestone sending}
-				SetWatchdog 3 3 {RecallLifestoneSending}
+				SetState {RecallLifestoneSending}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
