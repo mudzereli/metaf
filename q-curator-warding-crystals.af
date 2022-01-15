@@ -37,40 +37,59 @@
 ~~		prt (deprecated in VTank)														
 ~~ }																					
 
-STATE: {*SetupOptions} ~~ {
-	IF:	Always
-		DO:	DoAll
-				Chat {/f #action follow}
-				Chat {/bc /vt opt set NavCloseStopRange 0.00833}
-				Chat {/bc /vt opt set EnableNav true}
-				Chat {/bc /vt opt set EnableLooting true}
-				Chat {/bc /vt opt set NavPriorityBoost true}
-				Chat {/bc /vt opt set AttackDistance 0.063}
-	IF:	SecsInStateGE 1
-		DO:	DoAll
-				SetOpt {NavPriorityBoost} {false}
-				SetOpt {AttackDistance} {0.029}
-				SetState {CheckLocation}
-				SetOpt {NavCloseStopRange} {0.003}
-~~ }
-STATE: {CheckLocation} ~~ {
-	IF:	CellE 2C32003D
-		DO:	SetState {GoTo-1-RunUpHill}
-~~ }
 STATE: {Default} ~~ {
 	IF:	Always
 		DO:	SetState {*SetupOptions}
 ~~ }
-STATE: {GoTo-1-RunUpHill} ~~ {
+STATE: {*SetupOptions} ~~ {
 	IF:	Always
+		DO:	DoExpr {setvar[qrtw-leader,`Porkchop`]}
+	IF:	Not Expr {getcharstringprop[1]==getvar[qrtw-leader]}
+		DO:	DoAll
+				SetOpt {NavPriorityBoost} {true}
+				SetOpt {AttackDistance} {0.063}
+				ChatExpr {\/ub follow +getvar[qrtw-leader]}
+	IF:	Expr {getcharstringprop[1]==getvar[qrtw-leader]}
+		DO:	DoAll
+				SetOpt {NavPriorityBoost} {false}
+				SetOpt {AttackDistance} {0.029}
+				SetOpt {NavCloseStopRange} {0.003}
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableNav} {true}
+				SetOpt {EnableLooting} {true}
+				SetOpt {NavCloseStopRange} {0.003}
+				SetState {CheckLocation}
+~~ }
+STATE: {CheckLocation} ~~ {
+	IF:	Not Expr {getcharstringprop[1]==getvar[qrtw-leader]}
+		DO:	SetState {WaitingOnLeader}
+	IF:	CellE 2C32003D
+		DO:	SetState {GoTo-1-RunUpHill}
+~~ }
+STATE: {WaitingOnLeader} ~~ {
+	IF:	Always
+		DO:	ChatExpr {\/ub follow +getvar[qrtw-leader]}
+	IF: Expr {getgvar[qrtw-jump1]==1&&getvar[qrtw-jump1]!=1}
+		DO:	SetState {GoTo-2-PlatformJump}
+~~ }
+STATE: {GoTo-1-RunUpHill} ~~ {
+	IF:	Expr {getcharstringprop[1]==getvar[qrtw-leader]}
 		DO:	EmbedNav nav0 {qrtw-plains-to-catacombs.nav}
 	IF:	NavEmpty
 		DO:	SetState {GoTo-2-PlatformJump}
 ~~ }
 STATE: {GoTo-2-PlatformJump} ~~ {
-	IF:	Always
+	IF:	Expr {getcharstringprop[1]==getvar[qrtw-leader]}
 		DO:	EmbedNav nav1 {qrtw-catacombs-to-jump.nav}
 	IF:	All
+			Expr {getcharstringprop[1]==getvar[qrtw-leader]}
+			NavEmpty
+			NoMobsInDist 15
+		DO:	DoExpr {setgvar[qrtw-jump1,1]}
+	IF:	All
+			Expr {getgvar[qrtw-jump1,1]}
 			NavEmpty
 			NoMobsInDist 15
 		DO:	DoAll
@@ -78,6 +97,10 @@ STATE: {GoTo-2-PlatformJump} ~~ {
 				SetState {GoTo-3-JumpToTorment}
 ~~ }
 STATE: {GoTo-3-JumpToTorment} ~~ {
+	IF: Expr {getcharstringprop[1]!=getvar[qrtw-leader]}
+		DO:	DoAll
+				DoExpr {setvar[qrtw-jump1,1]}
+				SetState {WaitingOnLeader}
 	IF:	NavEmpty
 		DO:	DoAll
 				Chat {/f #action follow}
