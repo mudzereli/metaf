@@ -127,13 +127,14 @@ STATE: {QuestProgressCheck} ~~ {
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
-	IF:	CellE F6820033
+	IF:	Any
+			IntoPortal
+			CellE F6820033
 		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontryequipanywand[]>=0}
+	IF:	Expr {actiontrycastbyid[2931]}
 		DO:	DoAll
-				Chat {/mt cast Recall Aphus Lassel}
 				SetOpt {EnableCombat} {false}
-				SetWatchdog 3 3 {RecallAphusLassel}
+				SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	CellE 00070145
