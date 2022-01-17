@@ -60,6 +60,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {CorpseApproachRange-Min} {0}
 				SetOpt {CorpseApproachRange-Max} {0}
 				DoExpr {cleargvar[qlou-lever2pulled]}
+				DoExpr {setgvar[qlou-numcharsdone,0]}
 				EmbedNav navNone {None}
 				SetState {QuestProgressCheck}
 ~~ }
@@ -400,10 +401,14 @@ STATE: {GoToDelegateJump} ~~ {
 STATE: {GoToDelegate} ~~ {
 	IF:	Always
 		DO:	EmbedNav navGoToDelegate {GoToDelegate}
+	IF:	NavEmpty
+		DO:	SetState {AllDone}
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
-		DO:	Chat {/f Virindi Rescue Completed!}
+		DO:	DoAll
+				DoExpr {setgvar[qlou-numcharsdone,getgvar[qlou-numcharsdone]+1]}
+				ChatExpr {\/f Liberation of Uziz Completed\! \(+getgvar[qlou-numcharsdone]+\)}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
