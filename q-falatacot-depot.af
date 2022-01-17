@@ -61,6 +61,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qfdp-toonsinfirstroom,0]}
 				DoExpr {setgvar[qfdp-toonsinsecondroom,0]}
 				DoExpr {setgvar[qfdp-numcharsdone,0]}
+				DoExpr {setvar[qfdp-waitingatfirstroom,0]}
 				EmbedNav navNone {None}
 	IF:	SecsInStateGE 3
 		DO:	DoAll
@@ -160,15 +161,20 @@ STATE: {GoToForgeGuardian} ~~ {
 	~~ wait for everyone else
 	IF:	All
 			CellE 585E0138
-			Not Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}		
+			Not Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}
+			Expr {setvar[qfdp-waitingatfirstroom,1]}
 		DO:	DoAll
 				SetOpt {EnableNav} {false}
 				DoExpr {setgvar[qfdp-toonsinfirstroom,getgvar[qfdp-toonsinfirstroom]+1]}
 	~~ everyone's here lets go!
-	IF:	Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}
+	IF:	All
+			Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}
+			Expr {getvar[qfdp-waitingatfirstroom]==1}
 		DO:	SetOpt {EnableNav} {true}
 	~~ kill him once everyone is done with their nav
-	IF:	NavEmpty
+	IF:	Any
+			NavEmpty
+			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
 		DO:	SetState {KillingForgeGuardian}
 ~~ }
 STATE: {KillingForgeGuardian} ~~ {
