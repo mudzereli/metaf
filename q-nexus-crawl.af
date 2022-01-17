@@ -58,7 +58,7 @@ STATE: {*SetupOptions*} ~~ {
 					DoExpr {setgvar[qnxc-numtoonsinprogress,0]}
 					DoExpr {setgvar[qnxc-numcharsdone,0]}
 				EmbedNav navNone {navNone}
-				DoExpr {listadd[getvar[qnxc-portalsummoners],`Dan K Memes`]}
+				~~DoExpr {listadd[getvar[qnxc-portalsummoners],`Dan K Memes`]}
 				DoExpr {listadd[getvar[qnxc-portalsummoners],`Porkchop`]}
 	IF:	SecsInStateGE 3
 		DO:	DoAll
