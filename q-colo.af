@@ -58,7 +58,9 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
 				DoExpr {setgvar[qcolo-numcharswaiting,0]}
 				DoExpr {setvar[qcolo-started,0]}
-	IF:	SecsInStateGE 5
+	IF:	All
+			SecsInStateGE 3
+			Expr {getfellowshipcount[]>=3}
 		DO:	DoAll
 				DoExpr {setgvar[qcolo-numchars,getgvar[qcolo-numchars]+1]}
 				SetState {ProgressCheck}
