@@ -145,12 +145,10 @@ STATE: {GoToOmarah} ~~ {
 		DO:	SetState {TurnInEssence}
 ~~ }
 STATE: {RecallPortal} ~~ {
-	IF:	Expr {actiontryequipanywand[]==1}
-		DO:	DoAll
-				DoExpr {actiontrycastbyid[2645]}
-				SetWatchdog 3 3 {RecallPortal}
 	IF:	IntoPortal
 		DO:	SetState {QuestProgressCheck}
+	IF:	Expr {actiontrycastbyid[2645]}
+		DO:	SetState {RecallPortal}
 ~~ }
 STATE: {GoToVRF} ~~ {
 	IF:	CellE 56550318
