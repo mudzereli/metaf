@@ -235,17 +235,37 @@ STATE: {WaitingForGroupApostateMaster} ~~ {
 ~~ }
 STATE: {KillingApostateMaster} ~~ {
 	IF:	Always
-		DO:	SetOpt {EnableCombat} {true}
-	IF:	Expr {getobjectinternaltype[wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]] == 7}
-		DO:	EmbedNav navLootApostateNexusMaster {LootApostateNexusMaster}
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
+	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {RunningToEnd}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]}
+		DO:	SetState {LootingApostateMaster}
+~~ }
+STATE: {LootingApostateMaster} ~~ {
+	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {RunningToEnd}
 	IF:	ItemCountGE 1 {Aetherium Vault Key}
+		DO:	SetState {UnlockAndOpenFinalDoor}
+	IF:	Not Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]}
+		DO: SetState {KillingApostateMaster}
+	IF:	Expr {wobjectgetopencontainer[]}
+		DO:	DoAll
+				Chat {/ub use Aetherium Vault Key}
+				SetWatchdog 3 15 {LootingApostateMaster}
+	IF:	Not Expr {wobjectgetopencontainer[]}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[wobjectgetopencontainer[]]}
+				SetWatchdog 3 15 {LootingApostateMaster}
+~~ }
+STATE: {UnlockAndOpenFinalDoor} ~~ {
+	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {RunningToEnd}
+	IF:	Always
 		DO:	DoAll
 				EmbedNav navUnlockAndOpenFinalDoor {UnlockAndOpenFinalDoor}
-				SetWatchdog 3 15 {KillingApostateMaster}
-	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
-		DO:	SetState {RunningToEnd}
-	IF:	SecsInStateGE 90
-		DO:	SetState {KillingApostateMaster}
+				SetWatchdog 3 6 {UnlockAndOpenFinalDoor}
 ~~ }
 STATE: {RunningToEnd} ~~ {
 	IF:	All
@@ -302,14 +322,6 @@ NAV: navTownNetworkToZaikhal once ~~ {
 	pnt -101.844133337339 -96.6251447677612 2.08333134651184E-05
 	pnt -101.907621073723 -96.5826029936473 2.08333134651184E-05
 	ptl -101.907610054811 -96.5823128223419 2.08333134651184E-05 -101.90858749946 -96.5742208321889 -0.000262499845121056 14 {Portal to Zaikhal}
-~~ }
-NAV: navLootApostateNexusMaster once ~~ {
-	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
-	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/ub usel Corpse of Apostate Nexus Master}
-	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
-	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
-	cht -0.307584043343862 -100.814586671193 0.0250208338101705 {/ub use Aetherium Vault Key}
-	pau -0.307584043343862 -100.814586671193 0.0250208338101705 2000
 ~~ }
 NAV: navUnlockAndOpenFinalDoor once ~~ {
 	pnt -0.308091974258423 -100.815521844228 0.0250208338101705
