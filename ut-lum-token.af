@@ -40,8 +40,8 @@
 STATE: {Default} ~~{
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[TokenName,`Token of the Aura of Valor`]}
-				DoExpr {setvar[TokenNPC,`Nalicana`]}
+				DoExpr {setvar[TokenName,`Dark Falatacot Token of the Aura of Destruction`]}
+				DoExpr {setvar[TokenNPC,`Ka'hiri`]}
 	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
 		DO:	SetState {TurnInToken}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<5}
