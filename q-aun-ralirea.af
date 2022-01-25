@@ -49,7 +49,9 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableLooting} {false}
 				SetOpt {EnableNav} {true}
 	IF:	Always
-		DO:	DoExpr {setvar[qrlf-chat-channel,`cg`}
+		DO:	DoExpr {setvar[qrlf-chat-channel,`cg`]}
+	IF: Expr {getfellowshipcount[]>0}
+		DO:	DoExpr {setvar[qrlf-chat-channel,`f`]}
 	IF:	Always
 		DO:	SetState {QuestProgressCheck}
 ~~ }
