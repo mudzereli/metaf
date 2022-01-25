@@ -240,7 +240,7 @@ STATE: {KillingApostateMaster} ~~ {
 				SetOpt {EnableLooting} {false}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {RunningToEnd}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]!=0}
 		DO:	SetState {LootingApostateMaster}
 ~~ }
 STATE: {LootingApostateMaster} ~~ {
@@ -248,15 +248,15 @@ STATE: {LootingApostateMaster} ~~ {
 		DO:	SetState {RunningToEnd}
 	IF:	ItemCountGE 1 {Aetherium Vault Key}
 		DO:	SetState {UnlockAndOpenFinalDoor}
-	IF:	Not Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]}
+	IF: Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]==0}
 		DO: SetState {KillingApostateMaster}
-	IF:	Expr {wobjectgetopencontainer[]}
+	IF:	Expr {wobjectgetopencontainer[]!=0}
 		DO:	DoAll
 				Chat {/ub use Aetherium Vault Key}
 				SetWatchdog 3 15 {LootingApostateMaster}
-	IF:	Not Expr {wobjectgetopencontainer[]}
+	IF:	Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
-				DoExpr {actiontryuseitem[wobjectgetopencontainer[]]}
+				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]]}
 				SetWatchdog 3 15 {LootingApostateMaster}
 ~~ }
 STATE: {UnlockAndOpenFinalDoor} ~~ {
