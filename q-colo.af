@@ -53,11 +53,13 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableNav} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {EnableBuffing} {false}
-				DoExpr {setgvar[qcolo-numchars,0]}
 				DoExpr {setgvar[qcolo-looping,0]}
+				DoExpr {setgvar[qcolo-numchars,0]}
 				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
 				DoExpr {setgvar[qcolo-numcharswaiting,0]}
-				DoExpr {setvar[qcolo-started,0]}
+				DoExpr {setgvar[qcolo-numcharsreadyforturnin,0]}
+				DoExpr {setgvar[qcolo-fellowlocked,0]}
+				~~DoExpr {setvar[qcolo-started,0]}
 	IF:	All
 			SecsInStateGE 3
 			Expr {getfellowshipcount[]>=3}
@@ -68,10 +70,6 @@ STATE: {*SetupOptions*} ~~ {
 STATE: {ProgressCheck} ~~ {
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[37,Arena Bell] && coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[37,Arena Bell]]] <= 25}
 		DO:	SetState {StartCurrentRoom}
-	IF:	All
-			BlockE 00AF0000
-			Expr {getvar[qcolo-started]==1}
-		DO:	SetState {WaitingForRewards}
 	IF:	BlockE 00AF0000
 		DO:	SetState {WaitingForStart}
 	IF:	Always
@@ -98,46 +96,40 @@ STATE: {WaitingForStart} ~~ {
 				SetOpt {NavCloseStopRange} {0.008333}
 				SetOpt {PetRangeMode} {1}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
-				DoExpr {setvar[qcolo-started,0]}
-				DoExpr {setgvar[qcolo-fellowlocked,0]}
 				DoExpr {setgvar[qcolo-numcharswaiting,getgvar[qcolo-numcharswaiting]+1]}
 	~~ this condition puts you back into the arena if you reload the script after leaving
-	IF:	All
-			ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
-			Expr {getvar[qcolo-started]==0}
+	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
 		DO:	DoAll
-				SetState {BuffingBeforeRun}
 				DoExpr {setvar[qcolo-started,1]}
+				SetState {EnterFirstRoom}
 	~~ this condition will automatically start the next run if qcolo-looping is set to 1
 	IF:	All
-			Expr {getgvar[qcolo-looping]==1}
 			ItemCountGE 1 {Colosseum Ticket}
-			SecsInStateGE 90
+			Expr {getgvar[qcolo-looping]==1}
 			Expr {getgvar[qcolo-numcharswaiting]>=getgvar[qcolo-numchars]}
+			SecsInStateGE 90
 		DO:	SetState {GettingATicket}
 	~~ this condition triggers when the ticket holder receives a ticket stub
 	IF:	Any
 			Expr {getgvar[qcolo-fellowlocked]==1}
 			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
-		DO:	SetState {BuffingBeforeRun}
+		DO:	SetState {EnterFirstRoom}
 	~~ this condition is used to manually start the script [!startl in fellow] (with looping)
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!startl\"}
 		DO:	DoAll
-				SetState {GettingATicket}
 				DoExpr {setgvar[qcolo-looping,1]}
+				SetState {GettingATicket}
 	~~ this condition is used to manually start the script [!start in fellow] (without looping)
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!start\"}
 		DO:	SetState {GettingATicket}
 ~~ }
 STATE: {GettingATicket} ~~ {
 	~~ if we get a ticket stub, start buffing and notify clients that it was received
-	IF:	All
-			ItemCountGE 1 {Colosseum Ticket Stub}
-			Expr {getvar[qcolo-started]==0}
+	IF:	ItemCountGE 1 {Colosseum Ticket Stub}
 		DO:	DoAll
 				DoExpr {setgvar[qcolo-fellowlocked,1]}
 				Chat {/f Received a Colosseum Ticket Stub. Enter the first room and start buffing!}
-				SetState {BuffingBeforeRun}
+				SetState {EnterFirstRoom}
 	~~ if we have a ticket but no stub, try to get a ticket
 	IF:	All
 			ItemCountGE 1 {Colosseum Ticket}
@@ -152,28 +144,32 @@ STATE: {GettingATicket} ~~ {
 			ChatMatch {^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"}
 		DO:	SetState {GettingATicket}
 ~~ }
-STATE: {BuffingBeforeRun} ~~ {
+STATE: {EnterFirstRoom} ~~ {
 	~~ first lets go into the arena, so that we can start our timer
 	IF:	NavEmpty
 		DO: DoAll
+				DoExpr {setvar[qcolo-started,1]}
 				Chat {/ub usel Advanced Colosseum Arena}
-				SetWatchdog 3 3 {BuffingBeforeRun}
+				SetWatchdog 3 3 {EnterFirstRoom}
 	~~ ok we zoned into the arena, and we're actually going to start buffing
 	IF:	Any
 			IntoPortal
 			ExitPortal
+		DO:	SetState {BuffingBeforeRun}
+~~ }
+STATE: {BuffingBeforeRun} ~~ {
+	~~ first lets go into the arena, so that we can start our timer
+	IF:	Always
 		DO:	DoAll
-				ClearWatchdog
 				Chat {/vt forcebuff}
 				SetOpt {EnableBuffing} {true}
-				DoExpr {setgvar[qcolo-numcharswaiting,0]}
 	~~ if we've been buffing for 3 minutes, or we finished by casting Blackmoor's Favor, then we're good to go.. probably
 	IF:	Any
 			SecsInStateGE 180
 			ChatMatch {^You cast Blackmoor.*s Favor on yourself}
 		DO:	DoExpr {setgvar[qcolo-numcharsbuffed,getgvar[qcolo-numcharsbuffed]+1]}
 	~~ if everyones probably good to go.. then lets go
-	IF:	Expr {getgvar[qcolo-numcharsbuffed]>=getgvar[qcolo-numchars]}
+	IF:	Expr {getgvar[qcolo-numcharsbuffed]>=getgvar[qcolo-numcharswaiting]}
 		DO:	SetState {StartFirstRoom}
 ~~ }
 STATE: {StartFirstRoom} ~~ {
@@ -184,9 +180,6 @@ STATE: {StartFirstRoom} ~~ {
 				SetOpt {EnableCombat} {true}
 				SetOpt {NavCloseStopRange} {0.02}
 				SetOpt {ApproachDistance} {0.02}
-				DoExpr {setvar[qcolo-started,1]}
-				DoExpr {setgvar[qcolo-fellowlocked,0]}
-				~~DoExpr {setgvar[qcolo-numcharsbuffed,0]}
 				Chat {/myquests}
 				SetState {StartCurrentRoom}
 ~~ }
@@ -231,30 +224,12 @@ STATE: {MoveToNextRoomInPortal} ~~ {
 	IF:	ExitPortal
 		DO:	SetState {StartCurrentRoom}
 ~~ }
-STATE: {TurnInRewards} ~~ {
-	~~ this actually gets us the reward
-	IF:	Always
-		DO:	DoAll
-				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
-				DoExpr {setvar[qcolo-started,0]}
-	~~ once we get our rewards, go figure out what to do
-	IF:	ChatMatch {You\'ve earned .* experience\.}
-		DO:	SetState {ProgressCheck}
-	~~ if we think we're done but we're not, well keep on going.
-	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
-		DO:	SetState {StartFirstRoom}
-	~~ if we thought we did colo, but we actually didnt.. time for a fresh start
-	IF:	ChatMatch {Master Arbitrator tells you\, \"If you wish to fight as a gladiator in the Arena}
-		DO:	SetState {WaitingForStart}
-~~ }
 STATE: {WaitingForRewards} ~~ {
 	~~ if we started colo and we're at this step, then lets see if we're ready for turn in
-	IF:	Expr {getvar[qcolo-started]==1}
+	IF:	Always
 		DO:	Chat {/myquests}
 	~~ keep checking every 30 seconds
-	IF:	All
-			SecsInStateGE 30
-			Expr {getvar[qcolo-started]==1}
+	IF:	SecsInStateGE 30
 		DO:	SetState {WaitingForRewards}
 	~~ if all our flags are good, we can finally turn in!
 	IF:	All
@@ -264,8 +239,33 @@ STATE: {WaitingForRewards} ~~ {
 			Expr {getqueststatus[coloarenathreeaccess]}
 			Expr {getqueststatus[coloarenafouraccess]}
 			Expr {getqueststatus[coloarenafiveaccess]}
-			Expr {getvar[qcolo-started]==1}
+		DO:	SetState {ReadyToTurnInRewards}
+~~ }
+STATE: {ReadyToTurnInRewards} ~~ {
+	IF:	Always
+		DO:	DoExpr {setgvar[qcolo-numcharsreadyforturnin,getgvar[qcolo-numcharsreadyforturnin]+1]}
+	IF:	Expr {getgvar[qcolo-numcharsreadyforturnin]>=getgvar[qcolo-numchars]}
 		DO:	SetState {TurnInRewards}
+~~ }
+STATE: {TurnInRewards} ~~ {
+	~~ this actually gets us the reward
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
+				DoExpr {setgvar[qcolo-numcharswaiting,0]}
+				DoExpr {setgvar[qcolo-numcharsreadyforturnin,0]}
+				DoExpr {setgvar[qcolo-fellowlocked,0]}
+				DoExpr {setvar[qcolo-started,0]}
+				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
+	~~ once we get our rewards, go figure out what to do
+	IF:	ChatMatch {You\'ve earned .* experience\.}
+		DO:	SetState {ProgressCheck}
+	~~ if we think we're done but we're not, well keep on going.
+	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
+		DO:	SetState {EnterFirstRoom}
+	~~ if we thought we did colo, but we actually didnt.. time for a fresh start
+	IF:	ChatMatch {Master Arbitrator tells you\, \"If you wish to fight as a gladiator in the Arena}
+		DO:	SetState {WaitingForStart}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
