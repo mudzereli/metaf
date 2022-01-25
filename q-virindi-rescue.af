@@ -178,12 +178,22 @@ STATE: {GoToFirstJailor} ~~ {
 STATE: {OpeningFirstDoor} ~~ {
 	IF:	Always
 		DO:	SetOpt {EnableLooting} {true}
+	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,^Door]]}
+		DO:	SetState {GoToSecondJailor}
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
 				EmbedNav navOpenFirstDoor {navOpenFirstDoor}
 				SetWatchdog 3 15 {OpeningFirstDoor}
-	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,^Door]]}
-		DO:	SetState {GoToSecondJailor}
+	IF: Expr {wobjectgetopencontainer[]!=0}
+		DO:	DoAll
+				Chat {/ub use Virindi Prison Key}
+				SetWatchdog 3 15 {OpeningFirstDoor}
+	IF: All
+			Expr {wobjectfindnearestbynameandobjectclass[27,Virindi Jailor]!=0}
+			Expr {wobjectgetopencontainer[]==0}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,Virindi Jailor]]}
+				SetWatchdog 3 15 {OpeningFirstDoor}
 ~~ }
 STATE: {GoToSecondJailor} ~~ {
 	IF:	CellE 56550392
