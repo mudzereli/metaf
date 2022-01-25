@@ -108,7 +108,7 @@ STATE: {TurningInItem} ~~ {
 STATE: {DoneTurningIn} ~~ {
 	IF:	ChatMatch {^You\'ve earned .* experience\.}
 		DO:	DoAll
-				Chat {/ub jumpx 250}
+				Chat {/ub jumpx}
 				Chat {/mt fellow quit}
 				Chat {/say Done turning in Translated Orders for Zrikux!}
 				SetState {DropItems}
