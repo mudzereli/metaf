@@ -123,7 +123,7 @@ STATE: {QuestProgressCheck} ~~ {
 			CellE 5867014C
 			CellE 5867013D
 			CellE 58670146
-		DO:	SetState {KillingAndLootingSimulacrum}
+		DO:	SetState {KillingSimulacrum}
 	IF:	Always
 		DO:	SetState {RecallAphusLassel}
 ~~ }
@@ -364,33 +364,47 @@ STATE: {GoToCurator} ~~ {
 			Any
 				CellE 5867014C
 				CellE 5867013D
-		DO:	SetState {KillingAndLootingSimulacrum}
+		DO:	SetState {KillingSimulacrum}
 	IF:	NavEmpty
 		DO:	EmbedNav navGoToCurator {GoToCurator}
 ~~ }
-STATE: {KillingAndLootingSimulacrum} ~~ {
-	IF: Always
-		DO:	ClearWatchdog
-	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
-		DO:	SetState {GoToDelegateJump}
-	IF:	All
-			ItemCountGE 1 {Door Key}
-			NoMobsInDist 5
-		DO:	EmbedNav navUnlockFinalDoor {UnlockFinalDoor}
-	IF:	Expr {getobjectinternaltype[wobjectfindnearestbynameandobjectclass[27,Simulacrum Shifter]] == 7}
+STATE: {KillingSimulacrum} ~~ {
+	IF:	Always
 		DO:	DoAll
-				Chat {/ub delay 2000 /mt usep simulacrum shifter}
-				Chat {/ub delay 4000 /mt lootp door key}
-				SetWatchdog 5 30 {KillingAndLootingSimulacrum}
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
+	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {GoToDelegateJump}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,Simulacrum Shifter]!=0}
+		DO:	SetState {LootingSimulacrum}
 	IF:	SecsInStateGE 180
 		DO:	DoAll
 				EmbedNav navTriggerSimulacrumSpawn {TriggerSimulacrumSpawn}
-				SetState {KillingAndLootingSimulacrum}
-	IF:	All
-			SecsInStateGE 16
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==0}
-			ItemCountGE 1 {Door Key}
-		DO:	SetState {KillingAndLootingSimulacrum}
+				SetState {KillingSimulacrum}
+~~ }
+STATE: {LootingSimulacrum} ~~ {
+	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {GoToDelegateJump}
+	IF:	ItemCountGE 1 {Door Key}
+		DO:	SetState {UnlockAndOpenFinalDoor}
+	IF: Expr {wobjectfindnearestbynameandobjectclass[27,Simulacrum Shifter]==0}
+		DO: SetState {KillingApostateMaster}
+	IF:	Expr {wobjectgetopencontainer[]!=0}
+		DO:	DoAll
+				Chat {/ub use Door Key}
+				SetWatchdog 3 15 {LootingSimulacrum}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,Simulacrum Shifter]]}
+				SetWatchdog 3 15 {LootingSimulacrum}
+~~ }
+STATE: {UnlockAndOpenFinalDoor} ~~ {
+	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
+		DO:	SetState {GoToDelegateJump}
+	IF:	Always
+		DO:	DoAll
+				EmbedNav navUnlockFinalDoor {UnlockAndOpenFinalDoor}
+				SetWatchdog 3 6 {UnlockAndOpenFinalDoor}
 ~~ }
 STATE: {GoToDelegateJump} ~~ {
 	IF:	Always
