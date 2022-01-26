@@ -46,6 +46,8 @@ STATE: {*SetupOptions*} ~~ {
 		DO:	DoExpr {setgvar[qlou-leverpuller,Porkchop]}
 	IF:	Always
 		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Setting up for Liberation of Uziz\.\.\. \-\-}
+				EmbedNav navNone {None}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
@@ -60,8 +62,15 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {CorpseApproachRange-Min} {0}
 				SetOpt {CorpseApproachRange-Max} {0}
 				DoExpr {cleargvar[qlou-lever2pulled]}
+				DoExpr {setgvar[qlou-numchars,0]}
 				DoExpr {setgvar[qlou-numcharsdone,0]}
-				EmbedNav navNone {None}
+	IF:	SecsInStateGE 8
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Loading Liberation of Uziz meta on all characters\.\.\. \-\-}
+				DoExpr {setgvar[qlou-numchars,getgvar[qlou-numchars]+1]}
+	IF:	SecsInStateGE 10
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Starting Liberation of Uziz with +getgvar[qlou-numchars]+\ characters\! \-\-}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
