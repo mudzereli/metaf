@@ -44,6 +44,7 @@ STATE: {Default} ~~ {
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Setting up for Colosseum\.\.\. \-\-}
 				EmbedNav navNone {None}
 				SetOpt {AttackDistance} {0.3}
 				SetOpt {ApproachDistance} {0.021}
@@ -54,24 +55,38 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {EnableBuffing} {false}
 				DoExpr {setgvar[qcolo-looping,0]}
-				DoExpr {setgvar[qcolo-numchars,0]}
-				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
-				DoExpr {setgvar[qcolo-numcharswaiting,0]}
-				DoExpr {setgvar[qcolo-numcharsreadyforturnin,0]}
+				DoExpr {setgvar[qcolo-chars,listcreate[]]}
+				DoExpr {setgvar[qcolo-charswaiting,listcreate[]]}
+				DoExpr {setgvar[qcolo-charsbuffed,listcreate[]]}
+				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
 				DoExpr {setgvar[qcolo-fellowlocked,0]}
-				~~DoExpr {setvar[qcolo-started,0]}
+	IF:	SecsInStateGE 8
+		DO:	SetState {SynchronizeChars}
+~~ }
+STATE: {SynchronizeChars}
 	IF:	All
-			SecsInStateGE 3
+			Expr {getfellowshipcount[]>=3}
+			Not Expr {listcontains[getgvar[qcolo-chars],getcharstringprop[1]]}
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Loading Colosseum meta on all characters\.\.\. \-\-}
+				DoExpr {listadd[getgvar[qcolo-chars],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Expr {getfellowshipcount[]>=3}
+			Not Expr {listcontains[getgvar[qcolo-chars],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeChars}
+	IF:	All
+			SecsInStateGE 8
 			Expr {getfellowshipcount[]>=3}
 		DO:	DoAll
-				DoExpr {setgvar[qcolo-numchars,getgvar[qcolo-numchars]+1]}
+				ChatExpr {\/vt echo \-\- Starting Colosseum with +listcount[getgvar[qcolo-chars]]+\ characters\! \-\-}
 				SetState {ProgressCheck}
 ~~ }
 STATE: {ProgressCheck} ~~ {
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[37,Arena Bell] && coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[37,Arena Bell]]] <= 25}
 		DO:	SetState {StartCurrentRoom}
 	IF:	BlockE 00AF0000
-		DO:	SetState {WaitingForStart}
+		DO:	SetState {SynchronizeWaitingForStart}
 	IF:	Always
 		DO:	SetState {GoToColo}
 ~~ }
@@ -83,6 +98,20 @@ STATE: {GoToColo} ~~ {
 	~~ Colosseum Recall Spell ID = 4213
 	IF:	Expr {actiontrycastbyid[4213]}
 		DO: SetState {GoToColo}
+~~ }
+STATE: {SynchronizeWaitingForStart}
+	IF: Always
+		DO:	ChatExpr {\/vt echo \-\- Synchronizing characters @ Waiting For Start\.\.\. \-\-}
+	IF:	Not Expr {listcontains[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeWaitingForStart}
+	IF: Expr {listcount[getgvar[qcolo-charswaiting]]>=listcount[getgvar[qcolo-chars]]}
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- +listcount[getgvar[qcolo-charswaiting]]+\ characters @ Waiting For Start\.\.\. \-\-}
+				SetState {WaitingForStart}
 ~~ }
 STATE: {WaitingForStart} ~~ {
 	~~ this sets up all the initial variables when waiting to start
@@ -96,7 +125,6 @@ STATE: {WaitingForStart} ~~ {
 				SetOpt {NavCloseStopRange} {0.008333}
 				SetOpt {PetRangeMode} {1}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
-				DoExpr {setgvar[qcolo-numcharswaiting,getgvar[qcolo-numcharswaiting]+1]}
 	~~ this condition puts you back into the arena if you reload the script after leaving
 	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
 		DO:	DoAll
@@ -106,7 +134,7 @@ STATE: {WaitingForStart} ~~ {
 	IF:	All
 			ItemCountGE 1 {Colosseum Ticket}
 			Expr {getgvar[qcolo-looping]==1}
-			Expr {getgvar[qcolo-numcharswaiting]>=getgvar[qcolo-numchars]}
+			Expr {listcount[getgvar[qcolo-charswaiting]]>=listcount[getgvar[qcolo-chars]]}
 			SecsInStateGE 90
 		DO:	SetState {GettingATicket}
 	~~ this condition triggers when the ticket holder receives a ticket stub
@@ -167,10 +195,21 @@ STATE: {BuffingBeforeRun} ~~ {
 	IF:	Any
 			SecsInStateGE 180
 			ChatMatch {^You cast Blackmoor.*s Favor on yourself}
-		DO:	DoExpr {setgvar[qcolo-numcharsbuffed,getgvar[qcolo-numcharsbuffed]+1]}
-	~~ if everyones probably good to go.. then lets go
-	IF:	Expr {getgvar[qcolo-numcharsbuffed]>=getgvar[qcolo-numcharswaiting]}
-		DO:	SetState {StartFirstRoom}
+		DO:	SetState {SynchronizeAfterBuffing}
+~~ }
+STATE: {SynchronizeAfterBuffing}
+	IF: Always
+		DO:	ChatExpr {\/vt echo \-\- Synchronizing characters @ Finished Buffing\.\.\. \-\-}
+	IF:	Not Expr {listcontains[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeAfterBuffing}
+	IF: Expr {listcount[getgvar[qcolo-charsbuffed]]>=listcount[getgvar[qcolo-chars]]}
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- +listcount[getgvar[qcolo-charsbuffed]]+\ characters @ Finished Buffing\.\.\. \-\-}
+				SetState {StartFirstRoom}
 ~~ }
 STATE: {StartFirstRoom} ~~ {
 	~~ do this special setup for starting the first room
@@ -239,21 +278,29 @@ STATE: {WaitingForRewards} ~~ {
 			Expr {getqueststatus[coloarenathreeaccess]}
 			Expr {getqueststatus[coloarenafouraccess]}
 			Expr {getqueststatus[coloarenafiveaccess]}
-		DO:	SetState {ReadyToTurnInRewards}
+		DO:	SetState {SynchronizeRewardTurnIn}
 ~~ }
-STATE: {ReadyToTurnInRewards} ~~ {
-	IF:	Always
-		DO:	DoExpr {setgvar[qcolo-numcharsreadyforturnin,getgvar[qcolo-numcharsreadyforturnin]+1]}
-	IF:	Expr {getgvar[qcolo-numcharsreadyforturnin]>=getgvar[qcolo-numchars]}
-		DO:	SetState {TurnInRewards}
+STATE: {SynchronizeRewardTurnIn}
+	IF: Always
+		DO:	ChatExpr {\/vt echo \-\- Synchronizing characters @ Reward Turn In\.\.\. \-\-}
+	IF:	Not Expr {listcontains[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeRewardTurnIn}
+	IF: Expr {listcount[getgvar[qcolo-charsreadyforturnin]]>=listcount[getgvar[qcolo-chars]]}
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- +listcount[getgvar[qcolo-charsreadyforturnin]]+\ characters @ Reward Turn In\.\.\. \-\-}
+				SetState {TurnInRewards}
 ~~ }
 STATE: {TurnInRewards} ~~ {
 	~~ this actually gets us the reward
-	IF:	Always
+	IF:	SecsInStateGE 3
 		DO:	DoAll
-				DoExpr {setgvar[qcolo-numcharsbuffed,0]}
-				DoExpr {setgvar[qcolo-numcharswaiting,0]}
-				DoExpr {setgvar[qcolo-numcharsreadyforturnin,0]}
+				DoExpr {setgvar[qcolo-charsbuffed,listcreate[]]}
+				DoExpr {setgvar[qcolo-charswaiting,listcreate[]]}
+				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
 				DoExpr {setgvar[qcolo-fellowlocked,0]}
 				DoExpr {setvar[qcolo-started,0]}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
