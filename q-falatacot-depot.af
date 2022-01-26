@@ -56,16 +56,18 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {NavPriorityBoost} {true}
 				SetOpt {LootOnlyRares} {false}
 				SetOpt {IdlePeaceMode} {false}
-				DoExpr {setgvar[qfdp-toonsindungeon,0]}
-				DoExpr {setgvar[qfdp-toonsinprogress,0]}
-				DoExpr {setgvar[qfdp-toonsinfirstroom,0]}
-				DoExpr {setgvar[qfdp-toonsinsecondroom,0]}
+				DoExpr {setgvar[qfdp-numchars,0]}
+				DoExpr {setgvar[qfdp-numcharsindungeon,0]}
+				DoExpr {setgvar[qfdp-numcharsinfirstroom,0]}
+				DoExpr {setgvar[qfdp-numcharsinsecondroom,0]}
 				DoExpr {setgvar[qfdp-numcharsdone,0]}
-				DoExpr {setvar[qfdp-waitingatfirstroom,0]}
 				EmbedNav navNone {None}
 	IF:	SecsInStateGE 3
 		DO:	DoAll
-				DoExpr {setgvar[qfdp-toonsinprogress,getgvar[qfdp-toonsinprogress]+1]}
+				DoExpr {setgvar[qfdp-numchars,getgvar[qfdp-numchars]+1]}
+	IF:	SecsInStateGE 6
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Starting Quest Falatacot Depot with +getgvar[qfdp-numchars]+\ characters. \-\-}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -146,8 +148,8 @@ STATE: {EnteredFalatacotDepot} ~~ {
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {NavPriorityBoost} {false}
 				SetOpt {AttackDistance} {0.02}
-				DoExpr {setgvar[qfdp-toonsindungeon,getgvar[qfdp-toonsindungeon]+1]}
-	IF:	Expr {getgvar[qfdp-toonsindungeon]>=getgvar[qfdp-toonsinprogress]}
+				DoExpr {setgvar[qfdp-numcharsindungeon,getgvar[qfdp-numcharsindungeon]+1]}
+	IF:	Expr {getgvar[qfdp-numcharsindungeon]>=getgvar[qfdp-numchars]}
 		DO:	SetState {GoToForgeGuardian}
 ~~ }
 STATE: {GoToForgeGuardian} ~~ {
@@ -159,22 +161,17 @@ STATE: {GoToForgeGuardian} ~~ {
 				SetOpt {NavPriorityBoost} {true}
 				SetOpt {EnableCombat} {false}
 	~~ wait for everyone else
-	IF:	All
-			CellE 585E0138
-			Not Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}
-			Expr {setvar[qfdp-waitingatfirstroom,1]}
+	IF:	CellE 585E0138
 		DO:	DoAll
 				SetOpt {EnableNav} {false}
-				DoExpr {setgvar[qfdp-toonsinfirstroom,getgvar[qfdp-toonsinfirstroom]+1]}
+				DoExpr {setgvar[qfdp-numcharsinfirstroom,getgvar[qfdp-numcharsinfirstroom]+1]}
 	~~ everyone's here lets go!
-	IF:	All
-			Expr {getgvar[qfdp-toonsinfirstroom]>=getgvar[qfdp-toonsinprogress]}
-			Expr {getvar[qfdp-waitingatfirstroom]==1}
+	IF:	Expr {getgvar[qfdp-numcharsinfirstroom]>=getgvar[qfdp-numchars]}
 		DO:	SetOpt {EnableNav} {true}
 	~~ kill him once everyone is done with their nav
 	IF:	Any
 			NavEmpty
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
+			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {KillingForgeGuardian}
 ~~ }
 STATE: {KillingForgeGuardian} ~~ {
@@ -183,16 +180,29 @@ STATE: {KillingForgeGuardian} ~~ {
 	IF:	All
 			NavEmpty
 			NoMobsInDist 10
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
+			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToTiatusOverseer}
 ~~ }
 STATE: {GoToTiatusOverseer} ~~ {
 	IF:	Always
 		DO:	EmbedNav navGoToTiatusOverseer {GoToTiatusOverseer}
-	IF:	All
+	~~ turn off attacking when we get to the door
+	IF:	CellE 585E015E
+		DO:	DoAll
+				SetOpt {NavPriorityBoost} {true}
+				SetOpt {EnableCombat} {false}
+	~~ wait for everyone else
+	IF:	CellE 585E0162
+		DO:	DoAll
+				SetOpt {EnableNav} {false}
+				DoExpr {setgvar[qfdp-numcharsinsecondroom,getgvar[qfdp-numcharsinsecondroom]+1]}
+	~~ everyone's here lets go!
+	IF:	Expr {getgvar[qfdp-numcharsinsecondroom]>=getgvar[qfdp-numchars]}
+		DO:	SetOpt {EnableNav} {true}
+	~~ kill him once everyone is done with their nav
+	IF:	Any
 			NavEmpty
-			NoMobsInDist 10
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]==1}
+			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToZrikux}
 ~~ }
 STATE: {GoToZrikux} ~~ {
