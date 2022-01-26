@@ -37,6 +37,8 @@
 ~~		prt (deprecated in VTank)														
 ~~ }																					
 
+~~ quest flag: arantahkill1
+
 STATE: {Default} ~~ {
 	IF:	Always
 		DO:	SetState {*SetupOptions*}
@@ -53,7 +55,10 @@ STATE: {*SetupOptions*} ~~ {
 	IF: Expr {getfellowshipcount[]>0}
 		DO:	DoExpr {setvar[qrlf-chat-channel,`f`]}
 	IF:	Always
-		DO:	SetState {QuestProgressCheck}
+		DO:	DoAll
+				DoExpr {setvar[qrlf-status,iif[getqueststatus[arantahkill1]==0,`This Character has already gained a skill point from Aun Ralirea.`,`This Character has NOT gained a skill point from Aun Ralirea.`]]}
+				ChatExpr {\/vt echo +getvar[qrlf-status]}
+				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
 	IF:	CellE 1DB60016
@@ -106,7 +111,7 @@ STATE: {GoToLoopLocation} ~~ {
 		DO:	SetState {LookingForRalirea}
 ~~ }
 STATE: {LookingForRalirea} ~~ {
-	IF:	MobsInDist_Name 1 80 {Aun Ralirea}
+	IF:	MobsInDist_Name 1 999 {Aun Ralirea}
 		DO:	SetState {FoundRalirea}
 	IF:	Always
 		DO:	DoAll
