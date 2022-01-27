@@ -54,15 +54,26 @@ STATE: {*SetupOptions*} ~~ {
 					SetOpt {OpenDoors} {true}
 					DoExpr {setvar[qnxc-fellowleader,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
 					DoExpr {setvar[qnxc-portalsummoners,listcreate[]]}
-					DoExpr {setgvar[qnxc-numtoonsatmaster,0]}
-					DoExpr {setgvar[qnxc-numtoonsinprogress,0]}
+					DoExpr {setgvar[qnxc-chars,listcreate[]]}
+					DoExpr {setgvar[qnxc-charsatmaster,listcreate[]]}
 					DoExpr {setgvar[qnxc-numcharsdone,0]}
 				EmbedNav navNone {navNone}
-				~~DoExpr {listadd[getvar[qnxc-portalsummoners],`Dan K Memes`]}
 				DoExpr {listadd[getvar[qnxc-portalsummoners],`Porkchop`]}
-	IF:	SecsInStateGE 3
+	IF:	SecsInStateGE 8
+		DO:	SetState {SynchronizeChars}
+~~ }
+STATE: {SynchronizeChars}
+	IF:	Not Expr {listcontains[getgvar[qnxc-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				DoExpr {setgvar[qnxc-numtoonsinprogress,getgvar[qnxc-numtoonsinprogress]+1]}
+				ChatExpr {\/vt echo \-\- Loading Nexus Crawl meta on all Characters\.\.\. \-\-}
+				DoExpr {listadd[getgvar[qnxc-chars],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qnxc-chars],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeChars}
+	IF:	SecsInStateGE 8
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Starting Nexus Crawl with +listcount[getgvar[qnxc-chars]]+\ Characters\! \-\-}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -223,15 +234,23 @@ STATE: {RunningToApostateMaster} ~~ {
 	IF:	All
 			NavEmpty
 			CellE 7F02019E
-		DO:	SetState {WaitingForGroupApostateMaster}
+		DO:	SetState {SynchronizeCharsAtMaster}
 	IF:	Always
 		DO:	EmbedNav navGoToApostateMaster {RunningToApostateMaster}
 ~~ }
-STATE: {WaitingForGroupApostateMaster} ~~ {
-	IF:	Always
-		DO:	DoExpr {setgvar[qnxc-numtoonsatmaster,getgvar[qnxc-numtoonsatmaster]+1]}
-	IF:	Expr {getgvar[qnxc-numtoonsatmaster]>=getgvar[qnxc-numtoonsinprogress]}
-		DO:	SetState {KillingApostateMaster}
+STATE: {SynchronizeCharsAtMaster}
+	IF: Always
+		DO:	ChatExpr {\/vt echo \-\- Synchronizing all Characters @ Apostate Master\.\.\. \-\-}
+	IF:	Not Expr {listcontains[getgvar[qnxc-charsatmaster],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qnxc-charsatmaster],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qnxc-charsatmaster],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeCharsAtMaster}
+	IF: Expr {listcount[getgvar[qnxc-charsatmaster]]>=listcount[getgvar[qnxc-chars]]}
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Synchronized +listcount[getgvar[qnxc-charsatmaster]]+\ Characters @ Apostate Master\.\.\. \-\-}
+				SetState {KillingApostateMaster}
 ~~ }
 STATE: {KillingApostateMaster} ~~ {
 	IF:	Always

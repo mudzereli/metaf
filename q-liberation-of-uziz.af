@@ -62,15 +62,23 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {CorpseApproachRange-Min} {0}
 				SetOpt {CorpseApproachRange-Max} {0}
 				DoExpr {cleargvar[qlou-lever2pulled]}
-				DoExpr {setgvar[qlou-numchars,0]}
+				DoExpr {setgvar[qlou-chars,listcreate[]]}
 				DoExpr {setgvar[qlou-numcharsdone,0]}
 	IF:	SecsInStateGE 8
+		DO:	SetState {SynchronizeChars}
+~~ }
+STATE: {SynchronizeChars}
+	IF:	Not Expr {listcontains[getgvar[qlou-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Loading Liberation of Uziz meta on all characters\.\.\. \-\-}
-				DoExpr {setgvar[qlou-numchars,getgvar[qlou-numchars]+1]}
-	IF:	SecsInStateGE 10
+				ChatExpr {\/vt echo \-\- Loading Liberation of Uziz meta on all Characters \-\-}
+				DoExpr {listadd[getgvar[qlou-chars],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qlou-chars],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeChars}
+	IF:	SecsInStateGE 8
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Starting Liberation of Uziz with +getgvar[qlou-numchars]+\ characters\! \-\-}
+				ChatExpr {\/vt echo \-\- Starting Liberation of Uziz with +listcount[getgvar[qlou-chars]]+\ Characters\! \-\-}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {

@@ -56,18 +56,27 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {NavPriorityBoost} {true}
 				SetOpt {LootOnlyRares} {false}
 				SetOpt {IdlePeaceMode} {false}
-				DoExpr {setgvar[qfdp-numchars,0]}
-				DoExpr {setgvar[qfdp-numcharsindungeon,0]}
-				DoExpr {setgvar[qfdp-numcharsinfirstroom,0]}
-				DoExpr {setgvar[qfdp-numcharsinsecondroom,0]}
-				DoExpr {setgvar[qfdp-numcharsdone,0]}
+				DoExpr {setgvar[qfdp-chars,listcreate[]]}
+				DoExpr {setgvar[qfdp-charsindungeon,listcreate[]]}
+				DoExpr {setgvar[qfdp-charsinfirstroom,listcreate[]]}
+				DoExpr {setgvar[qfdp-charsinsecondroom,listcreate[]]}
+				DoExpr {setgvar[qfdp-charsdone,0]}
 				EmbedNav navNone {None}
-	IF:	SecsInStateGE 3
+	IF:	SecsInStateGE 8
+		DO:	SetState {SynchronizeChars}
+~~ }
+STATE: {SynchronizeChars}
+	IF:	Not Expr {listcontains[getgvar[qfdp-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				DoExpr {setgvar[qfdp-numchars,getgvar[qfdp-numchars]+1]}
-	IF:	SecsInStateGE 6
+				ChatExpr {\/vt echo \-\- Loading Falatacot Depot meta on all Characters\.\.\. \-\-}
+				DoExpr {listadd[getgvar[qfdp-chars],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qfdp-chars],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeChars}
+	IF:	SecsInStateGE 8
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Starting Quest Falatacot Depot with +getgvar[qfdp-numchars]+\ characters. \-\-}
+				ChatExpr {\/vt echo \-\- Starting Falatacot Depot with +listcount[getgvar[qfdp-chars]]+\ Characters\! \-\-}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -148,9 +157,21 @@ STATE: {EnteredFalatacotDepot} ~~ {
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {NavPriorityBoost} {false}
 				SetOpt {AttackDistance} {0.02}
-				DoExpr {setgvar[qfdp-numcharsindungeon,getgvar[qfdp-numcharsindungeon]+1]}
-	IF:	Expr {getgvar[qfdp-numcharsindungeon]>=getgvar[qfdp-numchars]}
-		DO:	SetState {GoToForgeGuardian}
+				SetState {SynchronizeCharsInDungeon}
+~~ }
+STATE: {SynchronizeCharsInDungeon}
+	IF: Always
+		DO:	ChatExpr {\/vt echo \-\- Synchronizing all Characters @ Dungeon Entrance\.\.\. \-\-}
+	IF:	Not Expr {listcontains[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeCharsInDungeon}
+	IF: Expr {listcount[getgvar[qfdp-charsindungeon]]>=listcount[getgvar[qfdp-chars]]}
+		DO:	DoAll
+				ChatExpr {\/vt echo \-\- Synchronized +listcount[getgvar[qfdp-charsindungeon]]+\ Characters @ Dungeon Entrance\.\.\. \-\-}
+				SetState {GoToForgeGuardian}
 ~~ }
 STATE: {GoToForgeGuardian} ~~ {
 	IF:	Always
@@ -158,24 +179,29 @@ STATE: {GoToForgeGuardian} ~~ {
 	~~ turn off attacking when we get to the door
 	IF:	CellE 585E0137
 		DO:	DoAll
-				SetOpt {NavPriorityBoost} {true}
+				~~SetOpt {NavPriorityBoost} {true}
 				SetOpt {EnableCombat} {false}
-	~~ wait for everyone else
-	IF:	CellE 585E0138
+				SetState {SynchronizeCharsInFirstRoom}
+~~}
+STATE: {SynchronizeCharsInFirstRoom}
+	IF: Always
+		DO:	ChatExpr {\/vt echo \-\- Synchronizing all Characters @ First Room\.\.\. \-\-}
+	IF:	Not Expr {listcontains[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeCharsInFirstRoom}
+	IF: Expr {listcount[getgvar[qfdp-charsinfirstroom]]>=listcount[getgvar[qfdp-chars]]}
 		DO:	DoAll
-				SetOpt {EnableNav} {false}
-				DoExpr {setgvar[qfdp-numcharsinfirstroom,getgvar[qfdp-numcharsinfirstroom]+1]}
-	~~ everyone's here lets go!
-	IF:	Expr {getgvar[qfdp-numcharsinfirstroom]>=getgvar[qfdp-numchars]}
-		DO:	SetOpt {EnableNav} {true}
-	~~ kill him once everyone is done with their nav
-	IF:	Any
-			NavEmpty
-			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
-		DO:	SetState {KillingForgeGuardian}
+				ChatExpr {\/vt echo \-\- Synchronized +listcount[getgvar[qfdp-charsinfirstroom]]+\ Characters @ First Room\.\.\. \-\-}
+				SetState {KillingForgeGuardian}
 ~~ }
 STATE: {KillingForgeGuardian} ~~ {
 	IF:	Always
+		DO:	SetOpt {EnableNav} {true}
+	~~ kill him once everyone is done with their nav
+	IF:	NavEmpty
 		DO:	SetOpt {EnableCombat} {true}
 	IF:	All
 			NavEmpty
@@ -189,19 +215,33 @@ STATE: {GoToTiatusOverseer} ~~ {
 	~~ turn off attacking when we get to the door
 	IF:	CellE 585E015E
 		DO:	DoAll
-				SetOpt {NavPriorityBoost} {true}
+				~~SetOpt {NavPriorityBoost} {true}
 				SetOpt {EnableCombat} {false}
-	~~ wait for everyone else
-	IF:	CellE 585E0162
+				SetState {SynchronizeCharsInSecondRoom}
+~~ }
+STATE: {SynchronizeCharsInSecondRoom}
+	IF: Always
+		DO:	ChatExpr {\/vt echo \-\- Synchronizing all Characters @ Second Room\.\.\. \-\-}
+	IF:	Not Expr {listcontains[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
+		DO:	SetState {SynchronizeCharsInSecondRoom}
+	IF: Expr {listcount[getgvar[qfdp-charsinsecondroom]]>=listcount[getgvar[qfdp-chars]]}
 		DO:	DoAll
-				SetOpt {EnableNav} {false}
-				DoExpr {setgvar[qfdp-numcharsinsecondroom,getgvar[qfdp-numcharsinsecondroom]+1]}
-	~~ everyone's here lets go!
-	IF:	Expr {getgvar[qfdp-numcharsinsecondroom]>=getgvar[qfdp-numchars]}
+				ChatExpr {\/vt echo \-\- Synchronized +listcount[getgvar[qfdp-charsinsecondroom]]+\ Characters @ Second Room\.\.\. \-\-}
+				SetState {KillingTiatusOverseer}
+~~ }
+STATE: {KillingTiatusOverseer} ~~ {
+	IF:	Always
 		DO:	SetOpt {EnableNav} {true}
 	~~ kill him once everyone is done with their nav
-	IF:	Any
+	IF:	NavEmpty
+		DO:	SetOpt {EnableCombat} {true}
+	IF:	All
 			NavEmpty
+			NoMobsInDist 10
 			Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToZrikux}
 ~~ }
@@ -271,8 +311,8 @@ STATE: {RecallLifestoneSending} ~~ {
 STATE: {AllDone} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setgvar[qfdp-numcharsdone,getgvar[qfdp-numcharsdone]+1]}
-				ChatExpr {\/f Falatacot Depot Completed\! \(+getgvar[qfdp-numcharsdone]+\)}
+				DoExpr {setgvar[qfdp-charsdone,getgvar[qfdp-charsdone]+1]}
+				ChatExpr {\/f Falatacot Depot Completed\! \(+getgvar[qfdp-charsdone]+\)}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
