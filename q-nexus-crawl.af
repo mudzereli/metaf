@@ -45,6 +45,7 @@ STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
 				DoAll
+					Chat {/vt echo -- Starting Quest: Nexus Crawl --}
 					SetOpt {EnableCombat} {false}
 					SetOpt {EnableBuffing} {false}
 					SetOpt {EnableLooting} {false}
@@ -65,7 +66,7 @@ STATE: {*SetupOptions*} ~~ {
 STATE: {SynchronizeChars}
 	IF:	Not Expr {listcontains[getgvar[qnxc-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Loading Nexus Crawl meta on all Characters\.\.\. \-\-}
+				Chat {/vt echo -- Loading Nexus Crawl Meta on all Characters --}
 				DoExpr {listadd[getgvar[qnxc-chars],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
@@ -97,18 +98,24 @@ STATE: {QuestProgressCheck} ~~ {
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Recalling to Aphus Lassel --}
 	IF:	IntoPortal
 		DO:	SetState {GoToTownNetwork}
 	IF:	Expr {actiontrycastbyid[2931]}
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to Town Network --}
 	IF:	CellE 00070145
 		DO:	SetState {GoToZaikhal}
 	IF:	Always
 		DO:	EmbedNav navAphusLasselToTownNetwork {GoToTownNetwork}
 ~~ }
 STATE: {GoToZaikhal} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to Zaikhal --}
 	IF:	CellE 80900013
 		DO:	SetState {GoToNed}
 	IF:	Always
@@ -116,11 +123,15 @@ STATE: {GoToZaikhal} ~~ {
 ~~ }
 STATE: {GoToNed} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Going to Ned Cleverson --}
+	IF:	Always
 		DO:	EmbedNav navGoToNed {GoToNed}
 	IF:	NavEmpty
 		DO:	SetState {TalkToNed}
 ~~ }
 STATE: {TalkToNed} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Talking to Ned Cleverson --}
 	IF:	Always
 		DO:	EmbedNav navTalkToNed {TalkToNed}
 	IF:	Any
@@ -134,6 +145,8 @@ STATE: {TalkToNed} ~~ {
 ~~ }
 STATE: {PickedUpQuest} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Picked up Nexus Crawl Quest --}
+	IF:	Always
 		DO:	EmbedNav navGoToPortalSummoningZone {GoToPortalSummoningZone}
 	IF:	All
 			NavEmpty
@@ -143,16 +156,22 @@ STATE: {PickedUpQuest} ~~ {
 		DO:	SetState {SummonPortalToNexusWaiting}
 ~~ }
 STATE: {SummonPortalToNexus} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Summoning a Portal to Nexus --}
 	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
 		DO:	SetState {SummonPortalToNexusSummoned}
 	IF:	Expr {actiontrycastbyid[157]}
 		DO:	SetState {SummonPortalToNexus}
 ~~ }
 STATE: {SummonPortalToNexusWaiting} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Waiting for a Portal to Nexus --}
 	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
 		DO:	SetState {SummonPortalToNexusSummoned}
 ~~ }
 STATE: {SummonPortalToNexusSummoned} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Entering Portal for Nexus --}
 	IF:	CellE 011002E1
 		DO:	SetState {EnteredNexus}
 	IF:	Always
@@ -161,6 +180,8 @@ STATE: {SummonPortalToNexusSummoned} ~~ {
 		DO:	SetState {SummonPortalToNexusSummoned}
 ~~ }
 STATE: {EnteredNexus} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Zoned in to Nexus --}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {NavCloseStopRange} {0.003}
@@ -176,11 +197,15 @@ STATE: {EnteredNexus} ~~ {
 ~~ }
 STATE: {GoToFirstJump} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Going to First Jump --}
+	IF:	Always
 		DO:	EmbedNav navGoToFirstJump {GoToFirstJump}
 	IF:	NavEmpty
 		DO:	SetState {DoFirstJump}
 ~~ }
 STATE: {DoFirstJump} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping --}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {false}
@@ -191,6 +216,8 @@ STATE: {DoFirstJump} ~~ {
 ~~ }
 STATE: {GoToSecondJump} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Going to Pit --}
+	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
 				EmbedNav navGoToSecondJump {GoToSecondJump}
@@ -198,6 +225,8 @@ STATE: {GoToSecondJump} ~~ {
 		DO:	SetState {DoSecondJump}
 ~~ }
 STATE: {DoSecondJump} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping into Pit and using the Crystal --}
 	IF:	CellE 7F0202A6
 		DO:	SetState {RunningToLever}
 	IF:	Always
@@ -207,6 +236,8 @@ STATE: {DoSecondJump} ~~ {
 				SetWatchdog 3 3 {DoSecondJump}
 ~~ }
 STATE: {RunningToLever} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Running to First Door Lever --}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {false}
@@ -218,6 +249,8 @@ STATE: {RunningToLever} ~~ {
 		DO: SetState {CheckLever}
 ~~ }
 STATE: {CheckLever} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Checking nearest door & waiting for Lever Puller --}
 	IF:	All
 			CellE 7F0201E8
 			Expr {getcharstringprop[1]==getvar[qnxc-fellowleader]}
@@ -231,6 +264,8 @@ STATE: {CheckLever} ~~ {
 		DO:	SetState {RunningToApostateMaster}
 ~~ }
 STATE: {RunningToApostateMaster} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Running to the Apostate Nexus Master --}
 	IF:	All
 			NavEmpty
 			CellE 7F02019E
@@ -254,6 +289,8 @@ STATE: {SynchronizeCharsAtMaster}
 ~~ }
 STATE: {KillingApostateMaster} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Killing the Apostate Nexus Master --}
+	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {false}
@@ -263,6 +300,8 @@ STATE: {KillingApostateMaster} ~~ {
 		DO:	SetState {LootingApostateMaster}
 ~~ }
 STATE: {LootingApostateMaster} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Looting the Apostate Nexus Master --}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {RunningToEnd}
 	IF:	ItemCountGE 1 {Aetherium Vault Key}
@@ -279,6 +318,8 @@ STATE: {LootingApostateMaster} ~~ {
 				SetWatchdog 3 15 {LootingApostateMaster}
 ~~ }
 STATE: {UnlockAndOpenFinalDoor} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Unlocking and Opening the Last Door --}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {RunningToEnd}
 	IF:	Always
@@ -287,6 +328,8 @@ STATE: {UnlockAndOpenFinalDoor} ~~ {
 				SetWatchdog 3 6 {UnlockAndOpenFinalDoor}
 ~~ }
 STATE: {RunningToEnd} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Running to End of Dungeon --}
 	IF:	All
 			CellE 7F020107
 			NavEmpty
@@ -295,6 +338,8 @@ STATE: {RunningToEnd} ~~ {
 		DO:	EmbedNav navRunToEnd {RunningToEnd}
 ~~ }
 STATE: {TurnInResonator} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Turning in Aetheric Resonator --}
 	IF:	All
 			ItemCountGE 1 {Aetheric Resonator}
 			NoMobsInDist 5
@@ -307,6 +352,8 @@ STATE: {TurnInResonator} ~~ {
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {AllDone} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Done with Quest: Nexus Crawl! --}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setgvar[qnxc-numcharsdone,getgvar[qnxc-numcharsdone]+1]}
