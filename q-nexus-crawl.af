@@ -250,7 +250,7 @@ STATE: {RunningToLever} ~~ {
 ~~ }
 STATE: {CheckLever} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Checking nearest door & waiting for Lever Puller --}
+		DO:	Chat {/vt echo -- Waiting for Lever Pull then Opening Door --}
 	IF:	All
 			CellE 7F0201E8
 			Expr {getcharstringprop[1]==getvar[qnxc-fellowleader]}
@@ -266,6 +266,8 @@ STATE: {CheckLever} ~~ {
 STATE: {RunningToApostateMaster} ~~ {
 	IF:	Always
 		DO:	Chat {/vt echo -- Running to the Apostate Nexus Master --}
+	IF:	CellE 7F02019F
+		DO:	SetOpt {NavCloseStopRange} {0.01}
 	IF:	All
 			NavEmpty
 			CellE 7F02019E
@@ -294,6 +296,7 @@ STATE: {KillingApostateMaster} ~~ {
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {false}
+				SetOpt {NavCloseStopRange} {0.0003}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {RunningToEnd}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]!=0}
