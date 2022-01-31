@@ -46,7 +46,7 @@ STATE: {*SetupOptions*} ~~ {
 		DO:	DoExpr {setgvar[qlou-leverpuller,Porkchop]}
 	IF:	Always
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Setting up for Liberation of Uziz\.\.\. \-\-}
+				Chat {/vt echo -- Starting Quest: Liberation of Uziz --}
 				EmbedNav navNone {None}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
@@ -70,7 +70,7 @@ STATE: {*SetupOptions*} ~~ {
 STATE: {SynchronizeChars}
 	IF:	Not Expr {listcontains[getgvar[qlou-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Loading Liberation of Uziz meta on all Characters \-\-}
+				Chat {/vt echo -- Loading Liberation of Uziz meta on all Characters --}
 				DoExpr {listadd[getgvar[qlou-chars],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
@@ -145,6 +145,8 @@ STATE: {QuestProgressCheck} ~~ {
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Recalling to Aphus Lassel --}
 	IF:	Any
 			IntoPortal
 			CellE F6820033
@@ -155,30 +157,40 @@ STATE: {RecallAphusLassel} ~~ {
 				SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to Town Network --}
 	IF:	CellE 00070145
 		DO:	SetState {GoToAlArqas}
 	IF:	Always
 		DO:	EmbedNav navGoToTownNetwork {GoToTownNetwork}
 ~~ }
 STATE: {GoToAlArqas} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to Al Arqas --}
 	IF:	CellE 8F58003B
 		DO:	SetState {GoToSettlementPortals}
 	IF:	Always
 		DO:	EmbedNav navGoToAlArqas {GoToAlArqas}
 ~~ }
 STATE: {GoToSettlementPortals} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to Settlement Portals --}
 	IF:	CellE 9664001B
 		DO:	SetState {GoToVirindiEdifice}
 	IF:	Always
 		DO:	EmbedNav navGoToSettlementPortals {GoToSettlementPortals}
 ~~ }
 STATE: {GoToVirindiEdifice} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to Dungeon: Virindi Edifice --}
 	IF:	CellE 5867026B
 		DO:	SetState {EnteredVirindiEdifice}
 	IF:	Always
 		DO:	EmbedNav navGoToVirindiEdifice {GoToVirindiEdifice}
 ~~ }
 STATE: {EnteredVirindiEdifice} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Entered Virindi Edifice --}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {OpenDoors} {true}
@@ -193,6 +205,8 @@ STATE: {EnteredVirindiEdifice} ~~ {
 ~~ }
 STATE: {GoToLever1} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Going to 1st Lever (Left Path) --}
+	IF:	Always
 		DO:	EmbedNav navGoToLever1 {GoToLever1}
 	IF:	All
 			NavEmpty
@@ -206,11 +220,15 @@ STATE: {GoToLever1} ~~ {
 ~~ }
 STATE: {PullLever1} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Pulling 1st Lever --}
+	IF:	Always
 		DO:	DoAll
 				Chat {/mt use Lever}
 				SetState {GoToJump1}
 ~~ }
 STATE: {GoToJump1} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping down from 1st Lever --}
 	IF:	All
 			CellE 5867031F
 			SecsInStateGE 2
@@ -229,6 +247,8 @@ STATE: {GoToJump1} ~~ {
 		DO:	SetState {GoToEntranceFromJump1}
 ~~ }
 STATE: {GoToEntranceFromJump1} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going back to 3 way split --}
 	IF:	All
 			NavEmpty
 			Any
@@ -241,6 +261,8 @@ STATE: {GoToEntranceFromJump1} ~~ {
 				EmbedNav navGoToEntranceFromJump1 {GoToEntranceFromJump1}
 ~~ }
 STATE: {GoToDoor1} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to 1st Door (Right Path) --}
 	IF:	All
 			NavEmpty
 			CellE 586702B3
@@ -249,6 +271,8 @@ STATE: {GoToDoor1} ~~ {
 		DO:	EmbedNav navGoToDoor1 {GoToDoor1}
 ~~ }
 STATE: {GoToJump2} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping across pit --}
 	IF:	CellE 586702B5
 		DO:	SetState {GoToJumpPuzzle}
 	IF:	Always
@@ -259,6 +283,8 @@ STATE: {GoToJump2} ~~ {
 ~~ }
 STATE: {GoToJumpPuzzle} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Going to 2nd Lever (Jump Puzzle) --}
+	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
 				EmbedNav navGoToJumpPuzzle {GoToJumpPuzzle}
@@ -268,6 +294,8 @@ STATE: {GoToJumpPuzzle} ~~ {
 		DO:	SetState {DoJumpPuzzle}
 ~~ }
 STATE: {DoJumpPuzzle} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Doing the Jump Puzzle & pulling 2nd Lever --}
 	IF:	Expr {getgvar[qlou-leverpuller]==getcharstringprop[1]}
 		DO:	EmbedNav navDoJumpPuzzle {DoJumpPuzzle}
 	IF:	All
@@ -286,6 +314,8 @@ STATE: {DoJumpPuzzle} ~~ {
 ~~ }
 STATE: {DoJumpPuzzleJumpDown} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Jumping down from Jump Puzzle --}
+	IF:	Always
 		DO:	EmbedNav navDoJumpPuzzleJumpDown {DoJumpPuzzleJumpDown}
 	IF:	All
 			NavEmpty
@@ -297,18 +327,24 @@ STATE: {DoJumpPuzzleJumpDown} ~~ {
 		DO:	SetState {DoJumpPuzzle}
 ~~ }
 STATE: {GoToJump3} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping down after 2nd Lever --}
 	IF:	CellE 5867029D
 		DO:	SetState {GoToEntranceFromJump3}
 	IF:	Always
 		DO:	EmbedNav navGoToJump3 {GoToJump3}
 ~~ }
 STATE: {GoToEntranceFromJump3} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going back to 3 way split --}
 	IF:	CellE 58670269
 		DO:	SetState {GoToDoor2}
 	IF:	Always
 		DO:	EmbedNav navGoToEntranceFromJump3 {GoToEntranceFromJump3}
 ~~ }
 STATE: {GoToDoor2} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to 2nd Door (Middle Path) --}
 	IF:	Always
 		DO:	EmbedNav navGoToDoor2 {GoToDoor2}
 	IF:	All
@@ -317,12 +353,16 @@ STATE: {GoToDoor2} ~~ {
 		DO:	SetState {GoToJump4}
 ~~ }
 STATE: {GoToJump4} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping across pit --}
 	IF:	CellE 5867025F
 		DO:	SetState {GoToLever3}
 	IF:	Always
 		DO:	EmbedNav navGoToJump4 {GoToJump4}
 ~~ }
 STATE: {GoToLever3} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to 3rd Lever --}
 	IF:	All
 			NavEmpty
 			CellE 586702F4
@@ -338,11 +378,15 @@ STATE: {GoToLever3} ~~ {
 ~~ }
 STATE: {PullLever3} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Pulling 3rd Lever --}
+	IF:	Always
 		DO:	DoAll
 				Chat {/mt use Lever}
 				SetState {GoToJump5}
 ~~ }
 STATE: {GoToJump5} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping down after 3rd Lever --}
 	IF:	All
 			NavEmpty
 			CellE 5867022E
@@ -360,6 +404,8 @@ STATE: {GoToJump5} ~~ {
 		DO:	EmbedNav navGoToJump5 {GoToJump5}
 ~~ }
 STATE: {GoToDoor3} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going back to 3 way split then Door 3 (Right Path) --}
 	IF:	All
 			NavEmpty
 			CellE 58670188
@@ -368,6 +414,8 @@ STATE: {GoToDoor3} ~~ {
 		DO:	EmbedNav navGoToDoor3 {GoToDoor3}
 ~~ }
 STATE: {GoToJump6} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Jumping down after Door 3 --}
 	IF:	All
 			NavEmpty
 			CellE 58670179
@@ -376,6 +424,8 @@ STATE: {GoToJump6} ~~ {
 		DO:	EmbedNav navGoToJump6 {GoToJump6}
 ~~ }
 STATE: {GoToCurator} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Going to Final Boss --}
 	IF:	All
 			NavEmpty
 			Any
@@ -386,6 +436,8 @@ STATE: {GoToCurator} ~~ {
 		DO:	EmbedNav navGoToCurator {GoToCurator}
 ~~ }
 STATE: {KillingSimulacrum} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Killing Simulacrum Shifter --}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
@@ -400,6 +452,8 @@ STATE: {KillingSimulacrum} ~~ {
 				SetState {KillingSimulacrum}
 ~~ }
 STATE: {LootingSimulacrum} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Looting Simulacrum Shifter --}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToDelegateJump}
 	IF:	ItemCountGE 1 {Door Key}
@@ -416,6 +470,8 @@ STATE: {LootingSimulacrum} ~~ {
 				SetWatchdog 3 15 {LootingSimulacrum}
 ~~ }
 STATE: {UnlockAndOpenFinalDoor} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Unlocking and Opening the Final Door --}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToDelegateJump}
 	IF:	Always
@@ -425,17 +481,23 @@ STATE: {UnlockAndOpenFinalDoor} ~~ {
 ~~ }
 STATE: {GoToDelegateJump} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Jumping across the last pit --}
+	IF:	Always
 		DO:	EmbedNav navGoToDelegateJump {GoToDelegateJump}
 	IF:	NavEmpty
 		DO:	SetState {GoToDelegate}
 ~~ }
 STATE: {GoToDelegate} ~~ {
 	IF:	Always
+		DO:	Chat {/vt echo -- Going to the Virindi Delegate to get Rewards --}
+	IF:	Always
 		DO:	EmbedNav navGoToDelegate {GoToDelegate}
 	IF:	NavEmpty
 		DO:	SetState {AllDone}
 ~~ }
 STATE: {AllDone} ~~ {
+	IF:	Always
+		DO:	Chat {/vt echo -- Liberation of Uziz Completed! --}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setgvar[qlou-numcharsdone,getgvar[qlou-numcharsdone]+1]}
