@@ -44,6 +44,7 @@ STATE: {Default} ~~ {
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
+				Chat {/vt echo [META]: Starting Quest: Virindi Rescue}
 				EmbedNav navNone {None}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
@@ -105,12 +106,16 @@ STATE: {QuestProgressCheck} ~~ {
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Recalling to Aphus Lassel}
 	IF:	IntoPortal
 		DO:	SetState {GoToTownNetwork}
 	IF:	Expr {actiontrycastbyid[2931]}
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to Town Network}
 	IF:	CellE 00070145
 		DO:	SetState {GoToPlateau}
 	IF:	Always
@@ -118,11 +123,17 @@ STATE: {GoToTownNetwork} ~~ {
 ~~ }
 STATE: {GoToPlateau} ~~ {
 	IF:	Always
+		DO: Chat {/vt echo [META]: Going to Plateau Village}
+	IF:	Always
 		DO:	EmbedNav navTownNetworkToPlateau {navTownNetworkToPlateau}
 	IF:	CellE 49B70021
 		DO:	SetState {QuestProgressCheck}
 ~~ }
 STATE: {GoToOmarah} ~~ {
+	IF:	Not ItemCountGE 1 {Essence of Dravann}
+		DO: Chat {/vt echo [META]: Going to Omarah to pick up quest}
+	IF:	ItemCountGE 1 {Essence of Dravann}
+		DO: Chat {/vt echo [META]: Going to Omarah to collect rewards}
 	IF:	CellE 49B70021
 		DO:	DoAll
 				SetOpt {OpenDoors} {true}
@@ -145,12 +156,16 @@ STATE: {GoToOmarah} ~~ {
 		DO:	SetState {TurnInEssence}
 ~~ }
 STATE: {RecallPortal} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Casting Portal Recall (Plateau Village)}
 	IF:	IntoPortal
 		DO:	SetState {QuestProgressCheck}
 	IF:	Expr {actiontrycastbyid[2645]}
 		DO:	SetState {RecallPortal}
 ~~ }
 STATE: {GoToVRF} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to Dungeon: Virindi Research Facility}
 	IF:	CellE 56550318
 		DO:	SetState {EnteredVRF}
 	IF:	Always
@@ -159,6 +174,8 @@ STATE: {GoToVRF} ~~ {
 				EmbedNav navGoToVRF {navGoToVRF}
 ~~ }
 STATE: {EnteredVRF} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Entered Virindi Research Facility}
 	IF:	Always
 		DO:	DoAll
 				EmbedNav navNone {None}
@@ -170,6 +187,8 @@ STATE: {EnteredVRF} ~~ {
 				SetState {GoToFirstJailor}
 ~~ }
 STATE: {GoToFirstJailor} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to Jailor 1 of 3}
 	IF:	CellE 5655039C
 		DO:	SetState {OpeningFirstDoor}
 	IF:	CellE 56550318
@@ -177,8 +196,10 @@ STATE: {GoToFirstJailor} ~~ {
 ~~ }
 STATE: {OpeningFirstDoor} ~~ {
 	IF:	Always
+		DO: Chat {/vt echo [META]: Killing Jailor to Unlock and Open Door 1 of 4}
+	IF:	Always
 		DO:	SetOpt {EnableLooting} {true}
-	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,^Door]]}
+	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,`^Door`]]}
 		DO:	SetState {GoToSecondJailor}
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
@@ -196,6 +217,8 @@ STATE: {OpeningFirstDoor} ~~ {
 				SetWatchdog 3 15 {OpeningFirstDoor}
 ~~ }
 STATE: {GoToSecondJailor} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to Jailor 2 of 3}
 	IF:	CellE 56550392
 		DO:	SetState {OpeningSecondDoor}
 	IF:	CellE 5655037B
@@ -207,6 +230,8 @@ STATE: {GoToSecondJailor} ~~ {
 ~~ }
 STATE: {OpeningSecondDoor} ~~ {
 	IF:	Always
+		DO: Chat {/vt echo [META]: Killing Jailor to Unlock and Open Door 2 of 4}
+	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableLooting} {true}
 				SetOpt {EnableCombat} {true}
@@ -214,10 +239,12 @@ STATE: {OpeningSecondDoor} ~~ {
 		DO:	DoAll
 				EmbedNav navOpenSecondDoor {navOpenSecondDoor}
 				SetWatchdog 3 15 {OpeningSecondDoor}
-	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,^Door]]}
+	IF:	Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,`^Door`]]}
 		DO:	SetState {GoToThirdJailor}
 ~~ }
 STATE: {GoToThirdJailor} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to Jailor 3 of 3}
 	IF:	CellE 56550296
 		DO:	SetState {OpeningThirdDoor}
 	IF:	CellE 565502B5
@@ -229,6 +256,8 @@ STATE: {GoToThirdJailor} ~~ {
 ~~ }
 STATE: {OpeningThirdDoor} ~~ {
 	IF:	Always
+		DO: Chat {/vt echo [META]: Killing Jailor to Unlock and Open Door 3 of 4}
+	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableLooting} {true}
 				SetOpt {EnableCombat} {true}
@@ -237,11 +266,13 @@ STATE: {OpeningThirdDoor} ~~ {
 				EmbedNav navOpenThirdDoor {navOpenThirdDoor}
 				SetWatchdog 3 15 {OpeningThirdDoor}
 	IF:	All
-			Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,^Door]]}
+			Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,`^Door`]]}
 			NavEmpty
 		DO:	SetState {GoToKeeper}
 ~~ }
 STATE: {GoToKeeper} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to Virindi Keeper}
 	IF:	CellE 565501AA
 		DO:	SetState {GettingLastKey}
 	IF:	Always
@@ -250,6 +281,8 @@ STATE: {GoToKeeper} ~~ {
 				EmbedNav navGoToKeeper {navGoToKeeper}
 ~~ }
 STATE: {GettingLastKey} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Getting the Virindi Research Center Key}
 	IF:	ItemCountGE 1 {Virindi Research Center Key}
 		DO:	DoExpr {setgvar[qvrc-finalkey,1]}
 	IF:	Expr {getgvar[qvrc-finalkey]==1}
@@ -259,6 +292,8 @@ STATE: {GettingLastKey} ~~ {
 				SetOpt {EnableLooting} {true}
 ~~ }
 STATE: {GoToLastDoor} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to the Last Door}
 	IF:	All
 			CellE 5655018F
 			Expr {wobjectgetisdooropen[wobjectfindnearestbynameandobjectclass[26,Virindi Research Center]]}
@@ -270,11 +305,15 @@ STATE: {GoToLastDoor} ~~ {
 ~~ }
 STATE: {GoToJump} ~~ {
 	IF:	Always
+		DO: Chat {/vt echo [META]: Going to the Last Door}
+	IF:	Always
 		DO:	EmbedNav navGoToJump {navGoToJump}
 	IF:	NavEmpty
 		DO:	SetState {DoJump}
 ~~ }
 STATE: {DoJump} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Jumping down to Final Boss Zone}
 	IF:	CellE 5655010B
 		DO:	SetState {GoToLastBoss}
 	IF:	NavEmpty
@@ -283,12 +322,16 @@ STATE: {DoJump} ~~ {
 				SetWatchdog 3 3 {DoJump}
 ~~ }
 STATE: {GoToLastBoss} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Going to the Final Boss}
 	IF:	CellE 56550107
 		DO:	SetState {GettingEssenceOfDravann}
 	IF:	Always
 		DO:	EmbedNav navGoToLastBoss {navGoToLastBoss}
 ~~ }
 STATE: {GettingEssenceOfDravann} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Killing and Looting Final Boss: Dravann}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableLooting} {true}
@@ -301,6 +344,8 @@ STATE: {GettingEssenceOfDravann} ~~ {
 ~~ }
 STATE: {TurnInEssence} ~~ {
 	IF:	Always
+		DO: Chat {/vt echo [META]: turning in Essence of Dravann}
+	IF:	Always
 		DO:	Chat {/ub give Essence of Dravann to Omarah}
 	IF:	All
 			ChatMatch {Omarah is too busy to accept gifts right now\.}
@@ -310,6 +355,8 @@ STATE: {TurnInEssence} ~~ {
 				SetState {AllDone}
 ~~ }
 STATE: {AllDone} ~~ {
+	IF:	Always
+		DO: Chat {/vt echo [META]: Quest Completed: Virindi Rescue}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setgvar[qvrc-numcharsdone,getgvar[qvrc-numcharsdone]+1]}
