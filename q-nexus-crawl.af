@@ -296,7 +296,7 @@ STATE: {KillingApostateMaster} ~~ {
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {false}
-				SetOpt {NavCloseStopRange} {0.0003}
+				SetOpt {NavCloseStopRange} {0.003}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {RunningToEnd}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,Apostate Nexus Master]!=0}
