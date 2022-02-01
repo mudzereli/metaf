@@ -46,7 +46,7 @@ STATE: {*SetupOptions*} ~~ {
 		DO:	DoExpr {setgvar[qlou-leverpuller,Porkchop]}
 	IF:	Always
 		DO:	DoAll
-				Chat {/vt echo -- Starting Quest: Liberation of Uziz --}
+				Chat {/vt echo [META]: Starting Quest: Liberation of Uziz}
 				EmbedNav navNone {None}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
@@ -67,10 +67,10 @@ STATE: {*SetupOptions*} ~~ {
 	IF:	SecsInStateGE 8
 		DO:	SetState {SynchronizeChars}
 ~~ }
-STATE: {SynchronizeChars}
+STATE: {SynchronizeChars} ~~{
 	IF:	Not Expr {listcontains[getgvar[qlou-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				Chat {/vt echo -- Loading Liberation of Uziz meta on all Characters --}
+				Chat {/vt echo [META]: Synchronizing Liberation of Uziz meta on all Characters}
 				DoExpr {listadd[getgvar[qlou-chars],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
@@ -78,7 +78,7 @@ STATE: {SynchronizeChars}
 		DO:	SetState {SynchronizeChars}
 	IF:	SecsInStateGE 8
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Starting Liberation of Uziz with +listcount[getgvar[qlou-chars]]+\ Characters\! \-\-}
+				ChatExpr {`/vt echo [META] Starting Liberation of Uziz with `+listcount[getgvar[qlou-chars]]+` Characters!`}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -146,7 +146,7 @@ STATE: {QuestProgressCheck} ~~ {
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Recalling to Aphus Lassel --}
+		DO:	Chat {/vt echo [META]: Recalling to Aphus Lassel}
 	IF:	Any
 			IntoPortal
 			CellE F6820033
@@ -158,7 +158,7 @@ STATE: {RecallAphusLassel} ~~ {
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to Town Network --}
+		DO:	Chat {/vt echo [META]: Going to Town Network}
 	IF:	CellE 00070145
 		DO:	SetState {GoToAlArqas}
 	IF:	Always
@@ -166,7 +166,7 @@ STATE: {GoToTownNetwork} ~~ {
 ~~ }
 STATE: {GoToAlArqas} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to Al Arqas --}
+		DO:	Chat {/vt echo [META]: Going to Al Arqas}
 	IF:	CellE 8F58003B
 		DO:	SetState {GoToSettlementPortals}
 	IF:	Always
@@ -174,7 +174,7 @@ STATE: {GoToAlArqas} ~~ {
 ~~ }
 STATE: {GoToSettlementPortals} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to Settlement Portals --}
+		DO:	Chat {/vt echo [META]: Going to Settlement Portals}
 	IF:	CellE 9664001B
 		DO:	SetState {GoToVirindiEdifice}
 	IF:	Always
@@ -182,7 +182,7 @@ STATE: {GoToSettlementPortals} ~~ {
 ~~ }
 STATE: {GoToVirindiEdifice} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to Dungeon: Virindi Edifice --}
+		DO:	Chat {/vt echo [META]: Going to Dungeon: Virindi Edifice}
 	IF:	CellE 5867026B
 		DO:	SetState {EnteredVirindiEdifice}
 	IF:	Always
@@ -190,7 +190,7 @@ STATE: {GoToVirindiEdifice} ~~ {
 ~~ }
 STATE: {EnteredVirindiEdifice} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Entered Virindi Edifice --}
+		DO:	Chat {/vt echo [META]: Entered Virindi Edifice}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {OpenDoors} {true}
@@ -205,7 +205,7 @@ STATE: {EnteredVirindiEdifice} ~~ {
 ~~ }
 STATE: {GoToLever1} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to 1st Lever (Left Path) --}
+		DO:	Chat {/vt echo [META]: Going to 1st Lever (Left Path)}
 	IF:	Always
 		DO:	EmbedNav navGoToLever1 {GoToLever1}
 	IF:	All
@@ -220,7 +220,7 @@ STATE: {GoToLever1} ~~ {
 ~~ }
 STATE: {PullLever1} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Pulling 1st Lever --}
+		DO:	Chat {/vt echo [META]: Pulling 1st Lever}
 	IF:	Always
 		DO:	DoAll
 				Chat {/mt use Lever}
@@ -228,7 +228,7 @@ STATE: {PullLever1} ~~ {
 ~~ }
 STATE: {GoToJump1} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping down from 1st Lever --}
+		DO:	Chat {/vt echo [META]: Jumping down from 1st Lever}
 	IF:	All
 			CellE 5867031F
 			SecsInStateGE 2
@@ -248,7 +248,7 @@ STATE: {GoToJump1} ~~ {
 ~~ }
 STATE: {GoToEntranceFromJump1} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going back to 3 way split --}
+		DO:	Chat {/vt echo [META]: Going back to 3 way split}
 	IF:	All
 			NavEmpty
 			Any
@@ -262,7 +262,7 @@ STATE: {GoToEntranceFromJump1} ~~ {
 ~~ }
 STATE: {GoToDoor1} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to 1st Door (Right Path) --}
+		DO:	Chat {/vt echo [META]: Going to 1st Door (Right Path)}
 	IF:	All
 			NavEmpty
 			CellE 586702B3
@@ -272,7 +272,7 @@ STATE: {GoToDoor1} ~~ {
 ~~ }
 STATE: {GoToJump2} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping across pit --}
+		DO:	Chat {/vt echo [META]: Jumping across pit}
 	IF:	CellE 586702B5
 		DO:	SetState {GoToJumpPuzzle}
 	IF:	Always
@@ -283,7 +283,7 @@ STATE: {GoToJump2} ~~ {
 ~~ }
 STATE: {GoToJumpPuzzle} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to 2nd Lever (Jump Puzzle) --}
+		DO:	Chat {/vt echo [META]: Going to 2nd Lever (Jump Puzzle)}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
@@ -295,7 +295,7 @@ STATE: {GoToJumpPuzzle} ~~ {
 ~~ }
 STATE: {DoJumpPuzzle} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Doing the Jump Puzzle & pulling 2nd Lever --}
+		DO:	Chat {/vt echo [META]: Doing the Jump Puzzle & pulling 2nd Lever}
 	IF:	Expr {getgvar[qlou-leverpuller]==getcharstringprop[1]}
 		DO:	EmbedNav navDoJumpPuzzle {DoJumpPuzzle}
 	IF:	All
@@ -314,7 +314,7 @@ STATE: {DoJumpPuzzle} ~~ {
 ~~ }
 STATE: {DoJumpPuzzleJumpDown} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping down from Jump Puzzle --}
+		DO:	Chat {/vt echo [META]: Jumping down from Jump Puzzle}
 	IF:	Always
 		DO:	EmbedNav navDoJumpPuzzleJumpDown {DoJumpPuzzleJumpDown}
 	IF:	All
@@ -328,7 +328,7 @@ STATE: {DoJumpPuzzleJumpDown} ~~ {
 ~~ }
 STATE: {GoToJump3} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping down after 2nd Lever --}
+		DO:	Chat {/vt echo [META]: Jumping down after 2nd Lever}
 	IF:	CellE 5867029D
 		DO:	SetState {GoToEntranceFromJump3}
 	IF:	Always
@@ -336,7 +336,7 @@ STATE: {GoToJump3} ~~ {
 ~~ }
 STATE: {GoToEntranceFromJump3} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going back to 3 way split --}
+		DO:	Chat {/vt echo [META]: Going back to 3 way split}
 	IF:	CellE 58670269
 		DO:	SetState {GoToDoor2}
 	IF:	Always
@@ -344,7 +344,7 @@ STATE: {GoToEntranceFromJump3} ~~ {
 ~~ }
 STATE: {GoToDoor2} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to 2nd Door (Middle Path) --}
+		DO:	Chat {/vt echo [META]: Going to 2nd Door (Middle Path)}
 	IF:	Always
 		DO:	EmbedNav navGoToDoor2 {GoToDoor2}
 	IF:	All
@@ -354,7 +354,7 @@ STATE: {GoToDoor2} ~~ {
 ~~ }
 STATE: {GoToJump4} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping across pit --}
+		DO:	Chat {/vt echo [META]: Jumping across pit}
 	IF:	CellE 5867025F
 		DO:	SetState {GoToLever3}
 	IF:	Always
@@ -362,7 +362,7 @@ STATE: {GoToJump4} ~~ {
 ~~ }
 STATE: {GoToLever3} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to 3rd Lever --}
+		DO:	Chat {/vt echo [META]: Going to 3rd Lever}
 	IF:	All
 			NavEmpty
 			CellE 586702F4
@@ -378,7 +378,7 @@ STATE: {GoToLever3} ~~ {
 ~~ }
 STATE: {PullLever3} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Pulling 3rd Lever --}
+		DO:	Chat {/vt echo [META]: Pulling 3rd Lever}
 	IF:	Always
 		DO:	DoAll
 				Chat {/mt use Lever}
@@ -386,7 +386,7 @@ STATE: {PullLever3} ~~ {
 ~~ }
 STATE: {GoToJump5} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping down after 3rd Lever --}
+		DO:	Chat {/vt echo [META]: Jumping down after 3rd Lever}
 	IF:	All
 			NavEmpty
 			CellE 5867022E
@@ -405,7 +405,7 @@ STATE: {GoToJump5} ~~ {
 ~~ }
 STATE: {GoToDoor3} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going back to 3 way split then Door 3 (Right Path) --}
+		DO:	Chat {/vt echo [META]: Going back to 3 way split then Door 3 (Right Path)}
 	IF:	All
 			NavEmpty
 			CellE 58670188
@@ -415,7 +415,7 @@ STATE: {GoToDoor3} ~~ {
 ~~ }
 STATE: {GoToJump6} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping down after Door 3 --}
+		DO:	Chat {/vt echo [META]: Jumping down after Door 3}
 	IF:	All
 			NavEmpty
 			CellE 58670179
@@ -425,7 +425,7 @@ STATE: {GoToJump6} ~~ {
 ~~ }
 STATE: {GoToCurator} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to Final Boss --}
+		DO:	Chat {/vt echo [META]: Going to Final Boss}
 	IF:	All
 			NavEmpty
 			Any
@@ -437,7 +437,7 @@ STATE: {GoToCurator} ~~ {
 ~~ }
 STATE: {KillingSimulacrum} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Killing Simulacrum Shifter --}
+		DO:	Chat {/vt echo [META]: Killing Simulacrum Shifter}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
@@ -453,7 +453,7 @@ STATE: {KillingSimulacrum} ~~ {
 ~~ }
 STATE: {LootingSimulacrum} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Looting Simulacrum Shifter --}
+		DO:	Chat {/vt echo [META]: Looting Simulacrum Shifter}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToDelegateJump}
 	IF:	ItemCountGE 1 {Door Key}
@@ -471,7 +471,7 @@ STATE: {LootingSimulacrum} ~~ {
 ~~ }
 STATE: {UnlockAndOpenFinalDoor} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Unlocking and Opening the Final Door --}
+		DO:	Chat {/vt echo [META]: Unlocking and Opening the Final Door}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToDelegateJump}
 	IF:	Always
@@ -481,7 +481,7 @@ STATE: {UnlockAndOpenFinalDoor} ~~ {
 ~~ }
 STATE: {GoToDelegateJump} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Jumping across the last pit --}
+		DO:	Chat {/vt echo [META]: Jumping across the last pit}
 	IF:	Always
 		DO:	EmbedNav navGoToDelegateJump {GoToDelegateJump}
 	IF:	NavEmpty
@@ -489,7 +489,7 @@ STATE: {GoToDelegateJump} ~~ {
 ~~ }
 STATE: {GoToDelegate} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Going to the Virindi Delegate to get Rewards --}
+		DO:	Chat {/vt echo [META]: Going to the Virindi Delegate to get Rewards}
 	IF:	Always
 		DO:	EmbedNav navGoToDelegate {GoToDelegate}
 	IF:	NavEmpty
@@ -497,7 +497,7 @@ STATE: {GoToDelegate} ~~ {
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo -- Liberation of Uziz Completed! --}
+		DO:	Chat {/vt echo [META]: Liberation of Uziz Completed!}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setgvar[qlou-numcharsdone,getgvar[qlou-numcharsdone]+1]}
