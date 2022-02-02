@@ -44,7 +44,7 @@ STATE: {Default} ~~ {
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
-				Chat {/vt echo [META]: Starting Quest: Falatacot Depot}
+				DoExpr {echo[`[META]: Starting Quest: Falatacot Depot`,19]}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
@@ -69,7 +69,7 @@ STATE: {*SetupOptions*} ~~ {
 STATE: {SynchronizeChars} ~~{
 	IF:	Not Expr {listcontains[getgvar[qfdp-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				Chat {/vt echo [META]: Synchronizing Falatacot Depot meta on All Characters}
+				DoExpr {echo[`[META]: Synchronizing Falatacot Depot meta on All Characters`,19]}
 				DoExpr {listadd[getgvar[qfdp-chars],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
@@ -77,12 +77,12 @@ STATE: {SynchronizeChars} ~~{
 		DO:	SetState {SynchronizeChars}
 	IF:	SecsInStateGE 8
 		DO:	DoAll
-				ChatExpr {\/vt echo \[META\]\: Starting Falatacot Depot with +listcount[getgvar[qfdp-chars]]+\ Characters\!}
+				DoExpr {echo[`[META]: Starting Falatacot Depot with `+listcount[getgvar[qfdp-chars]]+` Characters!`,19]}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
-	~~IF:	ItemCountGE 1 {Translated Orders for Zrikux}
-	~~	DO:	SetState {LifestoneRecall}
+	IF:	ItemCountGE 1 {Translated Orders for Zrikux}
+		DO:	SetState {RecallLifestoneSending}
 	IF:	Any
 			CellE 585E018E
 			CellE 585E018B
@@ -112,7 +112,7 @@ STATE: {QuestProgressCheck} ~~ {
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Recalling to Aphus Lassel}
+		DO:	DoExpr {echo[`[META]: Recalling to Aphus Lassel`,19]}
 	IF:	Any
 			IntoPortal
 			CellE F6820033
@@ -124,7 +124,7 @@ STATE: {RecallAphusLassel} ~~ {
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Town Network}
+		DO:	DoExpr {echo[`[META]: Going to Town Network`,19]}
 	IF:	All
 			CellE 00070145
 			ItemCountGE 1 {Orders for Zrikux}
@@ -136,7 +136,7 @@ STATE: {GoToTownNetwork} ~~ {
 ~~ }
 STATE: {GoToLinvakTukal} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Linvak Tukal}
+		DO:	DoExpr {echo[`[META]: Going to Linvak Tukal`,19]}
 	IF:	CellE A21E001A
 		DO:	SetState {GoToOutsideLinvakTukal}
 	IF:	Always
@@ -144,7 +144,7 @@ STATE: {GoToLinvakTukal} ~~ {
 ~~ }
 STATE: {GoToOutsideLinvakTukal} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Taking portal to Outside Linvak Tukal}
+		DO:	DoExpr {echo[`[META]: Taking portal to Outside Linvak Tukal`,19]}
 	IF:	CellE A220002F
 		DO:	SetState {GoToFalatacotDepot}
 	IF:	Always
@@ -152,7 +152,7 @@ STATE: {GoToOutsideLinvakTukal} ~~ {
 ~~ }
 STATE: {GoToFalatacotDepot} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Dungeon: Falatacot Depot}
+		DO:	DoExpr {echo[`[META]: Going to Dungeon: Falatacot Depot`,19]}
 	IF:	CellE 585E0101
 		DO:	SetState {EnteredFalatacotDepot}
 	IF:	Always
@@ -160,7 +160,7 @@ STATE: {GoToFalatacotDepot} ~~ {
 ~~ }
 STATE: {EnteredFalatacotDepot} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Entered Falatacot Depot}
+		DO:	DoExpr {echo[`[META]: Entered Falatacot Depot`,19]}
 	IF:	Always
 		DO:	DoAll
 				EmbedNav navNone {None}
@@ -174,7 +174,7 @@ STATE: {EnteredFalatacotDepot} ~~ {
 ~~ }
 STATE: {SynchronizeCharsInDungeon} ~~{
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Synchronizing all Characters @ Dungeon Entrance}
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Dungeon Entrance`,19]}
 	IF:	Not Expr {listcontains[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
 		DO:	DoExpr {listadd[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
 	IF:	All
@@ -183,12 +183,12 @@ STATE: {SynchronizeCharsInDungeon} ~~{
 		DO:	SetState {SynchronizeCharsInDungeon}
 	IF: Expr {listcount[getgvar[qfdp-charsindungeon]]>=listcount[getgvar[qfdp-chars]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \[META\]\: Synchronized +listcount[getgvar[qfdp-chars]]+\ Characters @ Dungeon Entrance}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp-chars]]+` Characters @ Dungeon Entrance`,19]}
 				SetState {GoToForgeGuardian}
 ~~ }
 STATE: {GoToForgeGuardian} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Forge Guardian Room}
+		DO:	DoExpr {echo[`[META]: Going to Forge Guardian Room`,19]}
 	IF:	Always
 		DO:	EmbedNav navGoToForgeGuardian {GoToForgeGuardian}
 	~~ turn off attacking when we get to the door
@@ -200,7 +200,7 @@ STATE: {GoToForgeGuardian} ~~ {
 ~~}
 STATE: {SynchronizeCharsInFirstRoom} ~~{
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Synchronizing all Characters @ Forge Guardian Room}
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Forge Guardian Room`,19]}
 	IF:	Not Expr {listcontains[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
 		DO:	DoExpr {listadd[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
 	IF:	All
@@ -209,12 +209,12 @@ STATE: {SynchronizeCharsInFirstRoom} ~~{
 		DO:	SetState {SynchronizeCharsInFirstRoom}
 	IF: Expr {listcount[getgvar[qfdp-charsinfirstroom]]>=listcount[getgvar[qfdp-chars]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \[META\]\: Synchronized +listcount[getgvar[qfdp-chars]]+\ Characters @ Forge Guardian Room}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp-chars]]+` Characters @ Forge Guardian Room`,19]}
 				SetState {KillingForgeGuardian}
 ~~ }
 STATE: {KillingForgeGuardian} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Killing the Forge Guardian}
+		DO:	DoExpr {echo[`[META]: Killing the Forge Guardian`,19]}
 	IF:	Always
 		DO:	SetOpt {EnableNav} {true}
 	~~ kill him once everyone is done with their nav
@@ -228,7 +228,7 @@ STATE: {KillingForgeGuardian} ~~ {
 ~~ }
 STATE: {GoToTiatusOverseer} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Tiatus Overseer Room}
+		DO:	DoExpr {echo[`[META]: Going to Tiatus Overseer Room`,19]}
 	IF:	Always
 		DO:	EmbedNav navGoToTiatusOverseer {GoToTiatusOverseer}
 	~~ turn off attacking when we get to the door
@@ -240,7 +240,7 @@ STATE: {GoToTiatusOverseer} ~~ {
 ~~ }
 STATE: {SynchronizeCharsInSecondRoom} ~~{
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Synchronizing all Characters @ Tiatus Overseer Room}
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Tiatus Overseer Room`,19]}
 	IF:	Not Expr {listcontains[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
 		DO:	DoExpr {listadd[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
 	IF:	All
@@ -249,12 +249,12 @@ STATE: {SynchronizeCharsInSecondRoom} ~~{
 		DO:	SetState {SynchronizeCharsInSecondRoom}
 	IF: Expr {listcount[getgvar[qfdp-charsinsecondroom]]>=listcount[getgvar[qfdp-chars]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \[META\]\: Synchronized +listcount[getgvar[qfdp-chars]]+\ Characters @ Tiatus Overseer Room}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp-chars]]+` Characters @ Tiatus Overseer Room`,19]}
 				SetState {KillingTiatusOverseer}
 ~~ }
 STATE: {KillingTiatusOverseer} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Killing Tiatus Overseer}
+		DO:	DoExpr {echo[`[META]: Killing Tiatus Overseer`,19]}
 	IF:	Always
 		DO:	SetOpt {EnableNav} {true}
 	~~ kill him once everyone is done with their nav
@@ -268,7 +268,7 @@ STATE: {KillingTiatusOverseer} ~~ {
 ~~ }
 STATE: {GoToZrikux} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Zrikux}
+		DO:	DoExpr {echo[`[META]: Going to Zrikux`,19]}
 	IF:	All
 			NavEmpty
 			Any
@@ -282,7 +282,7 @@ STATE: {GoToZrikux} ~~ {
 ~~ }
 STATE: {KillingAndLootingZrikux} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Killing and Looting Zrikux}
+		DO:	DoExpr {echo[`[META]: Killing and Looting Zrikux`,19]}
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableLooting} {true}
@@ -300,9 +300,38 @@ STATE: {KillingAndLootingZrikux} ~~ {
 				Chat {/ub close corpse}
 				SetState {RecallAphusLassel}
 ~~ }
+STATE: {KillingZrikux} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing Zrikux`,19]}
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
+				SetOpt {NavCloseStopRange} {0.003}
+	IF:	ItemCountGE 1 {Orders for Zrikux}
+		DO:	SetState {RecallAphusLassel}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]&&1}
+		DO:	SetState {LootingZrikux}
+~~ }
+STATE: {LootingZrikux} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Looting Zrikux`,19]}
+	IF:	ItemCountGE 1 {Orders for Zrikux}
+		DO:	SetState {RecallAphusLassel}
+	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
+		DO: SetState {KillingZrikux}
+	IF:	Expr {wobjectgetopencontainer[]&&1}
+		DO:	DoAll
+				Chat {/ub use Orders for Zrikux}
+				SetWatchdog 3 5 {LootingZrikux}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Zrikux`]]}
+				SetWatchdog 3 5 {LootingZrikux}
+~~ }
 STATE: {GoToHebianTo} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Hebian-To}
+		DO:	DoExpr {echo[`[META]: Going to Hebian-To`,19]}
 	IF:	CellE E64E002F
 		DO:	SetState {GoToHebianToLibrary}
 	IF:	Always
@@ -310,7 +339,7 @@ STATE: {GoToHebianTo} ~~ {
 ~~ }
 STATE: {GoToHebianToLibrary} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Going to Hebian-To Library}
+		DO:	DoExpr {echo[`[META]: Going to Hebian-To Library`,19]}
 	IF:	All
 			NavEmpty
 			CellE E54E010A
@@ -322,17 +351,19 @@ STATE: {GoToHebianToLibrary} ~~ {
 ~~ }
 STATE: {TranslateOrders} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Translating Orders for Zrikux}
+		DO:	DoExpr {echo[`[META]: Translating Orders for Zrikux`,19]}
 	IF:	Always
-		DO:	Chat {/ub give orders for zrikux to fanzen san the translator}
-	IF:	ChatMatch {Fanzen San the Translator gives you Translated Orders for Zrikux}
+		DO:	Chat {/ub give Orders for Zrikux to Fanzen San the Translator}
+	IF:	Any
+			ChatMatch {^Fanzen San the Translator gives you Translated Orders for Zrikux}
+			ItemCountGE 1 {Translated Orders for Zrikux}
 		DO:	SetState {RecallLifestoneSending}
 	IF:	SecsInStateGE 3
 		DO:	SetState {TranslateOrders}
 ~~ }
 STATE: {RecallLifestoneSending} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Recalling to Lifestone}
+		DO:	DoExpr {echo[`[META]: Recalling to Lifestone`,19]}
 	IF:	IntoPortal
 		DO:	SetState {AllDone}
 	IF:	Expr {actiontrycastbyid[1636]}
@@ -343,11 +374,11 @@ STATE: {RecallLifestoneSending} ~~ {
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
-		DO:	Chat {/vt echo [META]: Quest Completed: Falatacot Depot}
+		DO:	DoExpr {echo[`[META]: Quest Completed: Falatacot Depot`,19]}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setgvar[qfdp-charsdone,getgvar[qfdp-charsdone]+1]}
-				ChatExpr {\/f Falatacot Depot Completed\! \(+getgvar[qfdp-charsdone]+\)}
+				ChatExpr {`/f Falatacot Depot Completed! (`+getgvar[qfdp-charsdone]+`)`}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
