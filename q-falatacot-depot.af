@@ -88,7 +88,7 @@ STATE: {QuestProgressCheck} ~~ {
 			CellE 585E018B
 			CellE 585E018C
 			CellE 585E018F
-		DO:	SetState {KillingAndLootingZrikux}
+		DO:	SetState {KillingZrikux}
 	IF:	CellE E54E010A
 		DO:	SetState {TranslateOrders}
 	IF:	CellE E54E010A
@@ -276,29 +276,9 @@ STATE: {GoToZrikux} ~~ {
 				CellE 585E018B
 				CellE 585E018C
 				CellE 585E018F
-		DO:	SetState {KillingAndLootingZrikux}
+		DO:	SetState {KillingZrikux}
 	IF:	Always
 		DO:	EmbedNav navGoToZrikux {GoToZrikux}
-~~ }
-STATE: {KillingAndLootingZrikux} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Killing and Looting Zrikux`,19]}
-	IF:	Always
-		DO:	DoAll
-				SetOpt {EnableLooting} {true}
-				SetOpt {LootFellowCorpses} {true}
-				SetOpt {AttackDistance} {0.1}
-				SetOpt {ApproachDistance} {0.1}
-				SetOpt {CorpseApproachRange-Min} {0.00833}
-				SetOpt {CorpseApproachRange-Max} {0.1}
-				SetOpt {LootAllCorpses} {true}
-	IF:	ItemCountGE 1 {Orders for Zrikux}
-		DO:	DoAll
-				SetOpt {EnableLooting} {false}
-				SetOpt {EnableCombat} {false}
-				SetOpt {NavCloseStopRange} {0.00833}
-				Chat {/ub close corpse}
-				SetState {RecallAphusLassel}
 ~~ }
 STATE: {KillingZrikux} ~~ {
 	IF:	Always
