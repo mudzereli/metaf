@@ -7,33 +7,75 @@ CellE 00070145
 CellE 49B70021
 ~~ Virindi Research Facility Drop
 CellE 56550318
+~~ Lifestone Sending
+actiontrycastbyid[1636]
+~~ Recall Aphus Lassel
+actiontrycastbyid[2931]
+~~ Summong Primary Portal I
+actiontrycastbyid[157]
 
-STATE: {RecallLifestoneSending} ~~ {
-	IF:	IntoPortal
-		DO:	SetState {AllDone}
-	IF:	Expr {actiontrycastbyid[1636]}
-		DO:	DoAll
-				SetOpt {EnableLooting} {false}
-				SetOpt {EnableCombat} {false}
-				SetState {RecallLifestoneSending}
-~~ }
-STATE: {RecallAphusLassel} ~~ {
+
+
+~~ RECALLING
+STATE: {RecallState} ~~ {
 	IF:	Any
 			IntoPortal
-			CellE F6820033
-		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontrycastbyid[2931]}
+			CellE __destination_landcell
+		DO:	SetState {__destination}
+	IF:	Expr {actiontrycastbyid[__recall_spell_id]}
 		DO:	DoAll
 				SetOpt {EnableLooting} {false}
 				SetOpt {EnableCombat} {false}
-				SetState {RecallAphusLassel}
+				SetState {RecallState}
 ~~ }
-STATE: {GoToTownNetwork} ~~ {
-	IF:	CellE 00070145
+~~ REGULAR NAV
+STATE: {GoToArea} ~~ {
+	IF:	CellE __destination_landcell
 		DO:	SetState {GoToNextArea}
 	IF:	Always
-		DO:	EmbedNav navAphusLasselToTownNetwork {navAphusLasselToTownNetwork}
+		DO:	EmbedNav navGoToArea {GoToArea}
 ~~ }
+~~ KILLING AND LOOTING SOMETHING
+STATE: {KillingZrikux} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing Zrikux`,19]}
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
+				SetOpt {NavCloseStopRange} {0.003}
+	IF:	ItemCountGE 1 {Orders for Zrikux}
+		DO:	SetState {RecallAphusLassel}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]&&1}
+		DO:	SetState {LootingZrikux}
+~~ }
+STATE: {LootingZrikux} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Looting Zrikux`,19]}
+	IF:	ItemCountGE 1 {Orders for Zrikux}
+		DO:	SetState {RecallAphusLassel}
+	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
+		DO: SetState {KillingZrikux}
+	IF:	Expr {wobjectgetopencontainer[]&&1}
+		DO:	DoAll
+				Chat {/ub use Orders for Zrikux}
+				SetWatchdog 3 5 {LootingZrikux}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Zrikux`]]}
+				SetWatchdog 3 5 {LootingZrikux}
+~~ }
+~~ SUMMONING A PORTAL
+STATE: {SummonPortalToNexus} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Summoning a Portal to Nexus`,19]}
+	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
+		DO:	SetState {SummonPortalToNexusSummoned}
+	IF:	Expr {actiontrycastbyid[157]}
+		DO:	SetState {SummonPortalToNexus}
+~~ }
+
+
 
 NAV: navNone once ~~ {
 ~~ }
