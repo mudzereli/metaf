@@ -43,6 +43,8 @@ STATE: {Default} ~~ {
 ~~ }
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Loading Script: Falatacot Depot XP Share`,19]}
+	IF:	Always
 		DO:	DoAll
 				Chat {/mt fellow quit}
 				EmbedNav navNone {None}
@@ -54,7 +56,7 @@ STATE: {*SetupOptions*} ~~ {
 ~~ }
 STATE: {CheckLocation} ~~ {
 	IF:	CellE 00070145
-		DO:	SetState {GoToLinvak}
+		DO:	SetState {GoToLinvakTukal}
 	IF:	CellE A21E001A
 		DO:	SetState {GoToNeelic}
 	IF:	CellE A21E0026
@@ -63,6 +65,8 @@ STATE: {CheckLocation} ~~ {
 		DO:	SetState {RecallAphusLassel}
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Recalling to Aphus Lassel`,19]}
 	IF:	Any
 			IntoPortal
 			CellE F6820033
@@ -74,18 +78,24 @@ STATE: {RecallAphusLassel} ~~ {
 				SetState {RecallAphusLassel}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Town Network`,19]}
 	IF:	CellE 00070145
 		DO:	SetState {GoToLinvakTukal}
 	IF:	Always
 		DO:	EmbedNav navAphusLasselToTownNetwork {GoToTownNetwork}
 ~~ }
 STATE: {GoToLinvakTukal} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Linvak Tukal`,19]}
 	IF:	CellE A21E001A
 		DO:	SetState {GoToNeelic}
 	IF:	Always
 		DO:	EmbedNav navTownNetworkToLinvakTukal {GoToLinvakTukal}
 ~~ }
 STATE: {GoToNeelic} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Neelic`,19]}
 	IF:	All
 			NavEmpty
 			CellE A21E0026
@@ -94,10 +104,16 @@ STATE: {GoToNeelic} ~~ {
 		DO:	EmbedNav navGoToNeelic {GoToNeelic}
 ~~ }
 STATE: {WaitingForInvite} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Waiting for Fellowship Invite`,19]}
+	IF:	ItemCountLE 0 {Translated Orders for Zrikux}
+		DO:	SetState {DoneTurningIn}
 	IF:	ChatMatch {^You have been recruited into the .* fellowship.*}
 		DO:	SetState {TurningInItem}
 ~~ }
 STATE: {TurningInItem} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Turning in Translated Orders for Zrikux`,19]}
 	IF:	ItemCountGE 1 {Translated Orders for Zrikux}
 		DO:	Chat {/ub give Translated Orders for Zrikux to Neelic}
 	IF:	ItemCountLE 0 {Translated Orders for Zrikux}
@@ -106,6 +122,8 @@ STATE: {TurningInItem} ~~ {
 		DO:	SetState {TurningInItem}
 ~~ }
 STATE: {DoneTurningIn} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Done Turning in Translated Orders for Zrikux`,19]}
 	IF:	ChatMatch {^You\'ve earned .* experience\.}
 		DO:	DoAll
 				Chat {/ub jumpx}
@@ -114,9 +132,15 @@ STATE: {DoneTurningIn} ~~ {
 				SetState {DropItems}
 ~~ }
 STATE: {DropItems} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Dropping Extra Quest Items`,19]}
 	IF:	ItemCountGE 1 {Forging Gloves}
 		DO:	Chat {/mt drop Forging Gloves}
-	IF:	ItemCountLE 0 {Forging Gloves}
+	IF:	ItemCountGE 1 {Trasnlated Orders for Zrikux}
+		DO:	Chat {/mt drop Trasnlated Orders for Zrikux}
+	IF:	All
+			ItemCountLE 0 {Forging Gloves}
+			ItemCountGE 1 {Trasnlated Orders for Zrikux}
 		DO:	SetState {AllDone}
 	IF:	SecsInStateGE 1
 		DO:	SetState {DropItems}
