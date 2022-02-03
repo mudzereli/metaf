@@ -267,7 +267,7 @@ STATE: {RunningToApostateMaster} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Running to the Apostate Nexus Master`,19]}
 	IF:	CellE 7F02019F
-		DO:	SetOpt {NavCloseStopRange} {0.01}
+		DO:	SetOpt {NavCloseStopRange} {0.015}
 	IF:	All
 			NavEmpty
 			CellE 7F02019E
@@ -296,7 +296,7 @@ STATE: {KillingApostateMaster} ~~ {
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {false}
-				SetOpt {NavCloseStopRange} {0.003}
+				SetOpt {NavCloseStopRange} {0.00833}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {RunningToEnd}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Apostate Nexus Master`]&&1}
