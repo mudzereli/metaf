@@ -297,7 +297,9 @@ STATE: {LootingZrikux} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Looting Zrikux`,19]}
 	IF:	ItemCountGE 1 {Orders for Zrikux}
-		DO:	SetState {RecallAphusLassel}
+		DO:	DoAll
+				Chat {/ub close corpse}
+				SetState {RecallAphusLassel}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
 		DO: SetState {KillingZrikux}
 	IF:	Expr {wobjectgetopencontainer[]&&1}
