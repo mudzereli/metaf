@@ -75,11 +75,11 @@ STATE: {LootingCorpse} ~~{
 	IF:	Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
 				ChatExpr {`/ub use `+getvar[ltr-itemname]}
-				SetWatchdog 3 5 {LootingCorpse}
+				SetWatchdog 3 3 {LootingCorpse}
 	IF:	Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,getvar[ltr-mobname]]]}
-				SetWatchdog 3 5 {LootingCorpse}
+				SetWatchdog 3 3 {LootingCorpse}
 ~~}
 STATE: {AllDone} ~~{
 	IF:	Always
