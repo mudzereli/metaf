@@ -40,17 +40,14 @@
 STATE: {Default} ~~{
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[TokenName,`Dark Falatacot Token of the Aura of Destruction`]}
-				DoExpr {setvar[TokenNPC,`Ka'hiri`]}
-	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
-		DO:	SetState {TurnInToken}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<5}
-		DO:	SetState {PickUpToken}
+				DoExpr {setvar[TokenName,`Token of the Aura of`]}
+				DoExpr {setvar[TokenNPC,`Nalicana`]}
+				SetState {PickUpToken}
 ~~}
 STATE: {PickUpToken} ~~{
 	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
 		DO:	SetState {TurnInToken}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<5}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<10}
 		DO:	ChatExpr {\/ub uselp +getvar[TokenName]}
 	IF: SecsInStateGE 3
 		DO:	SetState {PickUpToken}
@@ -58,15 +55,15 @@ STATE: {PickUpToken} ~~{
 STATE: {TurnInToken} ~~{
 	IF:	Any
 			ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
-			ChatMatch {^.* tells you\, \"You have maxxed out increases to .*\.\"}
-			ChatMatch {^.* tells you\, \"You cannot increase your .*\"}
+			~~ChatMatch {^.* tells you\, \"You have maxxed out increases to .*\.\"}
+			~~ChatMatch {^.* tells you\, \"You cannot increase your .*\"}
 		DO:	SetState {AllDone}
 	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]==0}
 		DO:	SetState {PickUpToken}
 	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
 		DO:	DoAll
 				Chat {/ub prepclick yes 10}
-				ChatExpr {\/ub give +getvar[TokenName]+\ to +getvar[TokenNPC]}
+				ChatExpr {`/ub givep `+getvar[TokenName]+` to `+getvar[TokenNPC]}
 	IF: SecsInStateGE 3
 		DO:	SetState {TurnInToken}
 ~~}
