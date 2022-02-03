@@ -90,10 +90,10 @@ STATE: {GoToTownNetwork} ~~ {
 		DO:	DoExpr {echo[`[META]: Going to Town Network`,19]}
 	IF:	CellE 00070145
 		DO:	SetState {GoToBaishi}
-	IF:	Always
-		DO:	EmbedNav navGoToTownNetwork {GoToTownNetwork}
 	IF:	CellE 00070143
 		DO:	EmbedNav navGoToAnnex {GoToAnnex}
+	IF:	NavEmpty
+		DO:	EmbedNav navGoToTownNetwork {GoToTownNetwork}
 ~~ }
 STATE: {GoToBaishi} ~~ {
 	IF:	Always
@@ -175,7 +175,7 @@ STATE: {LootingMatron} ~~ {
 				Chat {/ub close corpse}
 				SetState {RecallLifestoneSending}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
-		DO: SetState {KillingZrikux}
+		DO: SetState {KillingMatron}
 	IF:	Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
 				Chat {/ub use Brood Matron Carapace}
