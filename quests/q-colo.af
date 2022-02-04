@@ -43,8 +43,9 @@ STATE: {Default} ~~ {
 ~~ }
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Setting up for Colosseum`,19]}
+	IF:	Always
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Setting up for Colosseum\.\.\. \-\-}
 				EmbedNav navNone {None}
 				SetOpt {AttackDistance} {0.3}
 				SetOpt {ApproachDistance} {0.021}
@@ -63,12 +64,12 @@ STATE: {*SetupOptions*} ~~ {
 	IF:	SecsInStateGE 8
 		DO:	SetState {SynchronizeChars}
 ~~ }
-STATE: {SynchronizeChars}
+STATE: {SynchronizeChars} ~~ {
 	IF:	All
 			Expr {getfellowshipcount[]>=3}
 			Not Expr {listcontains[getgvar[qcolo-chars],getcharstringprop[1]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Loading Colosseum meta on all characters\.\.\. \-\-}
+				DoExpr {echo[`[META]: Synchronizing Colosseum Meta on all Characters`,19]}
 				DoExpr {listadd[getgvar[qcolo-chars],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
@@ -79,7 +80,7 @@ STATE: {SynchronizeChars}
 			SecsInStateGE 8
 			Expr {getfellowshipcount[]>=3}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- Starting Colosseum with +listcount[getgvar[qcolo-chars]]+\ characters\! \-\-}
+				DoExpr {echo[`[META]: Starting Colosseum with `+listcount[getgvar[qcolo-chars]]+` Characters!`,19]}
 				SetState {ProgressCheck}
 ~~ }
 STATE: {ProgressCheck} ~~ {
@@ -91,6 +92,8 @@ STATE: {ProgressCheck} ~~ {
 		DO:	SetState {GoToColo}
 ~~ }
 STATE: {GoToColo} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Recalling to Colosseum`,19]}
 	~~ we're here so stop casting
 	IF:	BlockE 00AF0000
 		DO:	SetState {ProgressCheck}
@@ -99,9 +102,9 @@ STATE: {GoToColo} ~~ {
 	IF:	Expr {actiontrycastbyid[4213]}
 		DO: SetState {GoToColo}
 ~~ }
-STATE: {SynchronizeWaitingForStart}
+STATE: {SynchronizeWaitingForStart} ~~ {
 	IF: Always
-		DO:	ChatExpr {\/vt echo \-\- Synchronizing characters @ Waiting For Start\.\.\. \-\-}
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Waiting For Start`,19]}
 	IF:	Not Expr {listcontains[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
 		DO:	DoExpr {listadd[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
 	IF:	All
@@ -110,10 +113,12 @@ STATE: {SynchronizeWaitingForStart}
 		DO:	SetState {SynchronizeWaitingForStart}
 	IF: Expr {listcount[getgvar[qcolo-charswaiting]]>=listcount[getgvar[qcolo-chars]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- +listcount[getgvar[qcolo-charswaiting]]+\ characters @ Waiting For Start\.\.\. \-\-}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo-charswaiting]]+` Characters @ Waiting For Start`,19]}
 				SetState {WaitingForStart}
 ~~ }
 STATE: {WaitingForStart} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Waiting For Start`,19]}
 	~~ this sets up all the initial variables when waiting to start
 	IF:	Always
 		DO:	DoAll
@@ -152,6 +157,8 @@ STATE: {WaitingForStart} ~~ {
 		DO:	SetState {GettingATicket}
 ~~ }
 STATE: {GettingATicket} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Getting a Ticket for Entry`,19]}
 	~~ if we get a ticket stub, start buffing and notify clients that it was received
 	IF:	ItemCountGE 1 {Colosseum Ticket Stub}
 		DO:	DoAll
@@ -173,6 +180,8 @@ STATE: {GettingATicket} ~~ {
 		DO:	SetState {GettingATicket}
 ~~ }
 STATE: {EnterFirstRoom} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Entering First Room of the Colosseum`,19]}
 	~~ first lets go into the arena, so that we can start our timer
 	IF:	NavEmpty
 		DO: DoAll
@@ -186,6 +195,8 @@ STATE: {EnterFirstRoom} ~~ {
 		DO:	SetState {BuffingBeforeRun}
 ~~ }
 STATE: {BuffingBeforeRun} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Buffing before Colosseum Run`,19]}
 	~~ first lets go into the arena, so that we can start our timer
 	IF:	Always
 		DO:	DoAll
@@ -197,9 +208,9 @@ STATE: {BuffingBeforeRun} ~~ {
 			ChatMatch {^You cast Blackmoor.*s Favor on yourself}
 		DO:	SetState {SynchronizeAfterBuffing}
 ~~ }
-STATE: {SynchronizeAfterBuffing}
+STATE: {SynchronizeAfterBuffing} ~~ {
 	IF: Always
-		DO:	ChatExpr {\/vt echo \-\- Synchronizing characters @ Finished Buffing\.\.\. \-\-}
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Finished Buffing`,19]}
 	IF:	Not Expr {listcontains[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
 		DO:	DoExpr {listadd[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
 	IF:	All
@@ -208,10 +219,12 @@ STATE: {SynchronizeAfterBuffing}
 		DO:	SetState {SynchronizeAfterBuffing}
 	IF: Expr {listcount[getgvar[qcolo-charsbuffed]]>=listcount[getgvar[qcolo-chars]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- +listcount[getgvar[qcolo-charsbuffed]]+\ characters @ Finished Buffing\.\.\. \-\-}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo-charsbuffed]]+` Characters @ Finished Buffing`,19]}
 				SetState {StartFirstRoom}
 ~~ }
 STATE: {StartFirstRoom} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Starting the First Room of Colosseum`,19]}
 	~~ do this special setup for starting the first room
 	IF:	Always
 		DO:	DoAll
@@ -223,6 +236,8 @@ STATE: {StartFirstRoom} ~~ {
 				SetState {StartCurrentRoom}
 ~~ }
 STATE: {StartCurrentRoom} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Setting up for this Colosseum Room`,19]}
 	~~ if we try to start the room, but we finished the run, then wait for our timer
 	IF:	Any
 			CellE 00AF0118
@@ -239,6 +254,8 @@ STATE: {StartCurrentRoom} ~~ {
 				SetState {KillingCurrentRoom}
 ~~ }
 STATE: {KillingCurrentRoom} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Starting Battle in this Colosseum Room`,19]}
 	IF:	Any
 			ChatMatch {A Door appears on the North wall.}
 			ChatMatch {Congratulations! You have beaten the Colosseum!}
@@ -248,6 +265,8 @@ STATE: {KillingCurrentRoom} ~~ {
 				SetState {MoveToNextRoom}
 ~~ }
 STATE: {MoveToNextRoom} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Moving to Next Colosseum Room`,19]}
 	~~ once we enter the portal, don't try to use it anymore
 	IF:	IntoPortal
 		DO:	SetState {MoveToNextRoomInPortal}
@@ -264,6 +283,8 @@ STATE: {MoveToNextRoomInPortal} ~~ {
 		DO:	SetState {StartCurrentRoom}
 ~~ }
 STATE: {WaitingForRewards} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Waiting for Rewards Timer to Run Out`,19]}
 	~~ if we started colo and we're at this step, then lets see if we're ready for turn in
 	IF:	Always
 		DO:	Chat {/myquests}
@@ -280,9 +301,9 @@ STATE: {WaitingForRewards} ~~ {
 			Expr {getqueststatus[coloarenafiveaccess]}
 		DO:	SetState {SynchronizeRewardTurnIn}
 ~~ }
-STATE: {SynchronizeRewardTurnIn}
+STATE: {SynchronizeRewardTurnIn} ~~ {
 	IF: Always
-		DO:	ChatExpr {\/vt echo \-\- Synchronizing characters @ Reward Turn In\.\.\. \-\-}
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Reward Turn In`,19]}
 	IF:	Not Expr {listcontains[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
 		DO:	DoExpr {listadd[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
 	IF:	All
@@ -291,10 +312,12 @@ STATE: {SynchronizeRewardTurnIn}
 		DO:	SetState {SynchronizeRewardTurnIn}
 	IF: Expr {listcount[getgvar[qcolo-charsreadyforturnin]]>=listcount[getgvar[qcolo-chars]]}
 		DO:	DoAll
-				ChatExpr {\/vt echo \-\- +listcount[getgvar[qcolo-charsreadyforturnin]]+\ characters @ Reward Turn In\.\.\. \-\-}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo-charsreadyforturnin]]+` Characters @ Reward Turn In`,19]}
 				SetState {TurnInRewards}
 ~~ }
 STATE: {TurnInRewards} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Collecting Rewards from Master Arbitrator`,19]}
 	~~ this actually gets us the reward
 	IF:	SecsInStateGE 3
 		DO:	DoAll
