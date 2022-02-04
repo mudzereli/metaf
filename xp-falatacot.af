@@ -136,11 +136,11 @@ STATE: {DropItems} ~~ {
 		DO:	DoExpr {echo[`[META]: Dropping Extra Quest Items`,19]}
 	IF:	ItemCountGE 1 {Forging Gloves}
 		DO:	Chat {/mt drop Forging Gloves}
-	IF:	ItemCountGE 1 {Trasnlated Orders for Zrikux}
-		DO:	Chat {/mt drop Trasnlated Orders for Zrikux}
+	IF:	ItemCountGE 1 {Translated Orders for Zrikux}
+		DO:	Chat {/mt drop Translated Orders for Zrikux}
 	IF:	All
 			ItemCountLE 0 {Forging Gloves}
-			ItemCountGE 1 {Trasnlated Orders for Zrikux}
+			ItemCountLE 0 {Translated Orders for Zrikux}
 		DO:	SetState {AllDone}
 	IF:	SecsInStateGE 1
 		DO:	SetState {DropItems}
