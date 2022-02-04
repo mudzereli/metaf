@@ -195,7 +195,7 @@ STATE: {RecallLifestoneSending} ~~ {
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Quest Completed: Brood Matron Hive (120+ Baishi)`,19]}
+		DO:	DoExpr {echo[`[META]: Quest Completed: Brood Matron Hive (90+ Uziz)`,19]}
 	IF:	Always
 		DO:	Chat {/f Baishi Matron Hive Complete!}
 ~~ }
