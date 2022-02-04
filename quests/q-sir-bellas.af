@@ -45,7 +45,14 @@ STATE: {Default} ~~ {
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
+				DoExpr {echo[`[META]: Starting Quest: Sir Bellas`,19]}
+				DoExpr {echo[`[META]: You must already be FLAGGED and at the AUG REALM DROP!`,19]}
+	IF:	Always
+		DO:	DoAll
 				EmbedNav navNone {None}
+				SetOpt {EnableNav} {true}
+				SetOpt {EnableBuffing} {false}
+				SetOpt {EnableCombat} {false}
 				DoExpr {setgvar[qsrb-numcharsdone,0]}
 				SetState {QuestProgressCheck}
 ~~ }
@@ -58,6 +65,8 @@ STATE: {QuestProgressCheck} ~~ {
 		DO:	SetState {GoToSirBellas}
 ~~ }
 STATE: {GoToSirBellas} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Sir Bellas`,19]}
 	IF:	CellE 00560124
 		DO:	SetState {KillSirBellas}
 	IF:	Always
@@ -68,8 +77,11 @@ STATE: {GoToSirBellas} ~~ {
 ~~ }
 STATE: {KillSirBellas} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing Sir Bellas`,19]}
+	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
+				SetOpt {CorpseApproachRange-Max} {0.015}
 				SetOpt {EnableLooting} {true}
 				SetOpt {LootAllCorpses} {true}
 				SetOpt {LootFellowCorpses} {true}
@@ -77,6 +89,8 @@ STATE: {KillSirBellas} ~~ {
 		DO:	SetState {RecallLifestoneSending}
 ~~ }
 STATE: {RecallLifestoneSending} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Recalling with Lifestone Sending`,19]}
 	IF:	IntoPortal
 		DO:	SetState {AllDone}
 	IF:	Expr {actiontrycastbyid[1636]}
@@ -91,9 +105,11 @@ STATE: {RecallLifestoneSending} ~~ {
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Sir Bellas (Blank Augmentation Gem) Complete!`,19]}
+	IF:	Always
 		DO:	DoAll
 				DoExpr {setgvar[qsrb-numcharsdone,getgvar[qsrb-numcharsdone]+1]}
-				ChatExpr {\/f Blank Augmentation Gem Acquired\! \(+getgvar[qsrb-numcharsdone]+\)}
+				ChatExpr {`/f Blank Augmentation Gem Acquired! (`+getgvar[qsrb-numcharsdone]+`)`}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
