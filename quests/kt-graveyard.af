@@ -43,6 +43,8 @@ STATE: {Default} ~~ {
 ~~ }
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Loading Meta: Graveyard Killtasks`,19]}
+	IF:	Always
 		DO:	DoAll
 				EmbedNav navNone {None}
 				SetOpt {EnableBuffing} {true}
@@ -75,6 +77,8 @@ STATE: {QuestProgressCheck} ~~ {
 ~~ }
 STATE: {GoToKillZone} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Kill Zone`,19]}
+	IF:	Always
 		DO:	DoAll
 				SetOpt {NavCloseStopRange} {0.003}
 				EmbedNav navGoToKillZone {navGoToKillZone}
@@ -99,6 +103,8 @@ STATE: {GoToKillZone} ~~ {
 				SetState {CompletingKillTask}
 ~~ }
 STATE: {CompletingKillTask} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Completing Kill Tasks`,19]}
 	IF:	SecsInStateGE 60
 		DO:	DoAll
 				Chat {/myquests}
@@ -112,11 +118,15 @@ STATE: {CompletingKillTask} ~~ {
 ~~ }
 STATE: {CompletedKillTasksWaiting} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Completed Kill Tasks & Waiting on Others`,19]}
+	IF:	Always
 		DO:	DoExpr {setgvar[qktgy-numcharsdone,getgvar[qktgy-numcharsdone]+1]}
 	IF:	Expr {getgvar[qktgy-numcharsdone]>=getvar[qktgy-numchars]}
 		DO:	SetState {CompletedKillTasks}
 ~~ }
 STATE: {CompletedKillTasks} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Everyone is done with Kill Tasks`,19]}
 	IF:	Always
 		DO:	DoAll
 				EmbedNav navNone {None}
@@ -125,12 +135,16 @@ STATE: {CompletedKillTasks} ~~ {
 				SetState {RecallGraveyard}
 ~~ }
 STATE: {RecallGraveyard} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Recalling to Graveyard`,19]}
 	IF:	CellE 482D0104
 		DO:	SetState {PickUpOrTurnInQuests}
 	IF:	Expr {actiontrycastbyid[4128]}
 		DO:	SetState {RecallGraveyard}
 ~~ }
 STATE: {PickUpOrTurnInQuests} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Turning in Quests`,19]}
 	IF:	Always
 		DO:	EmbedNav navTalkToNPCs {navTalkToNPCs}
 	IF:	NavEmpty
