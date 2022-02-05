@@ -59,7 +59,7 @@ STATE: {CheckLocation} ~~ {
 		DO:	SetState {GoToArwic}
 	IF:	CellE C6A90009
 		DO:	SetState {GoToOlthoiHunter}
-	IF:	CellE A21E0026
+	IF:	CellE C5A6010C
 		DO:	SetState {WaitingForInvite}
 	IF:	Always
 		DO:	SetState {RecallAphusLassel}
