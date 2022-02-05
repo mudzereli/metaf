@@ -302,14 +302,24 @@ STATE: {LootingZrikux} ~~ {
 				SetState {RecallAphusLassel}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
 		DO: SetState {KillingZrikux}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
+	IF:	Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]}
 		DO:	DoAll
 				Chat {/ub use Orders for Zrikux}
 				SetWatchdog 3 5 {LootingZrikux}
+	IF:	Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]==0)}
+		DO: SetState {WaitForRespawn}
 	IF:	Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Zrikux`]]}
 				SetWatchdog 3 5 {LootingZrikux}
+~~ }
+STATE: {WaitForRespawn} ~~ {
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
+		DO:	SetState {KillingZrikux}
+	IF:	Expr {wobjectgetopencontainer[]&&1}
+		DO:	DoAll
+				Chat {/ub close corpse}
+				SetState {WaitForRespawn}
 ~~ }
 STATE: {GoToHebianTo} ~~ {
 	IF:	Always
