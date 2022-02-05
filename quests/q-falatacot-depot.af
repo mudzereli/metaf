@@ -295,23 +295,39 @@ STATE: {KillingZrikux} ~~ {
 ~~ }
 STATE: {LootingZrikux} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Looting Zrikux`,19]}
-	IF:	ItemCountGE 1 {Orders for Zrikux}
+		DO:	DoExpr {echo[`[META]: Opening Corpse of Zrikux`,19]}
+	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
+		DO: SetState {KillingZrikux}
+	IF:	Expr {wobjectgetopencontainer[]&&1}
+		DO:	SetState {PickingUpItem}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Zrikux`]]}
+				SetWatchdog 3 3 {LootingZrikux}
+~~ }
+STATE: {PickingUpItem} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Looting Corpse of Zrikux`,19]}
+	IF:	Any
+			ItemCountGE 1 {Orders for Zrikux}
+			ChatMatch {^You have solved this quest too recently\!}
 		DO:	DoAll
 				Chat {/ub close corpse}
 				SetState {RecallAphusLassel}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
 		DO: SetState {KillingZrikux}
-	IF:	Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	SetState {LootingZrikux}
+	IF:	All
+			SecsInStateGE 2
+			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]}
 		DO:	DoAll
 				Chat {/ub use Orders for Zrikux}
-				SetWatchdog 3 5 {LootingZrikux}
-	IF:	Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]==0)}
+				SetWatchdog 3 3 {PickingUpItem}
+	IF:	All
+			SecsInStateGE 2
+			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]==0)}
 		DO: SetState {WaitForRespawn}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	DoAll
-				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Zrikux`]]}
-				SetWatchdog 3 5 {LootingZrikux}
 ~~ }
 STATE: {WaitForRespawn} ~~ {
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
