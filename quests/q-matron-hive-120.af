@@ -169,21 +169,47 @@ STATE: {KillingMatron} ~~ {
 ~~ }
 STATE: {LootingMatron} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Opening Olthoi Brood Matron Corpse`,19]}
+	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
+		DO: SetState {KillingMatron}
+	IF:	Expr {wobjectgetopencontainer[]&&1}
+		DO:	SetState {PickingUpItem}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]]}
+				SetWatchdog 3 3 {LootingMatron}
+~~ }
+STATE: {PickingUpItem} ~~ {
+	IF:	Always
 		DO:	DoExpr {echo[`[META]: Looting Olthoi Brood Matron`,19]}
-	IF:	ItemCountGE 1 {Brood Matron Carapace}
+	IF:	Any
+			ItemCountGE 1 {Brood Matron Carapace}
+			ChatMatch {^You have solved this quest too recently\!}
 		DO:	DoAll
 				Chat {/ub close corpse}
 				SetState {RecallLifestoneSending}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
 		DO: SetState {KillingMatron}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	SetState {LootingMatron}
+	IF:	All
+			SecsInStateGE 2
+			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[8,`Brood Matron Carapace`]}
 		DO:	DoAll
 				Chat {/ub use Brood Matron Carapace}
-				SetWatchdog 3 3 {LootingMatron}
-	IF:	Expr {wobjectgetopencontainer[]==0}
+				SetWatchdog 3 3 {PickingUpItem}
+	IF:	All
+			SecsInStateGE 2
+			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[8,`Brood Matron Carapace`]==0)}
+		DO: SetState {WaitForRespawn}
+~~ }
+STATE: {WaitForRespawn} ~~ {
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
+		DO:	SetState {KillingMatron}
+	IF:	Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
-				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]]}
-				SetWatchdog 3 3 {LootingMatron}
+				Chat {/ub close corpse}
+				SetState {WaitForRespawn}
 ~~ }
 STATE: {RecallLifestoneSending} ~~ {
 	IF:	Always
