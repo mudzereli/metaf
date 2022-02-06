@@ -45,6 +45,8 @@ STATE: {Default} ~~{
 				SetState {PickUpToken}
 ~~}
 STATE: {PickUpToken} ~~{
+	IF:	ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
+		DO:	SetState {AllDone}
 	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
 		DO:	SetState {TurnInToken}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<10}
