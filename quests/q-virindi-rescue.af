@@ -383,13 +383,13 @@ STATE: {PickingUpItem} ~~ {
 		DO:	SetState {LootingDravann}
 	IF:	All
 			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[1,`Essence of Dravann`]}
+			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[8,`Essence of Dravann`]}
 		DO:	DoAll
 				Chat {/ub use Essence of Dravann}
 				SetWatchdog 3 3 {PickingUpItem}
 	IF:	All
 			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[1,`Essence of Dravann`]==0)}
+			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[8,`Essence of Dravann`]==0)}
 		DO: SetState {WaitForRespawn}
 ~~ }
 STATE: {WaitForRespawn} ~~ {
