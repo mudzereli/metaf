@@ -36,6 +36,7 @@
 ~~		cht					jmp															
 ~~		prt (deprecated in VTank)														
 ~~ }																					
+~~ 02062022 - SOME ISSUE WHERE IT SKIPPED PICKING UP THE CREST - more research needed
 
 STATE: {Default} ~~ {
 	IF:	Always
