@@ -45,7 +45,9 @@ STATE: {*SetupOptions*} ~~{
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setvar[ltr-mobname,`Curator of Torment`]}
+				~~DoExpr {setvar[ltr-mobname,`Gladiator Diemos`]}
 				DoExpr {setvar[ltr-itemname,`Shard of the Curator of Torment's Mask`]}
+				~~DoExpr {setvar[ltr-itemname,`Gladiator Diemos Token`]}
 				SetOpt {EnableLooting} {false}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableBuffing} {false}
