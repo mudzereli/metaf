@@ -50,6 +50,7 @@ STATE: {*SetupOptions*} ~~ {
 				EmbedNav navNone {None}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableLooting} {false}
+				SetOpt {EnableNav} {true}
 				SetOpt {NavCloseStopRange} {0.008333}
 				SetOpt {EnableBuffing} {false}
 				SetState {CheckLocation}
@@ -61,6 +62,16 @@ STATE: {CheckLocation} ~~ {
 		DO:	SetState {GoToNeelic}
 	IF:	CellE A21E0026
 		DO:	SetState {WaitingForInvite}
+	IF:	CellE 00070145
+		DO:	SetState {GoToLinvakTukal}
+	IF:	CellE 00070143
+		DO:	SetState {GoToTownNetwork}
+	IF:	CellE 00070133
+		DO:	SetState {GoToTownNetwork}
+	IF:	CellE 00070156
+		DO:	SetState {GoToTownNetwork}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[14,`Portal to Town Network`]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Portal to Town Network`]],getplayercoordinates[]]<=30}
+		DO:	SetState {UseTownNetworkPortal}
 	IF:	Always
 		DO:	SetState {RecallAphusLassel}
 ~~ }
@@ -77,11 +88,31 @@ STATE: {RecallAphusLassel} ~~ {
 				SetOpt {EnableCombat} {false}
 				SetState {RecallAphusLassel}
 ~~ }
+STATE: {UseTownNetworkPortal} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Using Town Network Portal`,19]}
+	IF:	CellE 00070143
+		DO:	EmbedNav navGoToAnnexFromAluvian {GoToAnnexFromAluvian}
+	IF:	CellE 00070133
+		DO:	EmbedNav navGoToAnnexFromGharundim {GoToAnnexFromGharundim}
+	IF:	CellE 00070156
+		DO:	EmbedNav navGoToAnnexFromSho {GoToAnnexFromSho}
+	IF:	CellE 00070145
+		DO:	SetState {GoToLinvakTukal}
+	IF:	Always
+		DO:	Chat {/ub usel Portal to Town Network}
+~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Going to Town Network`,19]}
 	IF:	CellE 00070145
 		DO:	SetState {GoToLinvakTukal}
+	IF:	CellE 00070143
+		DO:	EmbedNav navGoToAnnexFromAluvian {GoToAnnexFromAluvian}
+	IF:	CellE 00070133
+		DO:	EmbedNav navGoToAnnexFromGharundim {GoToAnnexFromGharundim}
+	IF:	CellE 00070156
+		DO:	EmbedNav navGoToAnnexFromSho {GoToAnnexFromSho}
 	IF:	Always
 		DO:	EmbedNav navAphusLasselToTownNetwork {GoToTownNetwork}
 ~~ }
@@ -149,6 +180,22 @@ STATE: {DropItems} ~~ {
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
+NAV: navGoToAnnexFromSho once ~~ {
+	pnt -101.615839290619 -96.6411283493042 2.08333134651184E-05
+	pnt -101.615839290619 -96.6411283493042 2.08333134651184E-05
+	pnt -101.659091536204 -96.6840290705363 2.08333134651184E-05
+~~ }
+NAV: navGoToAnnexFromGharundim once ~~ {
+	pnt -101.699284553528 -96.6421658198039 2.08333134651184E-05
+	pnt -101.699284553528 -96.6421658198039 2.08333134651184E-05
+	pnt -101.657626056671 -96.6836316744486 2.08333134651184E-05
+~~ }
+NAV: navGoToAnnexFromAluvian once ~~ {
+	pnt -101.657822354635 -96.5997297604879 2.08333134651184E-05
+	pnt -101.657822354635 -96.5997297604879 2.08333134651184E-05
+	pnt -101.699744319916 -96.6413258552551 2.08333134651184E-05
+	pnt -101.658815161387 -96.6835212071737 2.08333134651184E-05
+~~ }
 NAV: navTownNetworkToLinvakTukal once ~~ {
 	pnt -101.657915083567 -96.6814231872559 2.08333134651184E-05
 	pnt -101.658632119497 -96.6882947603861 2.08333134651184E-05
