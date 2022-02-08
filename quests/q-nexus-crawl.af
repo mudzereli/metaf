@@ -267,7 +267,7 @@ STATE: {RunningToApostateMaster} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Running to the Apostate Nexus Master`,19]}
 	IF:	CellE 7F02019F
-		DO:	SetOpt {NavCloseStopRange} {0.015}
+		DO:	SetOpt {NavCloseStopRange} {0.02}
 	IF:	All
 			NavEmpty
 			CellE 7F02019E
