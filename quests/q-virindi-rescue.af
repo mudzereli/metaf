@@ -202,17 +202,17 @@ STATE: {OpeningFirstDoor} ~~ {
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
 				EmbedNav navOpenFirstDoor {navOpenFirstDoor}
-				SetWatchdog 3 15 {OpeningFirstDoor}
+				SetWatchdog 3 5 {OpeningFirstDoor}
 	IF: Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
 				Chat {/ub use Virindi Prison Key}
-				SetWatchdog 3 15 {OpeningFirstDoor}
+				SetWatchdog 3 5 {OpeningFirstDoor}
 	IF: All
 			Expr {wobjectfindnearestbynameandobjectclass[27,`Virindi Jailor`]&&1}
 			Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Virindi Jailor`]]}
-				SetWatchdog 3 15 {OpeningFirstDoor}
+				SetWatchdog 3 5 {OpeningFirstDoor}
 ~~ }
 STATE: {GoToSecondJailor} ~~ {
 	IF:	Always
@@ -234,17 +234,17 @@ STATE: {OpeningSecondDoor} ~~ {
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
 				EmbedNav navOpenSecondDoor {navOpenSecondDoor}
-				SetWatchdog 3 15 {OpeningSecondDoor}
+				SetWatchdog 3 5 {OpeningSecondDoor}
 	IF: Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
 				Chat {/ub use Virindi Prison Key}
-				SetWatchdog 3 15 {OpeningSecondDoor}
+				SetWatchdog 3 5 {OpeningSecondDoor}
 	IF: All
 			Expr {wobjectfindnearestbynameandobjectclass[27,`Virindi Jailor`]&&1}
 			Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Virindi Jailor`]]}
-				SetWatchdog 3 15 {OpeningSecondDoor}
+				SetWatchdog 3 5 {OpeningSecondDoor}
 ~~ }
 STATE: {GoToThirdJailor} ~~ {
 	IF:	Always
@@ -266,17 +266,17 @@ STATE: {OpeningThirdDoor} ~~ {
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
 				EmbedNav navOpenThirdDoor {navOpenThirdDoor}
-				SetWatchdog 3 15 {OpeningThirdDoor}
+				SetWatchdog 3 5 {OpeningThirdDoor}
 	IF: Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
 				Chat {/ub use Virindi Prison Key}
-				SetWatchdog 3 15 {OpeningThirdDoor}
+				SetWatchdog 3 5 {OpeningThirdDoor}
 	IF: All
 			Expr {wobjectfindnearestbynameandobjectclass[27,`Virindi Jailor`]&&1}
 			Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Virindi Jailor`]]}
-				SetWatchdog 3 15 {OpeningThirdDoor}
+				SetWatchdog 3 5 {OpeningThirdDoor}
 ~~ }
 STATE: {GoToKeeper} ~~ {
 	IF:	Always
@@ -298,13 +298,13 @@ STATE: {GettingLastKey} ~~ {
 	IF: Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
 				Chat {/ub use Virindi Research Center Key}
-				SetWatchdog 3 15 {GettingLastKey}
+				SetWatchdog 3 5 {GettingLastKey}
 	IF: All
 			Expr {wobjectfindnearestbynameandobjectclass[27,`Virindi Keeper`]&&1}
 			Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Virindi Keeper`]]}
-				SetWatchdog 3 15 {GettingLastKey}
+				SetWatchdog 3 5 {GettingLastKey}
 ~~ }
 STATE: {GoToLastDoor} ~~ {
 	IF:	Always
@@ -355,6 +355,11 @@ STATE: {KillingDravann} ~~ {
 		DO:	SetState {RecallPortal}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]&&1}
 		DO:	SetState {LootingDravann}
+	IF:	All
+			SecsInStateGE 30
+			Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
+			Expr {wobjectfindnearestbynameandobjectclass[5,`Dravann`]==0}
+		DO:	EmbedNav navGoToLastBoss {navGoToLastBoss}
 ~~ }
 STATE: {LootingDravann} ~~ {
 	IF:	Always
