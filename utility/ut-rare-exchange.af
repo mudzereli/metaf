@@ -45,7 +45,9 @@ STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setvar[qrex-current-gem,0]}
-				DoExpr {setvar[qrex-last-gem,0]}
+				DoExpr {setvar[qrex-exchange-counter,0]}
+				DoExpr {setvar[qrex-kept-gems,listcreate[]]}
+				DoExpr {setvar[qrex-trade-notes,getitemcountininventorybyname[`Trade Note (250,000)`]]}
 				DoExpr {setvar[qrex-unwanted-gems,listcreate[]]}
 				~~ BANING
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Flame Baning`]}
@@ -126,20 +128,35 @@ STATE: {CheckInventoryForGems} ~~ {
 STATE: {TurnInGem} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Turning in Gem: `+getvar[qrex-current-gem],19]}
-	IF:	SecsInStateGE 1
+	IF:	Always
 		DO:	Chat {/mt give Trade Note (250,000) to Rare Exchanger}
 	IF:	ChatMatch {^You allow Rare Exchanger to examine your Trade Note \(250\,000\)\.}
 		DO:	ChatExpr {`/ub give 1 `+getvar[qrex-current-gem]+` to Rare Exchanger`}
 	IF:	All
 			ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
-			Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]}
-			Not Expr {listcontains[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]}
+			Not Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]}
+		DO:	DoExpr {listadd[getvar[qrex-kept-gems],getvar[capturegroup_exchange_item]]}
+	IF:	All
+			ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
+			Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]&&(listcontains[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]==0)}
 		DO:	DoAll
+				DoExpr {setvar[qrex-exchange-counter,getvar[qrex-exchange-counter]+1]}
 				DoExpr {echo[`[META]: Adding Gem to Unchecked List: `+getvar[qrex-current-gem],19]}
 				DoExpr {listadd[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]}
 				SetState {CheckInventoryForGems}
-	IF:	ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
-		DO:	SetState {CheckInventoryForGems}
+	IF:	All
+			ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
+			Not Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]&&(listcontains[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]==0)}
+		DO:	DoAll
+				DoExpr {setvar[qrex-exchange-counter,getvar[qrex-exchange-counter]+1]}
+				SetState {CheckInventoryForGems}
+~~ }
+STATE: {AllDone} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setvar[qrex-trade-notes-spent,getvar[qrex-trade-notes]-getitemcountininventorybyname[`Trade Note (250,000)`]]}
+				DoExpr {echo[`[META]: Spent `+getvar[qrex-trade-notes-spent]+` MMDS exchanging `+getvar[qrex-exchange-counter]+` rare gems.`,19]}
+				DoExpr {echo[`[META]: Kept Gems: `+getvar[qrex-kept-gems],19]}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
