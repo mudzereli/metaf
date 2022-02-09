@@ -80,7 +80,9 @@ STATE: {SynchronizeChars} ~~ {
 STATE: {QuestProgressCheck} ~~ {
 	IF:	CellE 7F020107
 		DO:	SetState {TurnInResonator}
-	IF:	CellE 7F02019E
+	IF:	Any
+			CellE 7F02019E
+			CellE 7F02019F
 		DO:	SetState {KillingApostateMaster}
 	IF:	CellE 7F0201E8
 		DO: SetState {CheckLever}
@@ -270,7 +272,9 @@ STATE: {RunningToApostateMaster} ~~ {
 		DO:	SetOpt {NavCloseStopRange} {0.02}
 	IF:	All
 			NavEmpty
-			CellE 7F02019E
+			Any
+				CellE 7F02019E
+				CellE 7F02019F
 		DO:	SetState {SynchronizeCharsAtMaster}
 	IF:	Always
 		DO:	EmbedNav navGoToApostateMaster {RunningToApostateMaster}
