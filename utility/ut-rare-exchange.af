@@ -75,10 +75,10 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Artificer's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Converter's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Zefir's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Vaulter's Crystal`]}
+				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Vaulter's Crystal`]}
 				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Dodger's Crystal`]}
 				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Resister's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Evader's Crystal`]}
+				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Evader's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Berzerker's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Warrior's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Rogue's Crystal`]}
@@ -107,9 +107,8 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Deceiver's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Hunter's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Observer's Crystal`]}
-				~~ OTHER
-				DoExpr {setvar[qrex-unchecked-gems,listcopy[getvar[qrex-unwanted-gems]]]}
 				~~ INITIATE
+				DoExpr {setvar[qrex-unchecked-gems,listcopy[getvar[qrex-unwanted-gems]]]}
 				DoExpr {setvar[qrex-current-gem,listpop[getvar[qrex-unchecked-gems]]]}
 				SetState {CheckInventoryForGems}
 ~~ }
@@ -141,7 +140,7 @@ STATE: {TurnInGem} ~~ {
 			Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]&&(listcontains[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]==0)}
 		DO:	DoAll
 				DoExpr {setvar[qrex-exchange-counter,getvar[qrex-exchange-counter]+1]}
-				DoExpr {echo[`[META]: Adding Gem to Unchecked List: `+getvar[qrex-current-gem],19]}
+				DoExpr {echo[`[META]: Adding Gem to Unchecked List: `+getvar[capturegroup_exchange_item],19]}
 				DoExpr {listadd[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]}
 				SetState {CheckInventoryForGems}
 	IF:	All
