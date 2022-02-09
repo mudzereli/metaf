@@ -68,6 +68,8 @@ STATE: {SetDefaultOptions} ~~ {
 				SetOpt {BuffProfile_Banes} {2}
 				SetOpt {StaminaToHealthMultiplier} {1.1}
 				SetOpt {Recharge-Norm-HitP} {85}
+				SetOpt {MinimumHealKitSuccessChance} {33}
+				SetOpt {ReadUnknownScrolls} {false}
 				SetOpt {SummonPets} {true}
 				SetOpt {DoHelp} {true}
 				SetOpt {IdlePeaceMode} {false}
