@@ -81,7 +81,7 @@ STATE: {KillSirBellas} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
-				SetOpt {CorpseApproachRange-Max} {0.015}
+				SetOpt {CorpseApproachRange-Max} {0.03}
 				SetOpt {EnableLooting} {true}
 				SetOpt {LootAllCorpses} {true}
 				SetOpt {LootFellowCorpses} {true}
