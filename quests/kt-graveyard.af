@@ -50,7 +50,8 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {true}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
+				SetOpt {EnableLooting} {true}
+				SetOpt {LootOnlyRareCorpses} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {ApproachDistance} {0}
@@ -88,7 +89,7 @@ STATE: {GoToKillZone} ~~ {
 		DO:	DoAll
 				EmbedNav navNone {None}
 				SetOpt {LootPriorityBoost} {true}
-				SetOpt {EnableLooting} {true}
+				SetOpt {LootOnlyRareCorpses} {false}
 				SetState {CompletingKillTask}
 	IF:	All
 			NavEmpty
@@ -98,7 +99,6 @@ STATE: {GoToKillZone} ~~ {
 				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {NavPriorityBoost} {true}
 				SetOpt {LootPriorityBoost} {true}
-				SetOpt {EnableLooting} {true}
 				SetOpt {AttackDistance} {0.29}
 				SetState {CompletingKillTask}
 ~~ }
@@ -131,7 +131,6 @@ STATE: {CompletedKillTasks} ~~ {
 		DO:	DoAll
 				EmbedNav navNone {None}
 				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
 				SetState {RecallGraveyard}
 ~~ }
 STATE: {RecallGraveyard} ~~ {
