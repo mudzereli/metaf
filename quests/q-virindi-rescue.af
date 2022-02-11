@@ -49,14 +49,14 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
+				SetOpt {EnableLooting} {true}
+				SetOpt {LootOnlyRareCorpses} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {ApproachDistance} {0}
 				SetOpt {CorpseApproachRange-Min} {0.00833}
 				SetOpt {CorpseApproachRange-Max} {0.01}
 				SetOpt {NavPriorityBoost} {true}
-				SetOpt {LootOnlyRares} {false}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {IdlePeaceMode} {false}
 				SetOpt {OpenDoors} {true}
@@ -183,7 +183,6 @@ STATE: {EnteredVRF} ~~ {
 				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {EnableCombat} {true}
 				SetOpt {NavPriorityBoost} {false}
-				SetOpt {LootOnlyRareCorpses} {false}
 				SetState {GoToFirstJailor}
 ~~ }
 STATE: {GoToFirstJailor} ~~ {
@@ -348,7 +347,6 @@ STATE: {KillingDravann} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {NavCloseStopRange} {0.003}
 	IF:	ItemCountGE 1 {Essence of Dravann}
@@ -420,6 +418,7 @@ STATE: {AllDone} ~~ {
 		DO: DoExpr {echo[`[META]: Quest Completed: Virindi Rescue`,19]}
 	IF:	Always
 		DO:	DoAll
+				SetOpt {LootOnlyRareCorpses} {false}
 				DoExpr {setgvar[qvrc-numcharsdone,getgvar[qvrc-numcharsdone]+1]}
 				ChatExpr {\/f Virindi Rescue Completed\! \(+getgvar[qvrc-numcharsdone]+\)}
 ~~ }

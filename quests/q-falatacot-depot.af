@@ -49,7 +49,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableLooting} {true}
-				SetOpt {LootOnlyRares} {true}
+				SetOpt {LootOnlyRareCorpses} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {ApproachDistance} {0}
@@ -376,7 +376,7 @@ STATE: {RecallLifestoneSending} ~~ {
 		DO:	SetState {AllDone}
 	IF:	Expr {actiontrycastbyid[1636]}
 		DO:	DoAll
-				SetOpt {LootOnlyRares} {false}
+				SetOpt {LootOnlyRareCorpses} {false}
 				SetOpt {EnableCombat} {false}
 				SetState {RecallLifestoneSending}
 ~~ }
