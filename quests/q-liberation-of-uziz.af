@@ -509,6 +509,7 @@ STATE: {AllDone} ~~ {
 		DO:	DoExpr {echo[`[META]: Quest Completed: Liberation of Uziz`,19]}
 	IF:	Always
 		DO:	DoAll
+				SetOpt {LootOnlyRares} {false}
 				DoExpr {setgvar[qlou-numcharsdone,getgvar[qlou-numcharsdone]+1]}
 				ChatExpr {`/f Liberation of Uziz Completed! (`+getgvar[qlou-numcharsdone]+`)`}
 ~~ }

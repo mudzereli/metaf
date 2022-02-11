@@ -48,14 +48,14 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
+				SetOpt {EnableLooting} {true}
+				SetOpt {LootOnlyRares} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {ApproachDistance} {0}
 				SetOpt {CorpseApproachRange-Min} {0}
 				SetOpt {CorpseApproachRange-Max} {0}
 				SetOpt {NavPriorityBoost} {true}
-				SetOpt {LootOnlyRares} {false}
 				SetOpt {IdlePeaceMode} {false}
 				DoExpr {setgvar[qfdp-chars,listcreate[]]}
 				DoExpr {setgvar[qfdp-charsindungeon,listcreate[]]}
@@ -166,7 +166,6 @@ STATE: {EnteredFalatacotDepot} ~~ {
 				EmbedNav navNone {None}
 				SetOpt {OpenDoors} {false}
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {NavPriorityBoost} {false}
 				SetOpt {AttackDistance} {0.02}
@@ -286,7 +285,6 @@ STATE: {KillingZrikux} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 	IF:	ItemCountGE 1 {Orders for Zrikux}
 		DO:	SetState {RecallAphusLassel}
@@ -378,7 +376,7 @@ STATE: {RecallLifestoneSending} ~~ {
 		DO:	SetState {AllDone}
 	IF:	Expr {actiontrycastbyid[1636]}
 		DO:	DoAll
-				SetOpt {EnableLooting} {false}
+				SetOpt {LootOnlyRares} {false}
 				SetOpt {EnableCombat} {false}
 				SetState {RecallLifestoneSending}
 ~~ }
