@@ -42,8 +42,10 @@ STATE: {Default} ~~ {
 		DO:	SetState {*SetupOptions*}
 ~~ }
 STATE: {*SetupOptions*} ~~ {
-	IF:	Always
-		DO:	DoExpr {setgvar[qlou-leverpuller,Porkchop]}
+	IF: Expr {getfellowshipleaderid[]!=0}
+		DO:	DoExpr {setgvar[qlou-leverpuller,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
+	IF: Expr {getfellowshipleaderid[]==0}
+		DO:	DoExpr {setgvar[qlou-leverpuller,getcharstringprop[1]]}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {echo[`[META]: Starting Quest: Liberation of Uziz`,19]}
@@ -51,10 +53,10 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
+				SetOpt {EnableLooting} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {NavPriorityBoost} {true}
-				SetOpt {LootOnlyRares} {false}
+				SetOpt {LootOnlyRares} {true}
 				SetOpt {OpenDoors} {true}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {NavCloseStopRange} {0.00833}
@@ -196,7 +198,6 @@ STATE: {EnteredVirindiEdifice} ~~ {
 		DO:	DoAll
 				SetOpt {OpenDoors} {true}
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {NavPriorityBoost} {false}
 				SetOpt {LootOnlyRareCorpses} {false}
@@ -388,20 +389,27 @@ STATE: {PullLever3} ~~ {
 ~~ }
 STATE: {GoToJump5} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Jumping down after 3rd Lever`,19]}
-	IF:	All
-			NavEmpty
-			CellE 5867022E
-		DO:	SetState {GoToDoor3}
+		DO:	DoExpr {echo[`[META]: Going to 3rd Lever jump`,19]}
 	IF:	All
 			NavEmpty
 			NoMobsInDist 5
 			Any
 				CellE 58670306
 				CellE 58670308
-		DO:	Chat {/ub jumpw 0 100}
+		DO:	SetState {DoJump5}
 	IF:	NavEmpty
 		DO:	EmbedNav navGoToJump5 {GoToJump5}
+~~ }
+STATE: {DoJump5} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Jumping down after 3rd Lever`,19]}
+	IF:	CellE 5867022E
+		DO:	SetState {GoToDoor3}
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {false}
+				Chat {/ub jumpw 0 100}
+				SetWatchdog 3 10 {DoJump5}
 ~~ }
 STATE: {GoToDoor3} ~~ {
 	IF:	Always
@@ -410,8 +418,10 @@ STATE: {GoToDoor3} ~~ {
 			NavEmpty
 			CellE 58670188
 		DO:	SetState {GoToJump6}
-	IF:	NavEmpty
-		DO:	EmbedNav navGoToDoor3 {GoToDoor3}
+	IF:	Always
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				EmbedNav navGoToDoor3 {GoToDoor3}
 ~~ }
 STATE: {GoToJump6} ~~ {
 	IF:	Always
@@ -439,9 +449,7 @@ STATE: {KillingSimulacrum} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Killing Simulacrum Shifter`,19]}
 	IF:	Always
-		DO:	DoAll
-				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
+		DO:	SetOpt {EnableCombat} {true}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {GoToDelegateJump}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,Simulacrum Shifter]!=0}
