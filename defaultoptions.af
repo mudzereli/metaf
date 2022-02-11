@@ -51,10 +51,10 @@ STATE: {SetDefaultOptions} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableMeta} {true}
-				SetOpt {EnableLooting} {false}
-				SetOpt {LootAllCorpses} {false}
+				SetOpt {EnableLooting} {true}
 				SetOpt {LootFellowCorpses} {false}
-				SetOpt {LootOnlyRareCorpses} {false}
+				SetOpt {LootAllCorpses} {false}
+				SetOpt {LootOnlyRareCorpses} {true}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {ApproachDistance} {0.00833}
 				SetOpt {CorpseApproachRange-Min} {0.00833}
