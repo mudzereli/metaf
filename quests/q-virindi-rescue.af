@@ -200,6 +200,7 @@ STATE: {OpeningFirstDoor} ~~ {
 		DO:	SetState {GoToSecondJailor}
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
+				Chat {/ub close corpse}
 				EmbedNav navOpenFirstDoor {navOpenFirstDoor}
 				SetWatchdog 3 5 {OpeningFirstDoor}
 	IF: Expr {wobjectgetopencontainer[]&&1}
@@ -232,6 +233,7 @@ STATE: {OpeningSecondDoor} ~~ {
 		DO:	SetState {GoToThirdJailor}
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
+				Chat {/ub close corpse}
 				EmbedNav navOpenSecondDoor {navOpenSecondDoor}
 				SetWatchdog 3 5 {OpeningSecondDoor}
 	IF: Expr {wobjectgetopencontainer[]&&1}
@@ -264,6 +266,7 @@ STATE: {OpeningThirdDoor} ~~ {
 		DO:	SetState {GoToKeeper}
 	IF:	ItemCountGE 1 {Virindi Prison Key}
 		DO:	DoAll
+				Chat {/ub close corpse}
 				EmbedNav navOpenThirdDoor {navOpenThirdDoor}
 				SetWatchdog 3 5 {OpeningThirdDoor}
 	IF: Expr {wobjectgetopencontainer[]&&1}
