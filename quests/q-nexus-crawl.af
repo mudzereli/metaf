@@ -48,7 +48,8 @@ STATE: {*SetupOptions*} ~~ {
 					DoExpr {echo[`[META]: Starting Quest: Nexus Crawl`,19]}
 					SetOpt {EnableCombat} {false}
 					SetOpt {EnableBuffing} {false}
-					SetOpt {EnableLooting} {false}
+					SetOpt {EnableLooting} {true}
+					SetOpt {LootOnlyRareCorpses} {true}
 					SetOpt {EnableNav} {true}
 					SetOpt {NavCloseStopRange} {0.00833}
 					SetOpt {IdlePeaceMode} {false}
@@ -189,7 +190,6 @@ STATE: {EnteredNexus} ~~ {
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {OpenDoors} {true}
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {EnableBuffing} {true}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {ApproachDistance} {0}
@@ -297,7 +297,6 @@ STATE: {KillingApostateMaster} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.00833}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	SetState {RunningToEnd}
