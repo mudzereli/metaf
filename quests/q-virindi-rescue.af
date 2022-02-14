@@ -294,7 +294,9 @@ STATE: {GettingLastKey} ~~ {
 	IF:	Always
 		DO:	SetOpt {EnableCombat} {true}
 	IF:	ItemCountGE 1 {Virindi Research Center Key}
-		DO:	DoExpr {setgvar[qvrc-finalkey,1]}
+		DO:	DoAll
+				Chat {/ub close corpse}
+				DoExpr {setgvar[qvrc-finalkey,1]}
 	IF:	Expr {getgvar[qvrc-finalkey]==1}
 		DO:	SetState {GoToLastDoor}
 	IF: Expr {wobjectgetopencontainer[]&&1}
