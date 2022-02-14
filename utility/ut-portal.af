@@ -53,8 +53,9 @@ STATE: {*SetupOptions*} ~~{
 				~~DoExpr {dictadditem[getvar[portal_dictionary],`Funnelcake`,listcreate[`nothing`,`nothing`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Dan K Memes`,listcreate[`candeth`,`wai jhou`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Mashadar`,listcreate[`swamp gardens`,`obs rim`]]}
-				~~DoExpr {dictadditem[getvar[portal_dictionary],`Free Hugs`,listcreate[`nothing`,`nothing`]]}
+				~~DoExpr {dictadditem[getvar[portal_dictionary],`Mudzereli`,listcreate[`nothing`,`nothing`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Spraynard Kruger`,listcreate[`beach fort`,`quarry`]]}
+				~~DoExpr {dictadditem[getvar[portal_dictionary],`Free Hugs`,listcreate[`nothing`,`nothing`]]}
 				SetState {ListDestinations}
 ~~}
 STATE: {WaitingForCommands} ~~{
@@ -70,7 +71,7 @@ STATE: {WaitingForCommands} ~~{
 STATE: {ListDestinations} ~~{
 	IF:	Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
 		DO: DoAll
-				ChatExpr {\/+getvar[chat_channel]+\ +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]+\ \| +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
+				ChatExpr {`/`+getvar[chat_channel]+` `+listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]+` | `+listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
 	IF:	Always
 		DO:	SetState {WaitingForCommands}
 ~~}
@@ -80,12 +81,14 @@ STATE: {ProcessCommand} ~~{
 			Expr {getvar[capturegroup_chat_message]==listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]}
 		DO: DoAll
 				DoExpr {setvar[portal_type,157]}
+				ChatExpr {`/`+getvar[chat_channel]+` Opening Portal to: `+listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],0]}
 				SetState {SummonPortal}
 	IF:	All
 			Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
 			Expr {getvar[capturegroup_chat_message]==listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
 		DO: DoAll
 				DoExpr {setvar[portal_type,2648]}
+				ChatExpr {`/`+getvar[chat_channel]+` Opening Portal to: `+listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],1]}
 				SetState {SummonPortal}
 	IF: Always
 		DO:	SetState {WaitingForCommands}
@@ -93,7 +96,7 @@ STATE: {ProcessCommand} ~~{
 STATE: {SummonPortal} ~~{
 	IF:	Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
 		DO:	DoAll
-				ChatExpr {\/+getvar[chat_channel]+\ Portal Opened \-\> +listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],iif[getvar[portal_type]==157,0,1]]}
+				ChatExpr {`/`+getvar[chat_channel]+` Portal Opened -> `+listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],iif[getvar[portal_type]==157,0,1]]}
 				SetState {WaitingForCommands}
 	IF:	Not Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
 		DO:	DoAll
