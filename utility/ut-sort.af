@@ -72,6 +72,17 @@ STATE: {SortWands} ~~ {
 				Chat {/ms set flags EP,WE,OC,IC}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
+		DO:	SetState {SortSpellComps}
+~~ }
+STATE: {SortSpellComps} ~~ {
+	IF:	Always
+		DO:	DoAll
+				Chat {/ms set source player}
+				Chat {/ms set dest pack 8}
+				Chat {/ms set ocfilter spellcomp}
+				Chat {/ms set flags EP,WE,OC,IC}
+				Chat {/ms start}
+	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortInventory}
 ~~ }
 STATE: {SortInventory} ~~ {
