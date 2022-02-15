@@ -328,6 +328,7 @@ STATE: {UnlockAndOpenFinalDoor} ~~ {
 		DO:	SetState {RunningToEnd}
 	IF:	Always
 		DO:	DoAll
+				Chat {/ub close corpse}
 				EmbedNav navUnlockAndOpenFinalDoor {UnlockAndOpenFinalDoor}
 				SetWatchdog 3 6 {UnlockAndOpenFinalDoor}
 ~~ }
