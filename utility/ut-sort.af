@@ -41,6 +41,7 @@ STATE: {Default} ~~ {
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setvar[mssortstring,`CV,AS,EQ,TR-,OC,IC,AL-,EP,MX-`]}
+				DoExpr {setvar[mssortsidepacks,0]}
 				SetState {SortManaStones}
 ~~ }
 STATE: {SortManaStones} ~~ {
@@ -49,7 +50,7 @@ STATE: {SortManaStones} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest pack 7}
 				Chat {/ms set ocfilter manastone}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortHealingKits}
@@ -60,7 +61,7 @@ STATE: {SortHealingKits} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest pack 7}
 				Chat {/ms set ocfilter healingkit}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortMisc}
@@ -71,7 +72,7 @@ STATE: {SortMisc} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest pack 2}
 				Chat {/ms set ocfilter misc}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortGems}
@@ -82,7 +83,7 @@ STATE: {SortGems} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest pack 3}
 				Chat {/ms set ocfilter gem}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortWeapons}
@@ -93,7 +94,7 @@ STATE: {SortWeapons} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest pack 1}
 				Chat {/ms set ocfilter meleeweapon}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortWands}
@@ -104,7 +105,7 @@ STATE: {SortWands} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest pack 1}
 				Chat {/ms set ocfilter wand}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortSpellComps}
@@ -115,7 +116,7 @@ STATE: {SortSpellComps} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest pack 8}
 				Chat {/ms set ocfilter spellcomp}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortInventory}
@@ -126,18 +127,20 @@ STATE: {SortInventory} ~~ {
 				Chat {/ms set source player}
 				Chat {/ms set dest player}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack1}
 ~~ }
 STATE: {SortPack1} ~~ {
+	IF:	Expr {$mssortsidepacks==0}
+		DO:	SetState {AllDone}
 	IF:	Always
 		DO:	DoAll
 				Chat {/ms set source pack 1}
 				Chat {/ms set dest pack 1}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack2}
@@ -148,7 +151,7 @@ STATE: {SortPack2} ~~ {
 				Chat {/ms set source pack 2}
 				Chat {/ms set dest pack 2}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack3}
@@ -159,7 +162,7 @@ STATE: {SortPack3} ~~ {
 				Chat {/ms set source pack 3}
 				Chat {/ms set dest pack 3}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack4}
@@ -170,7 +173,7 @@ STATE: {SortPack4} ~~ {
 				Chat {/ms set source pack 4}
 				Chat {/ms set dest pack 4}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack5}
@@ -181,7 +184,7 @@ STATE: {SortPack5} ~~ {
 				Chat {/ms set source pack 5}
 				Chat {/ms set dest pack 5}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack6}
@@ -192,7 +195,7 @@ STATE: {SortPack6} ~~ {
 				Chat {/ms set source pack 6}
 				Chat {/ms set dest pack 6}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack7}
@@ -203,7 +206,7 @@ STATE: {SortPack7} ~~ {
 				Chat {/ms set source pack 7}
 				Chat {/ms set dest pack 7}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {SortPack8}
@@ -214,7 +217,7 @@ STATE: {SortPack8} ~~ {
 				Chat {/ms set source pack 8}
 				Chat {/ms set dest pack 8}
 				Chat {/ms clear ocfilter}
-				ChatExpr {`/ms set flags `+getvar[mssortstring]}
+				ChatExpr {`/ms set flags `+$mssortstring}
 				Chat {/ms start}
 	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {AllDone}
