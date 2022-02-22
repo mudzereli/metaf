@@ -232,7 +232,7 @@ STATE: {StartFirstRoom} ~~ {
 				SetOpt {EnableCombat} {true}
 				SetOpt {NavCloseStopRange} {0.02}
 				SetOpt {ApproachDistance} {0.02}
-				Chat {/myquests}
+				Chat {/ub myquests}
 				SetState {StartCurrentRoom}
 ~~ }
 STATE: {StartCurrentRoom} ~~ {
@@ -287,7 +287,7 @@ STATE: {WaitingForRewards} ~~ {
 		DO:	DoExpr {echo[`[META]: Waiting for Rewards Timer to Run Out`,19]}
 	~~ if we started colo and we're at this step, then lets see if we're ready for turn in
 	IF:	Always
-		DO:	Chat {/myquests}
+		DO:	Chat {/ub myquests}
 	~~ keep checking every 30 seconds
 	IF:	SecsInStateGE 30
 		DO:	SetState {WaitingForRewards}
@@ -336,6 +336,46 @@ STATE: {TurnInRewards} ~~ {
 	~~ if we thought we did colo, but we actually didnt.. time for a fresh start
 	IF:	ChatMatch {Master Arbitrator tells you\, \"If you wish to fight as a gladiator in the Arena}
 		DO:	SetState {WaitingForStart}
+~~ }
+STATE: {LootRings} ~~ {
+	IF: Always
+		DO:	DoAll
+				DoExpr {echo[`[META]: Looting Colo Rings`,19]}
+				Chat {/ub opt set Looter.Enabled true}
+	IF:	All
+			SecsInStateGE 2
+			ItemCountGE 1 {Colosseum Vault Key}
+		DO:	SetState {UnlockChest}
+	IF:	ItemCountLE 0 {Colosseum Vault Key}
+		DO:	DoAll
+				Chat {/ub opt set Looter.Enabled false}
+				SetState {AllDone}
+~~ }
+STATE: {UnlockChest} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {echo[`[META]: Unlocking Chest`,19]}
+				Chat {/ub use Colosseum Vault Key on Colosseum Vault}
+	IF:	ChatMatch {^The Colosseum Vault has been unlocked}
+		DO:	SetState {OpenChest}
+	IF:	All
+			SecsInStateGE 4
+			ItemCountGE 1 {Colosseum Vault Key}
+		DO:	SetState {UnlockChest}
+~~ }
+STATE: {OpenChest} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {echo[`[META]: Opening Chest`,19]}
+				Chat {/ub usel Colosseum Vault}
+	IF: Expr {wobjectgetopencontainer[]&&1}
+		DO: SetState {PickupRing}
+~~ }
+STATE: {PickupRing} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Picking Up Ring`,19]}
+	IF: Expr {wobjectgetopencontainer[]==0}
+		DO: SetState {LootRings}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
