@@ -54,13 +54,17 @@ STATE: {*SetupOptions*} ~~ {
 					SetOpt {NavCloseStopRange} {0.00833}
 					SetOpt {IdlePeaceMode} {false}
 					SetOpt {OpenDoors} {true}
-					DoExpr {setvar[qnxc-fellowleader,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
 					DoExpr {setvar[qnxc-portalsummoners,listcreate[]]}
 					DoExpr {setgvar[qnxc-chars,listcreate[]]}
 					DoExpr {setgvar[qnxc-charsatmaster,listcreate[]]}
 					DoExpr {setgvar[qnxc-numcharsdone,0]}
 				EmbedNav navNone {navNone}
-				DoExpr {listadd[getvar[qnxc-portalsummoners],`Porkchop`]}
+	IF:	Expr {`///// Your Nexus Portal Summoner ///// ----->>>>>`}
+		DO:	DoExpr {listadd[getvar[qnxc-portalsummoners],`Porkchop`]}
+	IF: Expr {getfellowshipleaderid[]!=0}
+		DO:	DoExpr {setvar[qnxc-leverpuller,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
+	IF: Expr {getfellowshipleaderid[]==0}
+		DO:	DoExpr {setvar[qnxc-leverpuller,getcharstringprop[1]]}
 	IF:	SecsInStateGE 8
 		DO:	SetState {SynchronizeChars}
 ~~ }
@@ -255,7 +259,7 @@ STATE: {CheckLever} ~~ {
 		DO:	DoExpr {echo[`[META]: Waiting for Lever Pull then Opening Door`,19]}
 	IF:	All
 			CellE 7F0201E8
-			Expr {getcharstringprop[1]==getvar[qnxc-fellowleader]}
+			Expr {getcharstringprop[1]==getvar[qnxc-leverpuller]}
 			Not Expr {wobjectgetisdooropen[wobjectfindnearestdoor[]]}
 		DO:	DoAll
 				EmbedNav navPullLever {PullLever}
@@ -296,6 +300,7 @@ STATE: {KillingApostateMaster} ~~ {
 		DO:	DoExpr {echo[`[META]: Killing the Apostate Nexus Master`,19]}
 	IF:	Always
 		DO:	DoAll
+				Chat {/ub close corpse}
 				SetOpt {EnableCombat} {true}
 				SetOpt {NavCloseStopRange} {0.00833}
 	IF:	Expr {wobjectfindnearestdoor[]&&wobjectgetisdooropen[wobjectfindnearestdoor[]]}
@@ -315,11 +320,11 @@ STATE: {LootingApostateMaster} ~~ {
 	IF:	Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
 				Chat {/ub use Aetherium Vault Key}
-				SetWatchdog 3 15 {LootingApostateMaster}
+				SetWatchdog 3 5 {LootingApostateMaster}
 	IF:	Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Apostate Nexus Master`]]}
-				SetWatchdog 3 15 {LootingApostateMaster}
+				SetWatchdog 3 5 {LootingApostateMaster}
 ~~ }
 STATE: {UnlockAndOpenFinalDoor} ~~ {
 	IF:	Always
@@ -340,7 +345,9 @@ STATE: {RunningToEnd} ~~ {
 			NavEmpty
 		DO:	SetState {TurnInResonator}
 	IF:	Always
-		DO:	EmbedNav navRunToEnd {RunningToEnd}
+		DO:	DoAll
+				Chat {/ub close corpse}
+				EmbedNav navRunToEnd {RunningToEnd}
 ~~ }
 STATE: {TurnInResonator} ~~ {
 	IF:	Always
@@ -362,6 +369,7 @@ STATE: {AllDone} ~~ {
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setgvar[qnxc-numcharsdone,getgvar[qnxc-numcharsdone]+1]}
+				SetOpt {LootOnlyRareCorpses} {false}
 				ChatExpr {`/f Nexus Crawl Completed! (`+getgvar[qnxc-numcharsdone]+`)`}
 ~~ }
 
