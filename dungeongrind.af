@@ -1,0 +1,32 @@
+STATE: {Default} ~~{
+	IF:	Always
+		DO:	SetState {*SetupOptions*}
+~~}
+STATE: {*SetupOptions*} ~~{
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setvar[myNav,`myNavName`]}
+				DoExpr {setvar[recallID,48]}
+				SetState {PortalRecall}
+~~}
+STATE: {Hunting} ~~{
+	IF:	Always
+		DO:	DoAll
+				ChatExpr {`/vt nav load `+$myNav}
+				SetOpt {EnableNav} {true}
+				SetOpt {EnableCombat} {true}
+				SetWatchdog 5 120 {PortalRecall}
+~~}
+STATE: {PortalRecall} ~~{
+	IF:	IntoPortal
+		DO:	SetState {Hunting}
+	IF: Expr {actiontrycastbyid[$recallID]>=0}
+		DO:	DoAll
+				EmbedNav navNone {Nothing}
+				SetOpt {EnableNav} {false}
+				SetOpt {EnableCombat} {false}
+				SetState {PortalRecall}
+~~}
+
+NAV: navNone once ~~ {
+~~ }
