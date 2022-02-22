@@ -39,34 +39,92 @@
 
 STATE: {Default} ~~{
 	IF:	Always
+		DO: DoExpr {setvar[TokenNames,listcreate[]]}
+	~~ + 1 Skill Credit
+	IF:	Expr {getquestktprogress[lumaugskillquest]<2}
+		DO:	DoExpr {listadd[$TokenNames,`Skill`]}
+	~~ + +% Aetheria Proc
+	IF:	Expr {getcharintprop[338]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Aetheric Vision`]}
+	~~ + 1 Damage Reduction Rating
+	IF:	Expr {getcharintprop[334]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Protection`]}
+	~~ + 1 Crit Damage Reduction Rating
+	IF:	Expr {getcharintprop[336]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Temperance`]}
+	~~ + 1 Damage Rating
+	IF:	Expr {getcharintprop[333]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Valor`]}
+	~~ + 1 Crit Damage Rating
+	IF:	Expr {getcharintprop[335]<5}
+		DO:	DoExpr {listadd[$TokenNames,`thr Aura of Glory`]}
+	~~ + 1 Heal Rating
+	IF:	Expr {getcharintprop[342]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Purity`]}
+	~~ + 1 Equipment Mana Consumption Rating
+	IF:	Expr {getcharintprop[339]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Mana Flow`]}
+	~~ + 1 Mana Stone Rating
+	IF:	Expr {getcharintprop[340]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Mana Infusion`]}
+	~~ + 1 Crafting Skills
+	IF:	Expr {getcharintprop[343]<5}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of the Craftsman`]}
+	~~ + 1 All Skills
+	IF:	Expr {getcharintprop[365]<10}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of the World`]}
+	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[TokenName,`Token of the Aura of`]}
 				DoExpr {setvar[TokenNPC,`Nalicana`]}
+				SetOpt {NavCloseStopRange} {0.00833}
+				Chat {/mt combatstate peace}
 				SetState {PickUpToken}
 ~~}
 STATE: {PickUpToken} ~~{
-	IF:	ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
-		DO:	SetState {AllDone}
-	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setvar[CurrentToken,listgetitem[$TokenNames,0]}
+				EmbedNav navReset {Reset}
+	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	SetState {TurnInToken}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,getvar[TokenName]]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<10}
-		DO:	ChatExpr {\/ub uselp +getvar[TokenName]}
-	IF: SecsInStateGE 3
+	IF:	All
+			NavEmpty
+			Expr {wobjectfindnearestbynameandobjectclass[11,$CurrentToken]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,$CurrentToken]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<20}
+		DO:	ChatExpr {`/ub uselp Token of `+$CurrentToken}
+	IF: SecsInStateGE 12
 		DO:	SetState {PickUpToken}
 ~~}
 STATE: {TurnInToken} ~~{
-	IF:	Any
-			ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
-			~~ChatMatch {^.* tells you\, \"You have maxxed out increases to .*\.\"}
-			~~ChatMatch {^.* tells you\, \"You cannot increase your .*\"}
+	IF:	ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
 		DO:	SetState {AllDone}
-	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]==0}
+	IF:	Any
+			ChatMatch {^Nalicana tells you\, \"You cannot increase your .* any further\.\"}
+			ChatMatch {^Nalicana tells you\, \"You cannot spend any more Luminance on skill credits\.\"}
+		DO:	DoAll
+				DoExpr {listremoveat[$TokenNames,0]}
+				SetState {PickUpToken}
+	IF:	All
+			Any
+				ChatMatch {^Nalicana tells you}
+				ChatMatch {^You feel a surge of energy pass through you as the Light empowers your being\.}
+			Expr {getitemcountininventorybynamerx[$CurrentToken]==0}
 		DO:	SetState {PickUpToken}
-	IF:	Expr {getitemcountininventorybynamerx[getvar[TokenName]]>=1}
+	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	DoAll
 				Chat {/ub prepclick yes 10}
-				ChatExpr {`/ub givep `+getvar[TokenName]+` to `+getvar[TokenNPC]}
+				ChatExpr {`/ub givep `+$CurrentToken+` to `+$TokenNPC}
 	IF: SecsInStateGE 3
 		DO:	SetState {TurnInToken}
 ~~}
+STATE: {AllDone} ~~{
+	IF:	Always
+		DO:	EmbedNav navDone {Done}
+~~}
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
+
+NAV: navReset once ~~ {
+	pnt 69.2656905263662 21.0419925689697 1.55835418701172
+~~ }
+NAV: navDone once ~~ {
+	pnt 69.2346846898397 21.0472063700358 1.55835418701172
+~~ }
