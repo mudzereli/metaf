@@ -42,10 +42,8 @@ STATE: {Default} ~~ {
 		DO:	SetState {*SetupOptions*}
 ~~ }
 STATE: {*SetupOptions*} ~~ {
-	IF: Expr {getfellowshipleaderid[]!=0}
-		DO:	DoExpr {setgvar[qlou-leverpuller,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
-	IF: Expr {getfellowshipleaderid[]==0}
-		DO:	DoExpr {setgvar[qlou-leverpuller,getcharstringprop[1]]}
+	IF:	Expr {`///// Your Jumper / Lever Pulling Toon ///// ----->>>>>`}
+		DO:	DoExpr {setgvar[qlou-leverpuller,`Porkchop`]}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {echo[`[META]: Starting Quest: Liberation of Uziz`,19]}
