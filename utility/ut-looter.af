@@ -44,14 +44,25 @@ STATE: {Default} ~~{
 STATE: {*SetupOptions*} ~~{
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[ltr-mobname,`Curator of Torment`]}
-				~~DoExpr {setvar[ltr-mobname,`Gladiator Diemos`]}
-				DoExpr {setvar[ltr-itemname,`Shard of the Curator of Torment's Mask`]}
-				~~DoExpr {setvar[ltr-itemname,`Gladiator Diemos Token`]}
+				DoExpr {clearvar[ltr-mobname]}
+				DoExpr {clearvar[ltr-itemname]}
 				SetOpt {EnableLooting} {false}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableBuffing} {false}
-				SetState {WaitingForCorpse}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"\!bahktar"}
+		DO:	DoAll
+				DoExpr {setvar[ltr-mobname,`Bah'Ktar`]}
+				DoExpr {setvar[ltr-itemname,`Crimson Scarab`]}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"\!diemos"}
+		DO:	DoAll
+				DoExpr {setvar[ltr-mobname,`Gladiator Diemos`]}
+				DoExpr {setvar[ltr-itemname,`Gladiator Diemos Token`]}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"\!curator"}
+		DO:	DoAll
+				DoExpr {setvar[ltr-mobname,`Curator of Torment`]}
+				DoExpr {setvar[ltr-itemname,`Shard of the Curator of Torment's Mask`]}
+	IF:	Expr {getvar[ltr-mobname]&&getvar[ltr-itemname]}
+		DO:	SetState {WaitingForCorpse}
 ~~}
 STATE: {WaitingForCorpse} ~~{
 	IF:	Always
