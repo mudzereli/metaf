@@ -59,6 +59,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {NavPriorityBoost} {true}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {IdlePeaceMode} {false}
+				SetOpt {CastDispelSelf} {false}
 				SetOpt {OpenDoors} {true}
 				DoExpr {setvar[qvrc-questpickedup,0]}
 				DoExpr {cleargvar[qvrc-finalkey]}
@@ -378,7 +379,7 @@ STATE: {LootingDravann} ~~ {
 ~~ }
 STATE: {PickingUpItem} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Looting Dravann`,19]}
+		DO:	DoExpr {echo[`[META]: Picking Up Essence of Dravann`,19]}
 	IF:	Any
 			ItemCountGE 1 {Essence of Dravann}
 			ChatMatch {^You have solved this quest too recently\!}
@@ -394,13 +395,15 @@ STATE: {PickingUpItem} ~~ {
 			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[8,`Essence of Dravann`]}
 		DO:	DoAll
 				Chat {/ub use Essence of Dravann}
-				SetWatchdog 3 3 {PickingUpItem}
+				SetWatchdog 3 5 {PickingUpItem}
 	IF:	All
 			SecsInStateGE 2
 			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[8,`Essence of Dravann`]==0)}
 		DO: SetState {WaitForRespawn}
 ~~ }
 STATE: {WaitForRespawn} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Waiting for Respawn`,19]}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
 		DO:	SetState {KillingDravann}
 	IF:	Expr {wobjectgetopencontainer[]&&1}
@@ -423,6 +426,7 @@ STATE: {AllDone} ~~ {
 		DO: DoExpr {echo[`[META]: Quest Completed: Virindi Rescue`,19]}
 	IF:	Always
 		DO:	DoAll
+				SetOpt {CastDispelSelf} {true}
 				SetOpt {LootOnlyRareCorpses} {false}
 				DoExpr {setgvar[qvrc-numcharsdone,getgvar[qvrc-numcharsdone]+1]}
 				ChatExpr {\/f Virindi Rescue Completed\! \(+getgvar[qvrc-numcharsdone]+\)}
