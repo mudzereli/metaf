@@ -54,6 +54,8 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {PetRangeMode} {0}
 				SetOpt {EnableNav} {true}
 				SetOpt {LootFellowCorpses} {false}
+				SetOpt {LootOnlyRareCorpses} {false}
+				SetOpt {CastDispelSelf} {false}
 				SetOpt {EnableBuffing} {false}
 				DoExpr {setgvar[qcolo-looping,0]}
 				DoExpr {setgvar[qcolo-chars,listcreate[]]}
@@ -155,6 +157,12 @@ STATE: {WaitingForStart} ~~ {
 	~~ this condition is used to manually start the script [!start in fellow] (without looping)
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!start\"}
 		DO:	SetState {GettingATicket}
+	~~ this condition is used to start buying tickets
+	IF:	ChatMatch {\[Fellowship\] You say\, \"\!tickets\"}
+		DO:	SetState {BuyTickets}
+	~~ this condition is used to start turning in rings
+	IF:	ChatMatch {\[Fellowship\] .* say(s*)\, \"\!rings\"}
+		DO:	SetState {LootRings}
 ~~ }
 STATE: {GettingATicket} ~~ {
 	IF:	Always
@@ -171,12 +179,16 @@ STATE: {GettingATicket} ~~ {
 			Not ItemCountGE 1 {Colosseum Ticket Stub}
 		DO:	Chat {/ub give Colosseum Ticket to Master Arbitrator}
 	~~ if we're out of tickets, we're all done
-	IF:	ItemCountLE 0 {Colosseum Ticket}
+	IF:	All
+			ItemCountLE 0 {Colosseum Ticket Stub}
+			ItemCountLE 0 {Colosseum Ticket}
 		DO:	SetState {AllDone}
 	~~ keep trying to get a ticket until an arena frees up
-	IF:	Any
-			SecsInStateGE 10
-			ChatMatch {^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"}
+	IF:	All
+			ItemCountLE 0 {Colosseum Ticket Stub}
+			Any
+				SecsInStateGE 10
+				ChatMatch {^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"}
 		DO:	SetState {GettingATicket}
 ~~ }
 STATE: {EnterFirstRoom} ~~ {
@@ -339,45 +351,41 @@ STATE: {TurnInRewards} ~~ {
 ~~ }
 STATE: {LootRings} ~~ {
 	IF: Always
-		DO:	DoAll
-				DoExpr {echo[`[META]: Looting Colo Rings`,19]}
-				Chat {/ub opt set Looter.Enabled true}
-	IF:	All
-			SecsInStateGE 2
-			ItemCountGE 1 {Colosseum Vault Key}
+		DO:	DoExpr {echo[`[META]: Looting Colo Rings`,19]}
+	IF:	ItemCountGE 1 {Colosseum Vault Key}
 		DO:	SetState {UnlockChest}
 	IF:	ItemCountLE 0 {Colosseum Vault Key}
-		DO:	DoAll
-				Chat {/ub opt set Looter.Enabled false}
-				SetState {AllDone}
+		DO:	SetState {ApplyIvoryToColoRings}
 ~~ }
 STATE: {UnlockChest} ~~ {
-	IF:	Always
+	IF: Always
 		DO:	DoAll
-				DoExpr {echo[`[META]: Unlocking Chest`,19]}
-				Chat {/ub use Colosseum Vault Key on Colosseum Vault}
-	IF:	ChatMatch {^The Colosseum Vault has been unlocked}
-		DO:	SetState {OpenChest}
-	IF:	All
-			SecsInStateGE 4
-			ItemCountGE 1 {Colosseum Vault Key}
-		DO:	SetState {UnlockChest}
+				Chat {/mt use Colosseum Vault Key on Colosseum Vault}
+				Chat {/ub delay 1000 /mt use Colosseum Vault}
+				Chat {/ub delay 2000 /mt lootp Empyrean Ring}
+				Chat {/ub delay 4000 /ub mexec wobjectgetopencontainer[]&&actiontryuseitem[wobjectgetopencontainer[]]}
+				Chat {/ub delay 5000 /vt setmetastate LootRings}
 ~~ }
-STATE: {OpenChest} ~~ {
-	IF:	Always
+STATE: {ApplyIvoryToColoRings} ~~ {
+	IF:	All 
+			Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`]]>0}
+			Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`],`wobjectgetintprop[$1,114]==1`]]>0}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Opening Chest`,19]}
-				Chat {/ub usel Colosseum Vault}
-	IF: Expr {wobjectgetopencontainer[]&&1}
-		DO: SetState {PickupRing}
+				DoExpr {actiontryapplyitem[listgetitem[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`],0],listgetitem[listfilter[wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`],`wobjectgetintprop[$1,114]==1`],0]}
+				SetState {ApplyIvoryToColoRings}
+	~~IF:	Any 
+	~~		Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`]]<=0}
+	~~		Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`],`wobjectgetintprop[$1,114]==1`]]<=0}
+	~~	DO:	SetState {WaitingForStart}
 ~~ }
-STATE: {PickupRing} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Picking Up Ring`,19]}
-	IF: Expr {wobjectgetopencontainer[]==0}
-		DO: SetState {LootRings}
+STATE: {BuyTickets} ~~ {
+	IF:	ItemCountGE 20 {Colosseum Ticket}
+		DO:	SetState {WaitingForStart}
+	IF:	ItemCountLE 19 {Colosseum Ticket}
+		DO:	DoAll
+				Chat {/ub give 1 Trade Note (250,000) to Colosseum Ticket Vendor}
+				SetState {BuyTickets}
 ~~ }
-
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
 NAV: navNone once ~~ {
