@@ -54,7 +54,7 @@ STATE: {SetDefaultOptions} ~~ {
 				SetOpt {EnableLooting} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {LootAllCorpses} {false}
-				SetOpt {LootOnlyRareCorpses} {true}
+				SetOpt {LootOnlyRareCorpses} {false}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {ApproachDistance} {0.00833}
 				SetOpt {CorpseApproachRange-Min} {0.00833}
@@ -73,6 +73,7 @@ STATE: {SetDefaultOptions} ~~ {
 				SetOpt {SummonPets} {true}
 				SetOpt {DoHelp} {true}
 				SetOpt {IdlePeaceMode} {false}
+				SetOpt {CastDispelSelf} {true}
 				SetOpt {DoJiggle} {false}
 	IF:	Always
 		DO:	Chat {/ibc}
