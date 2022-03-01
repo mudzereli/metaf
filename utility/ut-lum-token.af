@@ -38,8 +38,135 @@
 ~~ }																					
 
 STATE: {Default} ~~{
+	IF: Always
+		DO:	SetState {CheckAugs}
+~~}
+STATE: {CheckAugs} ~~{
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(L|l)ong\"}
+		DO: DoAll	
+				DoExpr {echo[`--- [[ Death Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[231]+`/3] Clutch of the Miser - Ayan Baqur - (Rohula bint Ludun)`,15]}
+				DoExpr {echo[`[`+getcharintprop[232]+`/1] Enduring Enchantment - Ayan Baqur - (Erik Festus)`,15]}
+				DoExpr {echo[`--- [[ Skill Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[300]+`/1] Master of the Steel Circle - Silyun - (Carlito Gallo)`,17]}
+				DoExpr {echo[`[`+getcharintprop[302]+`/1] Master of the Five Fold Path - Zaikhal - (Rahina bint Zalanis)`,17]}
+				DoExpr {echo[`[`+getcharintprop[301]+`/1] Master of the Focused Eye - Zaikhal - (Kilaf)`,17]}
+				DoExpr {echo[`[`+getcharintprop[326]+`/1] Jack of All Trades - Bandit Castle - (Arianna the Adept)`,17]}
+				DoExpr {echo[`--- [[ Rating Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[309]+`/1] Frenzy of the Slayer - Bandit Castle - (Neela Nashua)`,18]}
+				DoExpr {echo[`[`+getcharintprop[310]+`/1] Iron Skin of the Invincible - Cragstone - (Emily Yarow)`,18]}
+				DoExpr {echo[`[`+getcharintprop[298]+`/1] Eye of the Remorseless - Ayan Baqur - (Anfram Mellow)`,18]}
+				DoExpr {echo[`[`+getcharintprop[299]+`/1] Hand of the Remorseless - Ayan Baqur - (Alishia bint Aldan)`,18]}
+				DoExpr {echo[`[`+getcharintprop[233]+`/1] Critical Protection - Sanamar - (Piersanti Linante)`,18]}
+				DoExpr {echo[`--- [[ Protection Augs (2 Max) ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[242]+`/2] Enhancement of the Mace Turner - Hebian-To - (Nawamara Dia)`,30]}
+				DoExpr {echo[`[`+getcharintprop[240]+`/2] Enhancement of the Blade Turner - Hebian-To - (Ilin Wis)`,30]}
+				DoExpr {echo[`[`+getcharintprop[241]+`/2] Enhancement of the Arrow Turner - Hebian-To - (Kyujo Rujen)`,30]}
+				DoExpr {echo[`[`+getcharintprop[246]+`/2] Storm's Enhancement - Hebian-To - (Enli Yuo)`,30]}
+				DoExpr {echo[`[`+getcharintprop[244]+`/2] Fiery Enhancement - Hebian-To - (Rikshen Ri)`,30]}
+				DoExpr {echo[`[`+getcharintprop[245]+`/2] Icy Enhancement - Hebian-To - (Lu Bao)`,30]}
+				DoExpr {echo[`[`+getcharintprop[243]+`/2] Caustic Enhancement - Hebian-To - (Shujio Milao)`,30]}
+				DoExpr {echo[`--- [[ Burden / Pack Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[230]+`/5] Might of the Seventh Mule - Zaikhal - (Husoon)`,19]}
+				DoExpr {echo[`[`+getcharintprop[229]+`/1] Shadow of the Seventh Mule - Zaikhal - (Dumida bint Ruminre)`,19]}
+				DoExpr {echo[`[`+getcharintprop[297]+`/1] Infused War Magic (Red Foci) - Silyun - (Raphel Detante)`,19]}
+				DoExpr {echo[`[`+getcharintprop[296]+`/1] Infused Life Magic (Green Foci) - Hebian-To - (Akemi Fei)`,19]}
+				DoExpr {echo[`[`+getcharintprop[295]+`/1] Infused Item Magic (Purple Foci) - Hebian-To - (Gan Fo)`,19]}
+				DoExpr {echo[`[`+getcharintprop[294]+`/1] Infused Creature Magic (Blue Foci) - Cragstone - (Gustuv Lansdown)`,19]}
+				DoExpr {echo[`[`+getcharintprop[328]+`/1] Infused Void Magic (Black Foci) - Candeth Keep - (Morathe)`,19]}
+				DoExpr {echo[`--- [[ Attribute Augs (10 Max) ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[218]+`/10] Reinforcement of the Lugians - Fiun Outpost - (Fiun Luunere)`,5]}
+				DoExpr {echo[`[`+getcharintprop[219]+`/10] Bleeargh's Fortitude - Fiun Outpost - (Fiun Ruun)`,5]}
+				DoExpr {echo[`[`+getcharintprop[220]+`/10] Oswald's Enhancement - Fiun Outpost - (Fiun Bayaas)`,5]}
+				DoExpr {echo[`[`+getcharintprop[221]+`/10] Siraluun's Blessing - Fiun Outpost - (Fiun Riish)`,5]}
+				DoExpr {echo[`[`+getcharintprop[222]+`/10] Enduring Calm - Fiun Outpost - (Fiun Vasherr)`,5]}
+				DoExpr {echo[`[`+getcharintprop[223]+`/10] Steadfast Will - Fiun Outpost - (Fiun Noress)`,5]}
+				DoExpr {echo[`--- [[ Misc Augs ]] ---`,2]}
+				DoExpr {echo[`[`+iif[getitemcountininventorybyname[`Asheron's Lesser Benediction`]>0,1,0]+`/1] Asheron's Lesser Benediction - Silyun - (Donatello Linante)`,13]}
+				DoExpr {echo[`[`+getcharintprop[238]+`/5] Archmage's Endurance - Mayoi - (Nawamara Ujio)`,13]}
+				DoExpr {echo[`[`+getcharintprop[234]+`/1] Quick Learner - Silyun - (Rickard Dumalia)`,13]}
+				DoExpr {echo[`[`+getcharintprop[237]+`/2] Innate Renewal - Bandit Castle - (Alison Dulane)`,13]}
+				DoExpr {echo[`--- [[ Crafting Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[235]+`/4] Ciandra's Fortune - Cragstone - (Kris Cennis)`,11]}
+				DoExpr {echo[`[`+getcharintprop[236]+`/1] Charmed Smith - Oolutanga's Refuge - (Lug)`,11]}
+				DoExpr {echo[`[`+getcharintprop[226]+`/1] Jibril's Essence - Cragstone - (Joshun Felden)`,11]}
+				DoExpr {echo[`[`+getcharintprop[225]+`/1] Yoshi's Essence - Cragstone - (Brienne Carlus)`,11]}
+				DoExpr {echo[`[`+getcharintprop[227]+`/1] Celdiseth's Essence - Cragstone - (Burrell Sammrun)`,11]}
+				DoExpr {echo[`[`+getcharintprop[228]+`/1] Koga's Essence - Cragstone - (Lenor Turk)`,11]}
+				DoExpr {echo[`[`+getcharintprop[224]+`/1] Ciandra's Essence - Cragstone - (Robert Crow)`,11]}
+				DoExpr {echo[`--- >>> Quest Augs: [`+iif[getqueststatus[blankaugluminancetimer_0511]==0,`X`,` `]+`] 100K Lum [`+iif[getqueststatus[augmentationblankgemacquired]==0,`X`,` `]+`] Sir Bellas [`+iif[getqueststatus[pickedupmarkerboss10x]==0,`X`,iif[testquestflag[golemstonediemosgiven]==0,`F`,` `]]+`] Diemos`,2]}
+				DoExpr {echo[`--- >>> # of Useable Augmentation Gems: `+listcount[listfilter[wobjectfindallinventory[],`wobjectgetintprop[$1,218103809]==23178||wobjectgetintprop[$1,218103809]==23179`]],2]}
+				DoExpr {echo[`--- >>> Unspent XP: `+floor[getcharquadprop[2]/1000000000]+` Billion`,2]}
+				SetState {CheckAugs}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(S|s)hort\"}
+		DO: DoAll	
+				DoExpr {echo[`--- [[ Death Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[231]+`/3] Keep Items [`+getcharintprop[232]+`] Keep Spells`,15]}
+				DoExpr {echo[`--- [[ Skill Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[326]+`] All [`+getcharintprop[300]+`] Melee [`+getcharintprop[302]+`] Magic [`+getcharintprop[301]+`] Missile`,17]}
+				DoExpr {echo[`--- [[ Rating Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[309]+`] Dam [`+getcharintprop[310]+`] Dam Resist [`+getcharintprop[298]+`] Crit % [`+getcharintprop[299]+`] Crit Dam [`+getcharintprop[233]+`] Crit Prot`,18]}
+				DoExpr {echo[`--- [[ Protection Augs (2 Max) ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[240]+`] S [`+getcharintprop[241]+`] P [`+getcharintprop[242]+`] B [`+getcharintprop[244]+`] F [`+getcharintprop[245]+`] C [`+getcharintprop[243]+`] A [`+getcharintprop[246]+`] L`,30]}
+				DoExpr {echo[`--- [[ Burden / Pack Augs ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[296]+`] Life [`+getcharintprop[295]+`] Item [`+getcharintprop[294]+`] Creature [`+getcharintprop[328]+`] Void [`+getcharintprop[297]+`] War [`+getcharintprop[229]+`] Pack [`+getcharintprop[230]+`/5] BU `,19]}
+				DoExpr {echo[`--- [[ Attribute Augs (10 Max) ]] ---`,2]}
+				DoExpr {echo[`[`+getcharintprop[218]+`] S [`+getcharintprop[219]+`] E [`+getcharintprop[220]+`] C [`+getcharintprop[221]+`] Q [`+getcharintprop[222]+`] F [`+getcharintprop[223]+`] W`,5]}
+				DoExpr {echo[`--- [[ Misc Augs ]] ---`,2]}
+				DoExpr {echo[`[`+iif[getitemcountininventorybyname[`Asheron's Lesser Benediction`]>0,1,0]+`] % HP [`+getcharintprop[238]+`/5] Spell Dur [`+getcharintprop[237]+`/2] Regen [`+getcharintprop[234]+`] % XP`,13]}
+				DoExpr {echo[`--- [[ Crafting Augs ]] ---`,2]}
+				DoExpr {echo[`Specialize -> [`+getcharintprop[226]+`] AT [`+getcharintprop[225]+`] IT [`+getcharintprop[227]+`] MIT [`+getcharintprop[228]+`] WT [`+getcharintprop[224]+`] SVG`,11]}
+				DoExpr {echo[`[`+getcharintprop[235]+`/4] 25% Salvage [`+getcharintprop[236]+`] 5% Imbue`,11]}
+				DoExpr {echo[`--- >>> Quest Augs: [`+iif[getqueststatus[blankaugluminancetimer_0511]==0,`X`,` `]+`] 100K Lum [`+iif[getqueststatus[augmentationblankgemacquired]==0,`X`,` `]+`] Sir Bellas [`+iif[getqueststatus[pickedupmarkerboss10x]==0,`X`,iif[testquestflag[golemstonediemosgiven]==0,`F`,` `]]+`] Diemos`,2]}
+				DoExpr {echo[`--- >>> # of Useable Augmentation Gems: `+listcount[listfilter[wobjectfindallinventory[],`wobjectgetintprop[$1,218103809]==23178||wobjectgetintprop[$1,218103809]==23179`]],2]}
+				DoExpr {echo[`--- >>> Unspent XP: `+floor[getcharquadprop[2]/1000000000]+` Billion`,2]}
+				SetState {CheckAugs}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(C|c)hat\"}
+		DO: DoAll	
+				DoExpr {chatbox[`--- [[ Death Augs ]] ---`]}
+				DoExpr {chatbox[`[`+getcharintprop[231]+`/3] Keep Items [`+getcharintprop[232]+`] Keep Spells`]}
+				DoExpr {chatbox[`--- [[ Skill Augs ]] ---`]}
+				DoExpr {chatbox[`[`+getcharintprop[326]+`] All [`+getcharintprop[300]+`] Melee [`+getcharintprop[302]+`] Magic [`+getcharintprop[301]+`] Missile`]}
+				DoExpr {chatbox[`--- [[ Rating Augs ]] ---`]}
+				DoExpr {chatbox[`[`+getcharintprop[309]+`] Dam [`+getcharintprop[310]+`] Dam Resist [`+getcharintprop[298]+`] Crit % [`+getcharintprop[299]+`] Crit Dam [`+getcharintprop[233]+`] Crit Prot`]}
+				DoExpr {chatbox[`--- [[ Protection Augs (2 Max) ]] ---`]}
+				DoExpr {chatbox[`[`+getcharintprop[240]+`] S [`+getcharintprop[241]+`] P [`+getcharintprop[242]+`] B [`+getcharintprop[244]+`] F [`+getcharintprop[245]+`] C [`+getcharintprop[243]+`] A [`+getcharintprop[246]+`] L`]}
+				DoExpr {chatbox[`--- [[ Burden / Pack Augs ]] ---`]}
+				DoExpr {chatbox[`[`+getcharintprop[296]+`] Life [`+getcharintprop[295]+`] Item [`+getcharintprop[294]+`] Creature [`+getcharintprop[328]+`] Void [`+getcharintprop[297]+`] War [`+getcharintprop[229]+`] Pack [`+getcharintprop[230]+`/5] BU `]}
+				DoExpr {chatbox[`--- [[ Attribute Augs (10 Max) ]] ---`]}
+				DoExpr {chatbox[`[`+getcharintprop[218]+`] S [`+getcharintprop[219]+`] E [`+getcharintprop[220]+`] C [`+getcharintprop[221]+`] Q [`+getcharintprop[222]+`] F [`+getcharintprop[223]+`] W`]}
+				DoExpr {chatbox[`--- [[ Misc Augs ]] ---`]}
+				DoExpr {chatbox[`[`+iif[getitemcountininventorybyname[`Asheron's Lesser Benediction`]>0,1,0]+`] % HP [`+getcharintprop[238]+`/5] Spell Dur [`+getcharintprop[237]+`/2] Regen [`+getcharintprop[234]+`] % XP`]}
+				DoExpr {chatbox[`--- [[ Crafting Augs ]] ---`]}
+				DoExpr {chatbox[`Specialize -> [`+getcharintprop[226]+`] AT [`+getcharintprop[225]+`] IT [`+getcharintprop[227]+`] MIT [`+getcharintprop[228]+`] WT [`+getcharintprop[224]+`] SVG`]}
+				DoExpr {chatbox[`[`+getcharintprop[235]+`/4] 25% Salvage [`+getcharintprop[236]+`] 5% Imbue`]}
+				DoExpr {chatbox[`--- >>> Quest Augs: [`+iif[getqueststatus[blankaugluminancetimer_0511]==0,`X`,` `]+`] 100K Lum [`+iif[getqueststatus[augmentationblankgemacquired]==0,`X`,` `]+`] Sir Bellas [`+iif[getqueststatus[pickedupmarkerboss10x]==0,`X`,iif[testquestflag[golemstonediemosgiven]==0,`F`,` `]]+`] Diemos`]}
+				DoExpr {chatbox[`--- >>> # of Useable Augmentation Gems: `+listcount[listfilter[wobjectfindallinventory[],`wobjectgetintprop[$1,218103809]==23178||wobjectgetintprop[$1,218103809]==23179`]]]}
+				DoExpr {chatbox[`--- >>> Unspent XP: `+floor[getcharquadprop[2]/1000000000]+` Billion`]}
+				SetState {CheckAugs}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(L|l)um\"}
+		DO: DoAll	
+				DoExpr {echo[`[`+iif[getqueststatus[blankaugluminancetimer_0511]==0,`1`,`0`]+`/1] Blank Augmentation Gem`,30]}
+				DoExpr {echo[`[`+getquestktprogress[lumaugskillquest]+`/2] +1 Skill Credit`,30]}
+				DoExpr {echo[`[`+getcharintprop[338]+`/5] +% Aetheria Proc`,30]}
+				DoExpr {echo[`[`+getcharintprop[334]+`/5] +1 Damage Reduction Rating`,30]}
+				DoExpr {echo[`[`+getcharintprop[336]+`/5] +1 Crit Damage Reduction Rating`,30]}
+				DoExpr {echo[`[`+getcharintprop[333]+`/5] +1 Damage Rating`,30]}
+				DoExpr {echo[`[`+getcharintprop[335]+`/5] +1 Crit Damage Rating`,30]}
+				DoExpr {echo[`[`+getcharintprop[342]+`/5] +1 Heal Rating`,30]}
+				DoExpr {echo[`[`+getcharintprop[339]+`/5] +1 Equipment Mana Consumption Rating`,30]}
+				DoExpr {echo[`[`+getcharintprop[340]+`/5] +1 Mana Stone Rating`,30]}
+				DoExpr {echo[`[`+getcharintprop[343]+`/5] +1 Crafting Skills`,30]}
+				DoExpr {echo[`[`+getcharintprop[365]+`/10] +1 All Skills`,30]}
+				DoExpr {echo[`--- >>> Unspent Luminance: `+getcharquadprop[6],2]}
+				SetState {CheckAugs}
+~~}
+STATE: {CheckTokens} ~~{
 	IF:	Always
 		DO: DoExpr {setvar[TokenNames,listcreate[]]}
+	~~ Blank Augmentation Gem
+	IF:	Expr {getqueststatus[blankaugluminancetimer_0511]==1}
+		DO:	DoExpr {listadd[$TokenNames,`the Augmentation Gem`]}
 	~~ + 1 Skill Credit
 	IF:	Expr {getquestktprogress[lumaugskillquest]<2}
 		DO:	DoExpr {listadd[$TokenNames,`Skill`]}
@@ -57,7 +184,7 @@ STATE: {Default} ~~{
 		DO:	DoExpr {listadd[$TokenNames,`the Aura of Valor`]}
 	~~ + 1 Crit Damage Rating
 	IF:	Expr {getcharintprop[335]<5}
-		DO:	DoExpr {listadd[$TokenNames,`thr Aura of Glory`]}
+		DO:	DoExpr {listadd[$TokenNames,`the Aura of Glory`]}
 	~~ + 1 Heal Rating
 	IF:	Expr {getcharintprop[342]<5}
 		DO:	DoExpr {listadd[$TokenNames,`the Aura of Purity`]}
@@ -78,11 +205,13 @@ STATE: {Default} ~~{
 				DoExpr {setvar[TokenNPC,`Nalicana`]}
 				SetOpt {NavCloseStopRange} {0.00833}
 				Chat {/mt combatstate peace}
+				Chat {/ub myquests}
 				SetState {PickUpToken}
 ~~}
 STATE: {PickUpToken} ~~{
 	IF:	Always
 		DO:	DoAll
+				Chat {/ub myquests}
 				DoExpr {setvar[CurrentToken,listgetitem[$TokenNames,0]}
 				EmbedNav navReset {Reset}
 	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
@@ -100,12 +229,15 @@ STATE: {TurnInToken} ~~{
 	IF:	Any
 			ChatMatch {^Nalicana tells you\, \"You cannot increase your .* any further\.\"}
 			ChatMatch {^Nalicana tells you\, \"You cannot spend any more Luminance on skill credits\.\"}
+			ChatMatch {^Nalicana tells you\, \"Your Timer is not up\.\"}
 		DO:	DoAll
 				DoExpr {listremoveat[$TokenNames,0]}
+				Chat {/ub myquests}
 				SetState {PickUpToken}
 	IF:	All
 			Any
 				ChatMatch {^Nalicana tells you}
+				ChatMatch {^Nalicana gives you Blank Augmentation Gem\.}
 				ChatMatch {^You feel a surge of energy pass through you as the Light empowers your being\.}
 			Expr {getitemcountininventorybynamerx[$CurrentToken]==0}
 		DO:	SetState {PickUpToken}
