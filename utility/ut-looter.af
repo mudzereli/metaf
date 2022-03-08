@@ -61,8 +61,14 @@ STATE: {*SetupOptions*} ~~{
 		DO:	DoAll
 				DoExpr {setvar[ltr-mobname,`Curator of Torment`]}
 				DoExpr {setvar[ltr-itemname,`Shard of the Curator of Torment's Mask`]}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"\!bellas"}
+		DO:	DoAll
+				DoExpr {setvar[ltr-mobname,`Sir Bellas`]}
+				DoExpr {setvar[ltr-itemname,`Blank Augmentation Gem`]}
 	IF:	Expr {getvar[ltr-mobname]&&getvar[ltr-itemname]}
-		DO:	SetState {WaitingForCorpse}
+		DO:	DoAll
+				DoExpr {setvar[ltr-currentamt,getitemcountininventorybyname[getvar[ltr-itemname]]]}
+				SetState {WaitingForCorpse}
 ~~}
 STATE: {WaitingForCorpse} ~~{
 	IF:	Always
@@ -73,7 +79,7 @@ STATE: {WaitingForCorpse} ~~{
 				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 				Chat {/ub close corpse}
-	IF:	Expr {getitemcountininventorybyname[getvar[ltr-itemname]]>=1}
+	IF:	Expr {getitemcountininventorybyname[getvar[ltr-itemname]]>getvar[ltr-currentamt]}
 		DO:	SetState {AllDone}
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,getvar[ltr-mobname]]&&1}
 		DO:	SetState {LootingCorpse}
@@ -81,7 +87,9 @@ STATE: {WaitingForCorpse} ~~{
 STATE: {LootingCorpse} ~~{
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Looting Corpse: `+getvar[ltr-mobname],19]}
-	IF:	Expr {getitemcountininventorybyname[getvar[ltr-itemname]]>=1}
+	IF:	Any
+			Expr {getitemcountininventorybyname[getvar[ltr-itemname]]>getvar[ltr-currentamt]}
+			ChatMatch {^You have solved this quest too recently\!}
 		DO:	SetState {AllDone}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,getvar[ltr-mobname]]==0}
 		DO: SetState {WaitingForCorpse}
