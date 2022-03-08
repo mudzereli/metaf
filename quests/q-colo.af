@@ -124,6 +124,7 @@ STATE: {WaitingForStart} ~~ {
 	~~ this sets up all the initial variables when waiting to start
 	IF:	Always
 		DO:	DoAll
+				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableLooting} {false}
@@ -244,12 +245,13 @@ STATE: {StartFirstRoom} ~~ {
 				SetOpt {EnableCombat} {true}
 				SetOpt {NavCloseStopRange} {0.02}
 				SetOpt {ApproachDistance} {0.02}
+				DoExpr {setvar[qcolo-roomnumber,5]}
 				Chat {/ub myquests}
 				SetState {StartCurrentRoom}
 ~~ }
 STATE: {StartCurrentRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Setting up for this Colosseum Room`,19]}
+		DO:	DoExpr {echo[`[META]: Setting up for Colosseum Room: `+cstr[getvar[qcolo-roomnumber]+1],19]}
 	~~ if we try to start the room, but we finished the run, then wait for our timer
 	IF:	Any
 			CellE 00AF0118
@@ -259,6 +261,7 @@ STATE: {StartCurrentRoom} ~~ {
 	~~ ring the bell, start killing & looting
 	IF:	Always
 		DO:	DoAll
+				DoExpr {setvar[qcolo-roomnumber,getvar[qcolo-roomnumber]+1]}
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {true}
 				SetOpt {AttackDistance} {0.3}
@@ -267,7 +270,7 @@ STATE: {StartCurrentRoom} ~~ {
 ~~ }
 STATE: {KillingCurrentRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Starting Battle in this Colosseum Room`,19]}
+		DO:	DoExpr {echo[`[META]: Starting Battle in Colosseum Room: `+getvar[qcolo-roomnumber],19]}
 	IF:	Any
 			ChatMatch {A Door appears on the North wall.}
 			ChatMatch {Congratulations! You have beaten the Colosseum!}
@@ -278,7 +281,7 @@ STATE: {KillingCurrentRoom} ~~ {
 ~~ }
 STATE: {MoveToNextRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Moving to Next Colosseum Room`,19]}
+		DO:	DoExpr {echo[`[META]: Moving to Colosseum Room: `+cstr[getvar[qcolo-roomnumber]+1],19]}
 	~~ once we enter the portal, don't try to use it anymore
 	IF:	IntoPortal
 		DO:	SetState {MoveToNextRoomInPortal}
@@ -335,7 +338,6 @@ STATE: {TurnInRewards} ~~ {
 		DO:	DoAll
 				DoExpr {setgvar[qcolo-charsbuffed,listcreate[]]}
 				DoExpr {setgvar[qcolo-charswaiting,listcreate[]]}
-				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
 				DoExpr {setgvar[qcolo-fellowlocked,0]}
 				DoExpr {setvar[qcolo-started,0]}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
@@ -353,18 +355,65 @@ STATE: {LootRings} ~~ {
 	IF: Always
 		DO:	DoExpr {echo[`[META]: Looting Colo Rings`,19]}
 	IF:	ItemCountGE 1 {Colosseum Vault Key}
-		DO:	SetState {UnlockChest}
+		DO:	SetState {GoToColosseumVault}
 	IF:	ItemCountLE 0 {Colosseum Vault Key}
 		DO:	SetState {ApplyIvoryToColoRings}
 ~~ }
-STATE: {UnlockChest} ~~ {
+STATE: {GoToColosseumVault} ~~ {
+	IF: Always
+		DO: DoAll
+				SetOpt {EnableCombat} {false}
+				SetOpt {EnableLooting} {false}
+				SetOpt {NavCloseStopRange} {0.00833}
+				SetOpt {EnableNav} {true}
+				Chat {/mt combatstate peace}
+	IF: All
+			NavEmpty
+			Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
+		DO:	SetState {UnlockColosseumVault}
+	IF:	Not Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
+		DO: EmbedNav navColosseumVault {ColosseumVault}
+~~ }
+STATE: {UnlockColosseumVault} ~~ {
 	IF: Always
 		DO:	DoAll
 				Chat {/mt use Colosseum Vault Key on Colosseum Vault}
-				Chat {/ub delay 1000 /mt use Colosseum Vault}
-				Chat {/ub delay 2000 /mt lootp Empyrean Ring}
-				Chat {/ub delay 4000 /ub mexec wobjectgetopencontainer[]&&actiontryuseitem[wobjectgetopencontainer[]]}
-				Chat {/ub delay 5000 /vt setmetastate LootRings}
+				SetWatchdog 3 3 {UnlockColosseumVault}
+	IF:	ChatMatch {^The Colosseum Vault has been unlocked\.}
+		DO:	SetState {OpenColosseumVault}
+~~ }
+STATE: {OpenColosseumVault} ~~ {
+	IF:	SecsInStateGE 1
+		DO:	DoAll
+				Chat {/mt use Colosseum Vault}
+				SetWatchdog 3 3 {UnlockColosseumVault}
+	IF: Expr {wobjectgetopencontainer[]&&1}
+		DO: SetState {LootEmpyreanRing}
+~~ }
+STATE: {LootEmpyreanRing} ~~ {
+	IF:	All
+			SecsInStateGE 2
+			Expr {listcount[listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],\`.* Empyrean Ring\`]`]] > 0}
+		DO: DoExpr {actiontryuseitem[listgetitem[listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],\`.* Empyrean Ring\`]`],0]]}
+	IF:	All
+			SecsInStateGE 4
+			Not Expr {listcount[listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],\`.* Empyrean Ring\`]`]] > 0}
+		DO: DoExpr {wobjectgetopencontainer[]&&actiontryuseitem[wobjectgetopencontainer[]]}
+	IF: Expr {wobjectgetopencontainer[]==0}
+		DO: SetState {LootRings}
+~~ }
+STATE: {FixBuggedColosseumVault} ~~ {
+	~~IF:	Always
+	~~	DO:	DoAll
+	~~			DoExpr {wobjectgetopencontainer[]&&actiontryuseitem[wobjectgetopencontainer[]]}
+	~~			SetWatchdog 3 3 {FixBuggedColosseumVault}
+	IF: Always
+		DO:	DoAll
+				EmbedNav navResetColosseumVault {ResetColosseumVault}
+	IF:	All
+			NavEmpty
+			Expr {wobjectgetopencontainer[]==0}
+		DO: SetState {OpenColosseumVault}
 ~~ }
 STATE: {ApplyIvoryToColoRings} ~~ {
 	IF:	All 
@@ -393,4 +442,11 @@ NAV: navNone once ~~ {
 NAV: navTalkMasterArbitrator once ~~ {
 	pnt -101.783239634832 38.0445641900102 2.08333134651184E-05
 	tlk -101.783916680018 37.9945620814959 2.08333134651184E-05 -101.783333333333 38.05 3.12502197630238E-05 37 {Master Arbitrator}
+~~ }
+NAV: navColosseumVault once ~~ {
+	pnt -101.834077048302 38.0082315127055 2.08333134651184E-05
+~~ }
+NAV: navResetColosseumVault once ~~ {
+	pnt -101.800076643626 38.0178716758887 2.08333134651184E-05
+	pnt -101.834182055791 38.0088105320931 2.08333134651184E-05
 ~~ }
