@@ -160,6 +160,18 @@ STATE: {CheckAugs} ~~{
 				DoExpr {echo[`[`+getcharintprop[365]+`/10] +1 All Skills`,30]}
 				DoExpr {echo[`--- >>> Unspent Luminance: `+getcharquadprop[6],2]}
 				SetState {CheckAugs}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(F|f)lag(s*)\"}
+		DO: DoAll	
+				DoExpr {echo[`--- [[ Aug Gems ]] ---`,2]}
+				DoExpr {echo[`[`+iif[getqueststatus[blankaugluminancetimer_0511]==0,`X`,` `]+`] 100K Lum [`+iif[getqueststatus[augmentationblankgemacquired]==0,`X`,` `]+`] Sir Bellas [`+iif[getqueststatus[pickedupmarkerboss10x]==0,`X`,iif[testquestflag[golemstonediemosgiven]==0,`F`,` `]]+`] Diemos`,2]}
+				DoExpr {echo[`--- [[ Skill Credits (4 Total)]] ---`,2]}
+				DoExpr {echo[`[`+iif[testquestflag[arantahkill1]==1,`X`,` `]+`] Aun Ralirea [`+iif[testquestflag[OswaldManualCompleted]==1,`X`,` `]+`] Chasing Oswald [`+getquestktprogress[lumaugskillquest]+`/2] 1M Lum`,2]}
+				~~ To Do - Recalls / Stipend / Focusing Stone / DI / Viss / Caul / Etc
+				DoExpr {echo[`--- [[ Aetheria ]] ---`,2]}
+				DoExpr {echo[`[`+iif[1&getcharintprop[322]==1,`X`,` `]+`] 75 [`+iif[2&getcharintprop[322]==2,`X`,` `]+`] 150 [`+iif[4&getcharintprop[322]==4,`X`,` `]+`] 225`,2]}
+				DoExpr {echo[`--- >>> Unspent Luminance: `+iif[testquestflag[OracleLuminanceRewardsAccess_1110]==0,`Not Flagged`,getcharquadprop[6]],2]}
+				DoExpr {echo[`--- >>> Unspent XP: `+floor[getcharquadprop[2]/1000000000]+` Billion`,2]}
+				SetState {CheckAugs}
 ~~}
 STATE: {CheckTokens} ~~{
 	IF:	Always
@@ -239,14 +251,15 @@ STATE: {TurnInToken} ~~{
 				ChatMatch {^Nalicana tells you}
 				ChatMatch {^Nalicana gives you Blank Augmentation Gem\.}
 				ChatMatch {^You feel a surge of energy pass through you as the Light empowers your being\.}
+			SecsInStateGE 3
 			Expr {getitemcountininventorybynamerx[$CurrentToken]==0}
 		DO:	SetState {PickUpToken}
 	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	DoAll
 				Chat {/ub prepclick yes 10}
 				ChatExpr {`/ub givep `+$CurrentToken+` to `+$TokenNPC}
-	IF: SecsInStateGE 3
-		DO:	SetState {TurnInToken}
+	~~IF: SecsInStateGE 3
+	~~	DO:	SetState {TurnInToken}
 ~~}
 STATE: {AllDone} ~~{
 	IF:	Always
