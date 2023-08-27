@@ -42,8 +42,55 @@ STATE: {Default} ~~{
 		DO:	SetState {CheckInventory}
 ~~}
 STATE: {CheckInventory} ~~{
+	IF:	ItemCountGE 2 {Pyreal Nugget}
+		DO:	SetState {CombinePyrealNuggets}
+	IF:	ItemCountGE 2 {Pyreal Sliver}
+		DO:	SetState {CombinePyrealSlivers}
 	IF:	ItemCountGE 1 {Wrapped Pyreal Sliver}
+		DO:	SetState {UnwrapPyrealSlivers}
+	IF:	ItemCountLE 1 {Wrapped Pyreal Sliver}
+		DO:	SetState {BuyWrappedPyrealSlivers}
+~~}
+STATE: {BuyWrappedPyrealSlivers} ~~{
+	IF:	ItemCountGE 1 {Wrapped Pyreal Sliver}
+		DO:	SetState {CheckInventory}
+	IF:	Always
+		DO:	DoAll
+				EmbedNav navBuyWrappedPyrealSlivers {BuyWrappedPyrealSlivers}
+				SetWatchdog 3 10 {CheckInventory}
+~~}
+STATE: {UnwrapPyrealSlivers} ~~{
+	IF:	ItemCountLE 0 {Wrapped Pyreal Sliver}
+		DO:	SetState {CheckInventory}
+	IF:	Always
 		DO:	DoAll
 				Chat {/mt use Wrapped Pyreal Sliver}
-				SetState {CheckInventory}
+				SetState {UnwrapPyrealSlivers}
+~~}
+STATE: {CombinePyrealSlivers} ~~{
+	IF:	ItemCountLE 1 {Pyreal Sliver}
+		DO:	SetState {CheckInventory}
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setvar[inv_slivers,wobjectfindallinventorybynamerx[`^Pyreal Sliver`]];actiontryapplyitem[listgetitem[$inv_slivers,0],listgetitem[$inv_slivers,1]]}
+				SetState {CombinePyrealSlivers}
+~~}
+STATE: {CombinePyrealNuggets} ~~{
+	IF:	ItemCountLE 1 {Pyreal Nugget}
+		DO:	SetState {CheckInventory}
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setvar[inv_nuggets,wobjectfindallinventorybynamerx[`^Pyreal Nugget`]];actiontryapplyitem[listgetitem[$inv_nuggets,0],listgetitem[$inv_nuggets,1]]}
+				SetState {CombinePyrealNuggets}
+~~}
+
+
+
+NAV: navBuyWrappedPyrealSlivers once ~~{
+	cht 0 0 0 {/ub vendor open Colosseum Coin Collector}
+	pau 0 0 0 300
+	cht 0 0 0 {/ub vendor addbuy 4 Wrapped Pyreal Sliver}
+	pau 0 0 0 300
+	cht 0 0 0 {/ub vendor buyall}
+	pau 0 0 0 300
 ~~}

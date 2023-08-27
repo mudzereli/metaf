@@ -138,17 +138,35 @@ STATE: {GoToArwic} ~~{
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Going to Arwic`,3]}
 	IF:	CellE C6A90009
-		DO:	SetState {GoToArwicLifestone}
+		DO:	SetState {GoToArwicVendor}
 	IF:	Always
 		DO:	EmbedNav navGoToArwic {GoToArwic}
+~~}
+STATE: {GoToArwicVendor} ~~{
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Arwic Vendor`,3]}
+	IF:	Always
+		DO:	EmbedNav navGoToArwicVendor {GoToArwicVendor}
+	IF:	NavEmpty
+		DO:	SetState {BuyPacksFromVendor}
+~~}
+STATE: {BuyPacksFromVendor} ~~{
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Buying Packs From Vendor`,3]}
+	IF:	ItemCountGE 6 {Pack}
+		DO:	SetState {GoToArwicLifestone}
+	IF:	Always
+		DO:	DoAll
+				EmbedNav navBuyPacksFromVendor {BuyPacksFromVendor}
+				SetWatchdog 3 10 {BuyPacksFromVendor}
 ~~}
 STATE: {GoToArwicLifestone} ~~{
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Going to Arwic Lifestone`,3]}
-	IF:	NavEmpty
-		DO:	SetState {AttuneToLifestone}
 	IF:	Always
 		DO:	EmbedNav navGoToArwicLifestone {GoToArwicLifestone}
+	IF:	NavEmpty
+		DO:	SetState {AttuneToLifestone}
 ~~}
 STATE: {AttuneToLifestone} ~~{
 	IF:	Always
@@ -164,6 +182,14 @@ STATE: {TalkToMonroe} ~~{
 	IF:	Always
 		DO:	EmbedNav navTalkToMonroe {TalkToMonroe}
 	IF:	NavEmpty
+		DO:	SetState {SortBags}
+~~}
+STATE: {SortBags} ~~{
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Sorting Bags`,3]}
+	IF:	Always
+		DO:	EmbedNav navSortBags {SortBags}
+	IF: ChatMatch {^You think\, \"done sorting\!\"$}
 		DO:	SetState {AllDone}
 ~~}
 STATE: {AllDone} ~~{
@@ -224,10 +250,12 @@ NAV: navGoToArwic once ~~ {
 	pnt -101.601229127248 -96.5160760084788 2.08333134651184E-05
 	ptl -101.601229127248 -96.5160760084788 2.08333134651184E-05 -101.588099161784 -96.5166525046031 -0.000262499845121056 14 {Portal to Arwic}
 ~~ }
-NAV: navGoToArwicLifestone once ~~ {
+NAV: navGoToArwicVendor once ~~ {
 	pnt 56.6450208346049 33.2752167165279 0.175020837783813
 	pnt 56.6478301048279 33.3284719705582 0.175020837783813
 	pnt 56.6480444749196 33.3690061569214 0.175020837783813
+~~ }
+NAV: navGoToArwicLifestone once ~~ {
 	pnt 56.6455473899841 33.3976800759633 0.175020837783813
 	pnt 56.6463928699493 33.4369568824768 0.175020837783813
 	pnt 56.6474084059397 33.463033692042 0.175020837783813
@@ -243,3 +271,20 @@ NAV: navTalkToMonroe once ~~ {
 	pnt 56.7814922650655 33.6411301930745 0.175027084350586
 	tlk 56.7814922650655 33.6411301930745 0.175027084350586 56.7816291809082 33.6455291748047 0.175020843744278 37 {Monroe}
 ~~ }
+NAV: navBuyPacksFromVendor once ~~{
+	cht 0 0 0 {/ub vendor open Shopkeep Mirinda}
+	pau 0 0 0 3000
+	cht 0 0 0 {/ub vendor addbuy 6 Pack}
+	pau 0 0 0 300
+	cht 0 0 0 {/ub vendor buyall}
+	pau 0 0 0 300
+~~}
+NAV: navSortBags once ~~{
+	cht 0 0 0 {/ms set source player}
+	pau 0 0 0 200
+	cht 0 0 0 {/ms set dest pack 7}
+	pau 0 0 0 200
+	cht 0 0 0 {/ms set flags OC}
+	pau 0 0 0 200
+	cht 0 0 0 {/ms start}
+~~}

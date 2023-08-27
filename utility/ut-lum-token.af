@@ -172,6 +172,8 @@ STATE: {CheckAugs} ~~{
 				DoExpr {echo[`--- >>> Unspent Luminance: `+iif[testquestflag[OracleLuminanceRewardsAccess_1110]==0,`Not Flagged`,getcharquadprop[6]],2]}
 				DoExpr {echo[`--- >>> Unspent XP: `+floor[getcharquadprop[2]/1000000000]+` Billion`,2]}
 				SetState {CheckAugs}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(T|t)oken(s*)\"}
+		DO: SetState {CheckTokens}
 ~~}
 STATE: {CheckTokens} ~~{
 	IF:	Always
@@ -223,43 +225,47 @@ STATE: {CheckTokens} ~~{
 STATE: {PickUpToken} ~~{
 	IF:	Always
 		DO:	DoAll
+				~~Chat {@grantluminance 1500000}
 				Chat {/ub myquests}
 				DoExpr {setvar[CurrentToken,listgetitem[$TokenNames,0]}
-				EmbedNav navReset {Reset}
 	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	SetState {TurnInToken}
-	IF:	All
-			NavEmpty
-			Expr {wobjectfindnearestbynameandobjectclass[11,$CurrentToken]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,$CurrentToken]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<20}
-		DO:	ChatExpr {`/ub uselp Token of `+$CurrentToken}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,$CurrentToken]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,$CurrentToken]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<20}
+		DO:	DoAll
+				ChatExpr {`/ub uselp Token of `+$CurrentToken}
+				SetWatchdog 3 3 {PickUpToken}
 	IF: SecsInStateGE 12
-		DO:	SetState {PickUpToken}
+		DO:	SetState {ResetPosition}
+~~}
+STATE: {ResetPosition} ~~{
+	IF:	NavEmpty
+		DO:	DoAll
+				EmbedNav navReset {Reset}
+				SetState {PickUpToken}
 ~~}
 STATE: {TurnInToken} ~~{
 	IF:	ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
 		DO:	SetState {AllDone}
 	IF:	Any
-			ChatMatch {^Nalicana tells you\, \"You cannot increase your .* any further\.\"}
+			~~ChatMatch {^Nalicana tells you\, \"You cannot increase your .* any further\.\"}
+			ChatMatch {^Nalicana tells you\, \"You cannot increase your .*"}
 			ChatMatch {^Nalicana tells you\, \"You cannot spend any more Luminance on skill credits\.\"}
 			ChatMatch {^Nalicana tells you\, \"Your Timer is not up\.\"}
 		DO:	DoAll
 				DoExpr {listremoveat[$TokenNames,0]}
 				Chat {/ub myquests}
 				SetState {PickUpToken}
-	IF:	All
-			Any
-				ChatMatch {^Nalicana tells you}
-				ChatMatch {^Nalicana gives you Blank Augmentation Gem\.}
-				ChatMatch {^You feel a surge of energy pass through you as the Light empowers your being\.}
-			SecsInStateGE 3
-			Expr {getitemcountininventorybynamerx[$CurrentToken]==0}
+	IF: Any
+			ChatMatch {^Nalicana gives you Blank Augmentation Gem\.}
+			ChatMatch {^You have gained a skill point\!}
+			ChatMatch {^You give Nalicana Token of the Aura of the World}
+			ChatMatch {^You feel a surge of energy pass through you as the Light empowers your being\.}
 		DO:	SetState {PickUpToken}
-	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
+	IF: Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	DoAll
 				Chat {/ub prepclick yes 10}
 				ChatExpr {`/ub givep `+$CurrentToken+` to `+$TokenNPC}
-	~~IF: SecsInStateGE 3
-	~~	DO:	SetState {TurnInToken}
+				SetWatchdog 3 3 {TurnInToken}
 ~~}
 STATE: {AllDone} ~~{
 	IF:	Always
