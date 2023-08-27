@@ -38,50 +38,22 @@
 ~~ }																					
 
 STATE: {Default} ~~ {
-	IF:	CellE 860201AD
-		DO:	Chat {/vt meta load ut-newcharacter}
-	IF:	Always
-		DO:	SetState {SetDefaultOptions}
-~~ }
-STATE: {SetDefaultOptions} ~~ {
 	IF:	Always
 		DO:	DoAll
-				EmbedNav navNothing {Nothing}
-				SetOpt {EnableCombat} {false}
-				SetOpt {EnableBuffing} {false}
-				SetOpt {EnableNav} {true}
-				SetOpt {EnableMeta} {true}
-				SetOpt {EnableLooting} {true}
-				SetOpt {LootFellowCorpses} {false}
-				SetOpt {LootAllCorpses} {false}
-				SetOpt {LootOnlyRareCorpses} {false}
-				SetOpt {AttackDistance} {0.02}
-				SetOpt {ApproachDistance} {0.00833}
-				SetOpt {CorpseApproachRange-Min} {0.00833}
-				SetOpt {CorpseApproachRange-Max} {0.01}
-				SetOpt {NavCloseStopRange} {0.00833}
-				SetOpt {MinimumRingTargets} {3}
-				SetOpt {RingDistance} {0.01667}
-				SetOpt {PetRangeMode} {1}
-				SetOpt {PetCustomRange} {0.042}
-				SetOpt {NavPriorityBoost} {false}
-				SetOpt {LootPriorityBoost} {false}
-				SetOpt {BuffProfile_Prots} {2}
-				SetOpt {BuffProfile_Banes} {2}
-				SetOpt {StaminaToHealthMultiplier} {1.1}
-				SetOpt {Recharge-Norm-HitP} {85}
-				SetOpt {MinimumHealKitSuccessChance} {33}
-				SetOpt {ReadUnknownScrolls} {false}
-				SetOpt {SummonPets} {true}
-				SetOpt {DoHelp} {true}
-				SetOpt {IdlePeaceMode} {false}
-				SetOpt {CastDispelSelf} {true}
-				SetOpt {DoJiggle} {false}
-	IF:	Always
-		DO:	Chat {/ibc}
+				DoExpr {clearvar[gotodest]}
+				SetState {WaitForCommands}
 ~~ }
-
-~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
-
-NAV: navNothing once ~~ {
+STATE: {WaitForCommands} ~~ {
+	IF: ChatCapture	{^.* (say|says)\, \"!goto (?<destination>.*)\"} {}
+		DO: SetState {GoToDestination}
+~~ }
+STATE: {GoToDestination} ~~ {
+	IF: Expr {getvar[capturegroup_destination]==sawato}
+		DO:	DoExpr {setvar[gotodest,`0xC95B0001 [14.800000 0.300000 12.004999] 0.930418 0.000000 0.000000 -0.366501`]}
+	IF: Expr {getvar[capturegroup_destination]==kahiri}
+		DO:	DoExpr {setvar[gotodest,`0xBC5D0100 [17.061972 107.010696 -0.340000] 0.722239 0.000000 0.000000 0.691643`]}
+	IF: Expr {getvar[gotodest]&&1}
+		DO:	DoAll
+				ChatExpr {`/teleloc `+getvar[gotodest]}
+				SetState {Default}
 ~~ }

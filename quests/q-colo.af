@@ -296,6 +296,10 @@ STATE: {MoveToNextRoomInPortal} ~~ {
 	~~ this is only to keep us from doing stuff while we're in the portal
 	IF:	ExitPortal
 		DO:	SetState {StartCurrentRoom}
+	IF: SecsInStateGE 40
+		DO:	DoAll
+				Chat {/f Stuck In Portal!}
+				SetState {GoToColo}
 ~~ }
 STATE: {WaitingForRewards} ~~ {
 	IF:	Always
