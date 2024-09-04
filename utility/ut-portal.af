@@ -53,7 +53,7 @@ STATE: {*SetupOptions*} ~~{
 				~~DoExpr {dictadditem[getvar[portal_dictionary],`Funnelcake`,listcreate[`nothing`,`nothing`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Dan K Memes`,listcreate[`candeth`,`wai jhou`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Mashadar`,listcreate[`swamp gardens`,`obs rim`]]}
-				~~DoExpr {dictadditem[getvar[portal_dictionary],`Mudzereli`,listcreate[`nothing`,`nothing`]]}
+				DoExpr {dictadditem[getvar[portal_dictionary],`Mudzereli`,listcreate[`xarabydun`,`desert march`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Spraynard Kruger`,listcreate[`beach fort`,`quarry`]]}
 				~~DoExpr {dictadditem[getvar[portal_dictionary],`Free Hugs`,listcreate[`nothing`,`nothing`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Bob Dobalina`,listcreate[`bdc`,`rynthid`]]}
