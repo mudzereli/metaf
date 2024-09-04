@@ -120,7 +120,13 @@ STATE: {SynchronizeWaitingForStart} ~~ {
 ~~ }
 STATE: {WaitingForStart} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Waiting For Start`,19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Waiting For Start`,19]}
+				DoExpr {echo[`[META]: Following commands are available:`,19]}
+				DoExpr {echo[`[META]: !start - start the colo run`,19]}
+				DoExpr {echo[`[META]: !startl - start the colo run, but loop & keep going after finishing`,19]}
+				DoExpr {echo[`[META]: !tickets - buy colo tickets`,19]}
+				DoExpr {echo[`[META]: !rings - use keys & loot colo rings`,19]}
 	~~ this sets up all the initial variables when waiting to start
 	IF:	Always
 		DO:	DoAll
