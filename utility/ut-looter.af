@@ -95,7 +95,8 @@ STATE: {LootingCorpse} ~~{
 		DO: SetState {WaitingForCorpse}
 	IF:	Expr {wobjectgetopencontainer[]&&1}
 		DO:	DoAll
-				ChatExpr {`/ub use `+getvar[ltr-itemname]}
+				~~ChatExpr {`/ub use `+getvar[ltr-itemname]}
+				DoExpr {actiontryuseitem[listreduce[listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==getvar[ltr-itemname]`],`$1`]]}
 				SetWatchdog 3 3 {LootingCorpse}
 	IF:	Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
