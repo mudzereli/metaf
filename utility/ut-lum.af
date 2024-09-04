@@ -39,7 +39,15 @@
 
 STATE: {Default} ~~{
 	IF: Always
-		DO:	SetState {CheckAugs}
+		DO:	DoAll
+				DoExpr {echo[`--- [[ Aug Commands ]] ---`,2]}
+				DoExpr {echo[`!long  - list all learned augs in long form`,2]}
+				DoExpr {echo[`!short - list all learned augs in short form`,2]}
+				DoExpr {echo[`!chat  - say in chat all learned augs in short form`,2]}
+				DoExpr {echo[`!lum   - list all learned lum flags in short form`,2]}
+				DoExpr {echo[`!flags - list status of major quest flags`,2]}
+				DoExpr {echo[`!token - start lum token grabbing meta (be at Nalicana)`,2]}
+				SetState {CheckAugs}
 ~~}
 STATE: {CheckAugs} ~~{
 	IF:	ChatMatch {^.* (think|say(s*))\, \"!(L|l)ong\"}
@@ -173,7 +181,9 @@ STATE: {CheckAugs} ~~{
 				DoExpr {echo[`--- >>> Unspent XP: `+floor[getcharquadprop[2]/1000000000]+` Billion`,2]}
 				SetState {CheckAugs}
 	IF:	ChatMatch {^.* (think|say(s*))\, \"!(T|t)oken(s*)\"}
-		DO: SetState {CheckTokens}
+		DO: DoAll
+				EmbedNav navReset {Reset}
+				SetState {CheckTokens}
 ~~}
 STATE: {CheckTokens} ~~{
 	IF:	Always
@@ -265,7 +275,8 @@ STATE: {TurnInToken} ~~{
 		DO:	DoAll
 				Chat {/ub prepclick yes 10}
 				ChatExpr {`/ub givep `+$CurrentToken+` to `+$TokenNPC}
-				SetWatchdog 3 3 {TurnInToken}
+	IF: SecsInStateGE 10
+		DO:	SetState {TurnInToken}
 ~~}
 STATE: {AllDone} ~~{
 	IF:	Always
