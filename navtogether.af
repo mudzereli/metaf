@@ -1,0 +1,114 @@
+~~		Get metaf here: https://github.com/JJEII/metaf/									
+~~																						
+~~ All recognized structural designators:												
+~~		STATE:				DO:															
+~~		IF:					NAV:														
+~~																						
+~~ All recognized CONDITION (IF:) operation keywords:									
+~~		Never				NavEmpty			MobsInDist_Priority		Not				
+~~		Always				Death				NeedToBuff				PSecsInStateGE	
+~~		All					VendorOpen			NoMobsInDist			SecsOnSpellGE	
+~~		Any					VendorClosed		BlockE					BuPercentGE		
+~~		ChatMatch			ItemCountLE			CellE					DistToRteGE		
+~~		MainSlotsLE			ItemCountGE			IntoPortal				Expr			
+~~		SecsInStateGE		MobsInDist_Name		ExitPortal				ChatCapture		
+~~																						
+~~ All recognized ACTION (DO:) operation keywords:										
+~~		None				EmbedNav			ChatExpr				SetOpt			
+~~		SetState			CallState			SetWatchdog				CreateView		
+~~		Chat				Return				ClearWatchdog			DestroyView		
+~~		DoAll				DoExpr				GetOpt					DestroyAllViews	
+~~																						
+~~ All recognized NAV types:															
+~~		circular			follow														
+~~		linear				once														
+~~																						
+~~ All recognized NAV NODE types:														
+~~		flw					vnd															
+~~		pnt					ptl															
+~~		rcl					tlk															
+~~		pau					chk															
+~~		cht					jmp															
+~~		prt (deprecated in VTank)														
+~~ }																					
+
+STATE: {Default} ~~ {
+	IF:	Always
+		DO:	SetState {*SetupOptions*}
+~~ }
+STATE: {*SetupOptions*} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {echo[`[NavTogether]: Loading Options`,19]}
+				SetOpt {EnableBuffing} {false}
+				SetOpt {EnableNav} {true}
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
+				SetOpt {NavCloseStopRange} {0.00833}
+				SetOpt {NavPriorityBoost} {true}
+				DoExpr {setgvar[mnav-chars,listcreate[]]}
+				DoExpr {setvar[mnav-max-distance,25]}
+				DoExpr {setvar[mnav-chat-command,`/f`]}
+				DoExpr {setvar[mnav-nav-file,`quests\\catacombs-of-torment`]}
+				~~DoExpr {setvar[mnav-leader,`Porkchop`]}
+				EmbedNav navNone {None}
+	IF:	SecsInStateGE 8
+		DO:	SetState {SynchronizeChars}
+~~ }
+STATE: {SynchronizeChars} ~~{
+	IF:	Not Expr {listcontains[getgvar[mnav-chars],wobjectgetplayer[]]}
+		DO:	DoAll
+				DoExpr {echo[`[NavTogether]: Synchronizing Meta on All Characters`,19]}
+				DoExpr {listadd[getgvar[mnav-chars],wobjectgetplayer[]]}
+	IF:	All
+			SecsInStateGE 2
+			Not Expr {listcontains[getgvar[mnav-chars],wobjectgetplayer[]]}
+		DO:	SetState {SynchronizeChars}
+	IF:	SecsInStateGE 8
+		DO:	DoAll
+				DoExpr {echo[`[NavTogether]: Starting with `+listcount[getgvar[mnav-chars]]+` Characters!`,19]}
+				SetState {DesignateLeader}
+~~ }
+STATE: {DesignateLeader} ~~{
+	IF: Always
+		DO: DoExpr {echo[`[NavTogether]: Designating Leader!`,19]}
+	IF: Expr {getfellowshipleaderid[]!=0&&getvar[mnav-leader]==0}
+		DO:	DoExpr {setvar[mnav-leader,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]}
+	IF: Expr {getfellowshipleaderid[]==0&&getvar[mnav-leader]==0}
+		DO:	DoExpr {setvar[mnav-leader,getcharstringprop[1]]}
+	IF: Expr {getvar[mnav-leader]==getcharstringprop[1]}
+		DO: SetState {NavigationLeadStart}
+	IF: Expr {getvar[mnav-leader]!=0&&getvar[mnav-leader]!=getcharstringprop[1]}
+		DO: SetState {NavigationFollow}
+~~ }
+STATE: {NavigationLeadStart}  ~~{
+	IF: Always
+		DO: DoExpr {echo[`[NavTogether]: I Am Leader!`,19]}
+	IF: SecsInStateGE 3
+		DO: DoAll
+				ChatExpr {`/vt nav load `+getvar[mnav-nav-file]}
+				SetState {NavigationLeading}
+~~ }
+STATE: {NavigationFollow}  ~~{
+	IF: Always
+		DO: DoExpr {echo[`[NavTogether]: Following Leader: `+getvar[mnav-leader]+`!`,19]}
+	IF: Always
+		DO: ChatExpr {`/ub follow `+getvar[mnav-leader]}
+~~ }
+STATE: {NavigationLeading}  ~~{
+	IF: Always
+		DO: DoExpr {setvar[mnav-chars-out-of-range,listfilter[getgvar[mnav-chars],`coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectgetplayer[]],wobjectgetphysicscoordinates[$1]]>=getvar[mnav-max-distance]`]]}
+	IF: Expr {listcount[getvar[mnav-chars-out-of-range]]>0}
+		DO: DoAll
+				ChatExpr {getvar[mnav-chat-command]+` [NavTogether]: Pausing Due to Out of Range Characters: `+listmap[getvar[mnav-chars-out-of-range],`wobjectgetstringprop[$1,1]`]}
+				SetOpt {EnableNav} {false}
+	IF: Expr {listcount[getvar[mnav-chars-out-of-range]]==0}
+		DO: DoAll
+				ChatExpr {getvar[mnav-chat-command]+` [NavTogether]: Continuing Navigation as Chars are all In Range!`}
+				SetOpt {EnableNav} {true}
+	IF: SecsInStateGE 3
+		DO: SetState {NavigationLeading}
+~~ }
+~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
+NAV: navNone once ~~ {
+~~ }
