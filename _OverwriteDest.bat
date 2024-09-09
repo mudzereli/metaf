@@ -42,3 +42,4 @@ for /L %%i in (1,1,%argc%) do (
 
 echo.
 echo FILES PROCESSED: %argc%
+pause
