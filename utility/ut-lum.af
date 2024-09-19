@@ -47,6 +47,7 @@ STATE: {Default} ~~{
 				DoExpr {echo[`!lum   - list all learned lum flags in short form`,2]}
 				DoExpr {echo[`!flags - list status of major quest flags`,2]}
 				DoExpr {echo[`!token - start lum token grabbing meta (be at Nalicana)`,2]}
+				DoExpr {setvar[ulum-getaugtoken,0]}
 				SetState {CheckAugs}
 ~~}
 STATE: {CheckAugs} ~~{
@@ -189,7 +190,7 @@ STATE: {CheckTokens} ~~{
 	IF:	Always
 		DO: DoExpr {setvar[TokenNames,listcreate[]]}
 	~~ Blank Augmentation Gem
-	IF:	Expr {getqueststatus[blankaugluminancetimer_0511]==1}
+	IF:	Expr {getqueststatus[blankaugluminancetimer_0511]==1&&getvar[ulum-getaugtoken]==1}
 		DO:	DoExpr {listadd[$TokenNames,`the Augmentation Gem`]}
 	~~ + 1 Skill Credit
 	IF:	Expr {getquestktprogress[lumaugskillquest]<2}
@@ -258,6 +259,7 @@ STATE: {TurnInToken} ~~{
 		DO:	SetState {AllDone}
 	IF:	Any
 			~~ChatMatch {^Nalicana tells you\, \"You cannot increase your .* any further\.\"}
+			ChatMatch {^You may empower another Blank Augmentation Gem again in.*"}
 			ChatMatch {^Nalicana tells you\, \"You cannot increase your .*"}
 			ChatMatch {^Nalicana tells you\, \"You cannot spend any more Luminance on skill credits\.\"}
 			ChatMatch {^Nalicana tells you\, \"Your Timer is not up\.\"}
@@ -276,7 +278,7 @@ STATE: {TurnInToken} ~~{
 				Chat {/ub prepclick yes 10}
 				ChatExpr {`/ub givep `+$CurrentToken+` to `+$TokenNPC}
 	IF: SecsInStateGE 10
-		DO:	SetState {TurnInToken}
+		DO:	SetState {ResetPosition}
 ~~}
 STATE: {AllDone} ~~{
 	IF:	Always

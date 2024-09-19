@@ -63,24 +63,27 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qcolo-charsbuffed,listcreate[]]}
 				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
 				DoExpr {setgvar[qcolo-fellowlocked,0]}
+				DoExpr {setgvar[qcolo-allowsolo,1]}
+				DoExpr {setgvar[qcolo-enablebuffing,0]}
+				DoExpr {setgvar[qcolo-adminmode,1]}
 	IF:	SecsInStateGE 8
 		DO:	SetState {SynchronizeChars}
 ~~ }
 STATE: {SynchronizeChars} ~~ {
 	IF:	All
-			Expr {getfellowshipcount[]>=3}
+			Expr {getfellowshipcount[]>=3||getgvar[qcolo-allowsolo]==1}
 			Not Expr {listcontains[getgvar[qcolo-chars],getcharstringprop[1]]}
 		DO:	DoAll
 				DoExpr {echo[`[META]: Synchronizing Colosseum Meta on all Characters`,19]}
 				DoExpr {listadd[getgvar[qcolo-chars],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
-			Expr {getfellowshipcount[]>=3}
+			Expr {getfellowshipcount[]>=3||getgvar[qcolo-allowsolo]==1}
 			Not Expr {listcontains[getgvar[qcolo-chars],getcharstringprop[1]]}
 		DO:	SetState {SynchronizeChars}
 	IF:	All
 			SecsInStateGE 8
-			Expr {getfellowshipcount[]>=3}
+			Expr {getfellowshipcount[]>=3||getgvar[qcolo-allowsolo]==1}
 		DO:	DoAll
 				DoExpr {echo[`[META]: Starting Colosseum with `+listcount[getgvar[qcolo-chars]]+` Characters!`,19]}
 				SetState {ProgressCheck}
@@ -214,6 +217,10 @@ STATE: {EnterFirstRoom} ~~ {
 		DO:	SetState {BuffingBeforeRun}
 ~~ }
 STATE: {BuffingBeforeRun} ~~ {
+	IF: Expr {getgvar[qcolo-enablebuffing]==0}
+		DO: DoAll
+				SetOpt {EnableBuffing} {false}
+				SetState {SynchronizeAfterBuffing}
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Buffing before Colosseum Run`,19]}
 	~~ first lets go into the arena, so that we can start our timer
@@ -277,6 +284,10 @@ STATE: {StartCurrentRoom} ~~ {
 STATE: {KillingCurrentRoom} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Starting Battle in Colosseum Room: `+getvar[qcolo-roomnumber],19]}
+	IF: All
+			SecsInStateGE 180
+			Expr {getvar[qcolo-adminmode]==1}
+		DO:	Chat {/smite all}
 	IF:	Any
 			ChatMatch {A Door appears on the North wall.}
 			ChatMatch {Congratulations! You have beaten the Colosseum!}
