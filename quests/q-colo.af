@@ -284,10 +284,21 @@ STATE: {StartCurrentRoom} ~~ {
 STATE: {KillingCurrentRoom} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Starting Battle in Colosseum Room: `+getvar[qcolo-roomnumber],19]}
+	IF: Death
+		DO: DoAll
+				DoExpr {echo[`[META]: Died in Colosseum Room: `+getvar[qcolo-roomnumber],19]}
+				SetState {ProgressCheck}
 	IF: All
-			SecsInStateGE 180
-			Expr {getvar[qcolo-adminmode]==1}
-		DO:	Chat {/smite all}
+			SecsInStateGE 60
+			Expr {getgvar[qcolo-adminmode]==1}
+		DO:	DoAll
+				Chat {/objsend}
+	IF: All
+			SecsInStateGE 120
+			Expr {getgvar[qcolo-adminmode]==1}
+		DO:	DoAll
+				Chat {/smite all}
+				SetState {KillingCurrentRoom}
 	IF:	Any
 			ChatMatch {A Door appears on the North wall.}
 			ChatMatch {Congratulations! You have beaten the Colosseum!}
