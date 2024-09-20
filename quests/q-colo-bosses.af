@@ -53,23 +53,23 @@ STATE: {CheckLocation} ~~ {
 STATE: {CheckTokens} ~~ {
 	IF:	Any
 			ItemCountGE 1 {Stone Fists Token}
-			Expr {testquestflag[pickedupstonefiststoken]==1}
+			Expr {getqueststatus[pickedupstonefiststoken]==0}
 		DO:	DoExpr {setvar[stonefists,0]}
 	IF:	Any
 			ItemCountGE 1 {Azaxis Token}
-			Expr {testquestflag[pickedupazaxistoken]==1}
+			Expr {getqueststatus[pickedupazaxistoken]==0}
 		DO:	DoExpr {setvar[azaxis,0]}
 	IF:	Any
 			ItemCountGE 1 {Crowley's Champion Token}
-			Expr {testquestflag[pickedupcrowleyschampiontoken]==1}
+			Expr {getqueststatus[pickedupcrowleyschampiontoken]==0}
 		DO:	DoExpr {setvar[killagurg,0]}
 	IF:	Any
 			ItemCountGE 1 {Demon Swarm Matron Token}
-			Expr {testquestflag[pickedupdemonswarmmatrontoken]==1}
+			Expr {getqueststatus[pickedupdemonswarmmatrontoken]==0}
 		DO:	DoExpr {setvar[dsmatron,0]}
 	IF:	Any
 			ItemCountGE 1 {The Master Token}
-			Expr {testquestflag[pickedupthemastertoken]==1}
+			Expr {getqueststatus[pickedupthemastertoken]==0}
 		DO:	DoExpr {setvar[themaster,0]}
 	IF:	Expr {getvar[stonefists]==1}
 		DO:	SetState {GoToStoneFists}
@@ -206,7 +206,7 @@ STATE: {SetupOptions} ~~ {
 				DoExpr {setvar[themaster,1]}
 				DoAll
 					SetOpt {EnableCombat} {true}
-					SetOpt {EnableBuffing} {true}
+					SetOpt {EnableBuffing} {false}
 					SetOpt {EnableNav} {true}
 					SetOpt {AttackDistance} {0.3}
 					SetOpt {LootFellowCorpses} {true}
