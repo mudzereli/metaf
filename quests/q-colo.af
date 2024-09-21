@@ -47,16 +47,17 @@ STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
 				EmbedNav navNone {None}
-				SetOpt {AttackDistance} {0.3}
-				SetOpt {ApproachDistance} {0.021}
+				SetOpt {LootOnlyRareCorpses} {true}
+				SetOpt {LootPriorityBoost} {true}
+				SetOpt {EnableBuffing} {false}
+				SetOpt {AttackDistance} {0.13333}
+				SetOpt {ApproachDistance} {0.13333}
 				SetOpt {NavCloseStopRange} {0.021}
 				SetOpt {EnableCombat} {false}
 				SetOpt {PetRangeMode} {0}
 				SetOpt {EnableNav} {true}
 				SetOpt {LootFellowCorpses} {false}
-				SetOpt {LootOnlyRareCorpses} {false}
 				SetOpt {CastDispelSelf} {false}
-				SetOpt {EnableBuffing} {false}
 				DoExpr {setgvar[qcolo-looping,0]}
 				DoExpr {setgvar[qcolo-chars,listcreate[]]}
 				DoExpr {setgvar[qcolo-charswaiting,listcreate[]]}
@@ -65,7 +66,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qcolo-fellowlocked,0]}
 				DoExpr {setgvar[qcolo-allowsolo,1]}
 				DoExpr {setgvar[qcolo-enablebuffing,0]}
-				DoExpr {setgvar[qcolo-adminmode,1]}
+				DoExpr {setgvar[qcolo-adminmode,0]}
 	IF:	SecsInStateGE 8
 		DO:	SetState {SynchronizeChars}
 ~~ }
@@ -135,12 +136,7 @@ STATE: {WaitingForStart} ~~ {
 		DO:	DoAll
 				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
 				SetOpt {EnableCombat} {false}
-				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableLooting} {false}
-				SetOpt {AttackDistance} {0.02}
-				SetOpt {ApproachDistance} {0}
-				SetOpt {NavCloseStopRange} {0.008333}
-				SetOpt {PetRangeMode} {1}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
 	~~ this condition puts you back into the arena if you reload the script after leaving
 	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
@@ -254,10 +250,6 @@ STATE: {StartFirstRoom} ~~ {
 	~~ do this special setup for starting the first room
 	IF:	Always
 		DO:	DoAll
-				SetOpt {AttackDistance} {0.3}
-				SetOpt {EnableCombat} {true}
-				SetOpt {NavCloseStopRange} {0.02}
-				SetOpt {ApproachDistance} {0.02}
 				DoExpr {setvar[qcolo-roomnumber,5]}
 				Chat {/ub myquests}
 				SetState {StartCurrentRoom}
@@ -277,7 +269,6 @@ STATE: {StartCurrentRoom} ~~ {
 				DoExpr {setvar[qcolo-roomnumber,getvar[qcolo-roomnumber]+1]}
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {true}
-				SetOpt {AttackDistance} {0.3}
 				Chat {/ub usel Arena Bell}
 				SetState {KillingCurrentRoom}
 ~~ }
@@ -316,7 +307,8 @@ STATE: {MoveToNextRoom} ~~ {
 	~~ turn off looting and use the nearest portal.. over and over until it works
 	IF:	Always
 		DO:	DoAll
-				SetOpt {enablelooting} {false}
+				SetOpt {EnableLooting} {false}
+				SetOpt {EnableCombat} {false}
 				DoExpr {actiontryuseitem[wobjectfindnearestbyobjectclass[14]]}
 				SetWatchdog 2 2 {MoveToNextRoom}
 ~~ }
@@ -396,8 +388,6 @@ STATE: {GoToColosseumVault} ~~ {
 		DO: DoAll
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableLooting} {false}
-				SetOpt {NavCloseStopRange} {0.00833}
-				SetOpt {EnableNav} {true}
 				Chat {/mt combatstate peace}
 	IF: All
 			NavEmpty
