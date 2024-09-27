@@ -50,6 +50,8 @@ STATE: {*SetupOptions*} ~~{
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {Recharge-Norm-Mana} {0}
+				SetOpt {Recharge-Norm-HitP} {0}
+				SetOpt {Recharge-Norm-Stam} {0}
 				SetOpt {NavCloseStopRange} {0.00833}
 				Chat {/ub opt set VTank.PatchExpressionEngine true}
 				Chat {/mt click OK}
