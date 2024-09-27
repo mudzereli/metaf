@@ -50,6 +50,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setvar[qrex-trade-notes,getitemcountininventorybyname[`Trade Note (250,000)`]]}
 				DoExpr {setvar[qrex-unwanted-gems,listcreate[]]}
 				~~ BANING
+				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Impenetrability`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Flame Baning`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Pierce Baning`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Blade Baning`]}
@@ -58,11 +59,11 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Frost Baning`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Lightning Baning`]}
 				~~ PROTS
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Executor's Jewel`]}
+				DoExpr {listadd[getvar[qrex-unwanted-gems],`Executor's Jewel`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Tusker's Jewel`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Archer's Jewel`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Duelist's Jewel`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Astyrrian's Jewel`]}
+				DoExpr {listadd[getvar[qrex-unwanted-gems],`Astyrrian's Jewel`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Olthoi's Jewel`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Gelid's Jewel`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Inferno's Jewel`]}
@@ -70,15 +71,15 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Monarch's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Adherent's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Physician's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Life Giver's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Enchanter's Crystal`]}
+				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Life Giver's Crystal`]}
+				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Enchanter's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Artificer's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Converter's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Zefir's Crystal`]}
 				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Vaulter's Crystal`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Dodger's Crystal`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Resister's Crystal`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Evader's Crystal`]}
+				DoExpr {listadd[getvar[qrex-unwanted-gems],`Dodger's Crystal`]}
+				DoExpr {listadd[getvar[qrex-unwanted-gems],`Resister's Crystal`]}
+				DoExpr {listadd[getvar[qrex-unwanted-gems],`Evader's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Berzerker's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Warrior's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Rogue's Crystal`]}
@@ -93,7 +94,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Thief's Crystal`]}
 				~~ WEAPONS
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Elysa's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Hieromancer's Crystal`]}
+				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Hieromancer's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Ben Ten's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Thorsten's Crystal`]}
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Oswald's Crystal`]}
