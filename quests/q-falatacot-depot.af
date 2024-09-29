@@ -119,6 +119,7 @@ STATE: {RecallAphusLassel} ~~ {
 		DO:	SetState {GoToTownNetwork}
 	IF:	Expr {actiontrycastbyid[2931]}
 		DO:	DoAll
+				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {EnableCombat} {false}
 				SetState {RecallAphusLassel}
 ~~ }
@@ -285,6 +286,7 @@ STATE: {KillingZrikux} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 	IF:	ItemCountGE 1 {Orders for Zrikux}
 		DO:	SetState {RecallAphusLassel}
