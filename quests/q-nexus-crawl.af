@@ -165,7 +165,7 @@ STATE: {PickedUpQuest} ~~ {
 STATE: {SummonPortalToNexus} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Summoning a Portal to Nexus`,19]}
-	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
+	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=7}
 		DO:	SetState {SummonPortalToNexusSummoned}
 	IF:	Expr {actiontrycastbyid[157]}
 		DO:	SetState {SummonPortalToNexus}
@@ -173,7 +173,7 @@ STATE: {SummonPortalToNexus} ~~ {
 STATE: {SummonPortalToNexusWaiting} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Waiting for a Portal to Nexus`,19]}
-	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
+	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=7}
 		DO:	SetState {SummonPortalToNexusSummoned}
 ~~ }
 STATE: {SummonPortalToNexusSummoned} ~~ {
