@@ -450,9 +450,13 @@ STATE: {ApplyIvoryToColoRings} ~~ {
 	~~	DO:	SetState {WaitingForStart}
 ~~ }
 STATE: {BuyTickets} ~~ {
-	IF:	ItemCountGE 20 {Colosseum Ticket}
+	IF: ItemCountLE 5 {Trade Note (250,000)}
+		DO: DoAll
+				DoExpr {echo[`[ERROR]: Not Enough MMD Notes to Buy More Tickets!`,21]}
+				SetState {WaitingForStart}
+	IF:	ItemCountGE 12 {Colosseum Ticket}
 		DO:	SetState {WaitingForStart}
-	IF:	ItemCountLE 19 {Colosseum Ticket}
+	IF:	ItemCountLE 11 {Colosseum Ticket}
 		DO:	DoAll
 				Chat {/ub give 1 Trade Note (250,000) to Colosseum Ticket Vendor}
 				SetState {BuyTickets}
