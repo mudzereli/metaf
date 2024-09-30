@@ -274,9 +274,11 @@ STATE: {TurnInToken} ~~{
 			ChatMatch {^You feel a surge of energy pass through you as the Light empowers your being\.}
 		DO:	SetState {PickUpToken}
 	IF: Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
-		DO:	DoAll
-				Chat {/ub prepclick yes 10}
-				ChatExpr {`/ub givep `+$CurrentToken+` to `+$TokenNPC}
+		DO:	Chat {/ub prepclick yes 10}
+	IF: All
+			Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
+			SecsInStateGE 2
+		DO: ChatExpr {`/ub givep `+$CurrentToken+` to `+$TokenNPC}
 	IF: SecsInStateGE 10
 		DO:	SetState {ResetPosition}
 ~~}
