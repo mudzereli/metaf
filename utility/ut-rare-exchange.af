@@ -47,7 +47,8 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setvar[qrex-current-gem,0]}
 				DoExpr {setvar[qrex-exchange-counter,0]}
 				DoExpr {setvar[qrex-kept-gems,listcreate[]]}
-				DoExpr {setvar[qrex-trade-notes,getitemcountininventorybyname[`Trade Note (250,000)`]]}
+				DoExpr {setvar[qrex-exchange-note,`Trade Note (250,000)`]}
+				DoExpr {setvar[qrex-trade-notes,getitemcountininventorybyname[getvar[qrex-exchange-note]]]}
 				DoExpr {setvar[qrex-unwanted-gems,listcreate[]]}
 				~~ BANING
 				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Impenetrability`]}
@@ -129,8 +130,8 @@ STATE: {TurnInGem} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Turning in Gem: `+getvar[qrex-current-gem],19]}
 	IF:	Always
-		DO:	Chat {/mt give Trade Note (250,000) to Rare Exchanger}
-	IF:	ChatMatch {^You allow Rare Exchanger to examine your Trade Note \(250\,000\)\.}
+		DO:	ChatExpr {`/mt give `+getvar[qrex-exchange-note]+` to Rare Exchanger`}
+	IF:	ChatMatch {^You allow Rare Exchanger to examine your Trade Note}
 		DO:	ChatExpr {`/ub give 1 `+getvar[qrex-current-gem]+` to Rare Exchanger`}
 	IF:	All
 			ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
@@ -154,7 +155,7 @@ STATE: {TurnInGem} ~~ {
 STATE: {AllDone} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[qrex-trade-notes-spent,getvar[qrex-trade-notes]-getitemcountininventorybyname[`Trade Note (250,000)`]]}
+				DoExpr {setvar[qrex-trade-notes-spent,getvar[qrex-trade-notes]-getitemcountininventorybyname[getvar[qrex-exchange-note]]]}
 				DoExpr {echo[`[META]: Spent `+getvar[qrex-trade-notes-spent]+` MMDS exchanging `+getvar[qrex-exchange-counter]+` rare gems.`,19]}
 				DoExpr {echo[`[META]: Kept Gems: `+getvar[qrex-kept-gems],19]}
 ~~ }
