@@ -58,6 +58,8 @@ STATE: {*SetupOptions*} ~~ {
 					DoExpr {setgvar[qnxc-chars,listcreate[]]}
 					DoExpr {setgvar[qnxc-charsatmaster,listcreate[]]}
 					DoExpr {setgvar[qnxc-numcharsdone,0]}
+					DoExpr {setvar[qnxc-summonspellid,157]}
+					~~ 157 = primary / 2648 = secondary
 				EmbedNav navNone {navNone}
 	IF:	Expr {`///// Your Nexus Portal Summoner ///// ----->>>>>`}
 		DO:	DoExpr {listadd[getvar[qnxc-portalsummoners],`Porkchop`]}
@@ -167,7 +169,7 @@ STATE: {SummonPortalToNexus} ~~ {
 		DO:	DoExpr {echo[`[META]: Summoning a Portal to Nexus`,19]}
 	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=7}
 		DO:	SetState {SummonPortalToNexusSummoned}
-	IF:	Expr {actiontrycastbyid[157]}
+	IF:	Expr {actiontrycastbyid[getvar[qnxc-summonspellid]]}
 		DO:	SetState {SummonPortalToNexus}
 ~~ }
 STATE: {SummonPortalToNexusWaiting} ~~ {
