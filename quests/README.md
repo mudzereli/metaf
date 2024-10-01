@@ -1,3 +1,9 @@
-| Meta Name     | Quest Name  | Setup / How to Run                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Known Issues                                                                                                                                                 |
-| ------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| q-nexus-crawl | Nexus Crawl | <ul><br><li>1 character must be tied to Nexus summon</li><br><li>add the summoner to this line of the meta: \*\*DoExpr {listadd[getvar[qnxc-portalsummoners],\`Porkchop\`]}\*\*</li><br><li>make sure the \*\*setvar[qnxc-summonspellid,157]\*\* aligns with primary (157) or secondary (2648) summon</li><br><li>characters must be in a fellow (fellow leader will pull levers)</li><br><li>characters must have Aphus Lassel Recall</li><br><li>start with \*\*/ub bc /vt meta load q-nexus-crawl\*\*</li><br></ul> | <ul><br><li>if characters don't start buffed, they can get out of sync</li><br><li>characters may rarely get stuck on walls due to packed mobs</li><br></ul> |
+### General Requirements
+> [!CAUTION]
+> All Metas Require Virindi Tank (latest version)
+> All Metas Require Utility Belt (latest version)
+> [!WARNING]
+> Most Metas require Aphus Lassel Recall
+> Most Metas work better if you buff beforehand
+> Most Metas work better if you put your characters into a fellow beforehand
+> Most Metas are started with `/ub bc /vt meta load <meta name>`
