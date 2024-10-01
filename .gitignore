@@ -5,3 +5,5 @@
 *.bat
 *.dll
 *.json
+*.exe
+*.html
