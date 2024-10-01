@@ -367,7 +367,9 @@ STATE: {KillingDravann} ~~ {
 ~~ }
 STATE: {LootingDravann} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Opening Corpse of Dravann`,19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Opening Corpse of Dravann`,19]}
+				SetOpt {EnableLooting} {false}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
 		DO: SetState {KillingDravann}
 	IF:	Expr {wobjectgetopencontainer[]&&1}
@@ -385,6 +387,7 @@ STATE: {PickingUpItem} ~~ {
 			ChatMatch {^You have solved this quest too recently\!}
 		DO:	DoAll
 				Chat {/ub close corpse}
+				SetOpt {EnableLooting} {true}
 				SetState {RecallPortal}
 	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
 		DO: SetState {KillingDravann}
