@@ -8,3 +8,6 @@
 > * Most Metas work better if you buff beforehand
 > * Most Metas work better if you put your characters into a fellow beforehand
 > * Most Metas are started with `/ub bc /vt meta load <meta name>`
+
+
+<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTP4a7Zz64OOvmidOuEBAfTRqGTnSb6cUoBGZY0ATXKrhXHceoiICWrCERLBTBWr0PRypqFVgW-YxtF/pubhtml?gid=665802056&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
