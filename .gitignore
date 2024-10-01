@@ -1,3 +1,7 @@
 *.bak
 .\af\*
 *.bak
+*.xml
+*.bat
+*.dll
+*.json
