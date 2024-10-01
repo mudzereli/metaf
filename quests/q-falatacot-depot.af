@@ -112,7 +112,9 @@ STATE: {QuestProgressCheck} ~~ {
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Recalling to Aphus Lassel`,19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Recalling to Aphus Lassel`,19]}
+				SetWatchdog 3 3 {RecallAphusLassel}
 	IF:	Any
 			IntoPortal
 			CellE F6820033
