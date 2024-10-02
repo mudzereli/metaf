@@ -1149,7 +1149,7 @@ echo[`[META]: Buying Packs From Vendor`,3]
 s
 BuyPacksFromVendor
 i
-12
+26
 i
 1
 TABLE
@@ -1158,15 +1158,11 @@ k
 v
 n
 n
-2
+1
 s
-n
+e
 s
-Pack
-s
-c
-i
-6
+getfreecontainerslots[]==0
 s
 GoToArwicLifestone
 s
@@ -1210,7 +1206,7 @@ uTank2 NAV 1.2
 0
 0
 0
-/ub vendor addbuy 6 Pack
+/ub vendor addbuy 1 Pack
 3
 0
 0
@@ -1249,7 +1245,7 @@ d
 s
 t
 d
-10
+3
 s
 BuyPacksFromVendor
 i

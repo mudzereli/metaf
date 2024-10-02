@@ -157,12 +157,12 @@ STATE: {GoToArwicVendor} ~~{
 STATE: {BuyPacksFromVendor} ~~{
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Buying Packs From Vendor`,3]}
-	IF:	ItemCountGE 6 {Pack}
+	IF:	Expr {getfreecontainerslots[]==0}
 		DO:	SetState {GoToArwicLifestone}
 	IF:	Always
 		DO:	DoAll
 				EmbedNav navBuyPacksFromVendor {BuyPacksFromVendor}
-				SetWatchdog 3 10 {BuyPacksFromVendor}
+				SetWatchdog 3 3 {BuyPacksFromVendor}
 ~~}
 STATE: {GoToArwicLifestone} ~~{
 	IF:	Always
@@ -289,7 +289,7 @@ NAV: navTalkToMonroe once ~~ {
 NAV: navBuyPacksFromVendor once ~~{
 	cht 0 0 0 {/ub vendor open Shopkeep Mirinda}
 	pau 0 0 0 3000
-	cht 0 0 0 {/ub vendor addbuy 6 Pack}
+	cht 0 0 0 {/ub vendor addbuy 1 Pack}
 	pau 0 0 0 300
 	cht 0 0 0 {/ub vendor buyall}
 	pau 0 0 0 300
