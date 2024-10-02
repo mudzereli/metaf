@@ -3680,7 +3680,7 @@ K
 V
 n
 n
-6
+7
 i
 26
 TABLE
@@ -3732,7 +3732,7 @@ n
 s
 e
 s
-((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||wobjectgetopencontainer[]&&1)
+((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||(wobjectgetopencontainer[]&&1))
 i
 26
 TABLE
@@ -3759,6 +3759,10 @@ s
 e
 s
 actiontryuseitem[listgetitem[$corpseitems,1]]
+i
+0
+i
+0
 i
 0
 s
