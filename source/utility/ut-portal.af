@@ -45,6 +45,7 @@ STATE: {*SetupOptions*} ~~{
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setvar[chat_channel,say]}
+				DoExpr {setvar[callback_command,`/ibc`]}
 				DoExpr {setvar[portal_dictionary,dictcreate[]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Porkchop`,listcreate[`nexus`,`eo`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Beasthoss`,listcreate[`jaw`,`bellas`]]}
@@ -61,7 +62,7 @@ STATE: {*SetupOptions*} ~~{
 ~~}
 STATE: {WaitingForCommands} ~~{
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[14,`Gateway`]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
-		DO:	Chat {/ibc}
+		DO:	ChatExpr {getvar[callback_command]}
 	IF:	ChatMatch {^.* (say|says)\, \"whereto\"}
 		DO: SetState {ListDestinations}
 	IF:	All
