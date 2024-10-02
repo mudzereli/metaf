@@ -74,7 +74,16 @@ STATE: {SummonPortalToNexus} ~~ {
 	IF:	Expr {actiontrycastbyid[157]}
 		DO:	SetState {SummonPortalToNexus}
 ~~ }
-
+STATE: {LootASpecificItem} ~~ {
+	IF: All
+			Expr {$corpsename=`Dravann`}
+			Expr {$itemloot=`Essence of Dravann`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||wobjectgetopencontainer[]&&1)}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+		DO: None
+~~ }
 
 
 NAV: navNone once ~~ {
