@@ -353,35 +353,9 @@ STATE: {KillingDravann} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
+				SetOpt {EnableLooting} {false}
 				SetOpt {AttackDistance} {0.02}
 				SetOpt {NavCloseStopRange} {0.003}
-	IF:	ItemCountGE 1 {Essence of Dravann}
-		DO:	SetState {RecallPortal}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]&&1}
-		DO:	SetState {LootingDravann}
-	IF:	All
-			SecsInStateGE 30
-			Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
-			Expr {wobjectfindnearestbynameandobjectclass[5,`Dravann`]==0}
-		DO:	EmbedNav navGoToLastBoss {navGoToLastBoss}
-~~ }
-STATE: {LootingDravann} ~~ {
-	IF:	Always
-		DO:	DoAll
-				DoExpr {echo[`[META]: Opening Corpse of Dravann`,19]}
-				SetOpt {EnableLooting} {false}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
-		DO: SetState {KillingDravann}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	SetState {PickingUpItem}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	DoAll
-				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Dravann`]]}
-				SetWatchdog 3 3 {LootingDravann}
-~~ }
-STATE: {PickingUpItem} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Picking Up Essence of Dravann`,19]}
 	IF:	Any
 			ItemCountGE 1 {Essence of Dravann}
 			ChatMatch {^You have solved this quest too recently\!}
@@ -389,30 +363,19 @@ STATE: {PickingUpItem} ~~ {
 				Chat {/ub close corpse}
 				SetOpt {EnableLooting} {true}
 				SetState {RecallPortal}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
-		DO: SetState {KillingDravann}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	SetState {LootingDravann}
+	IF: All
+			Expr {$corpsename=`Dravann`}
+			Expr {$itemloot=`Essence of Dravann`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||wobjectgetopencontainer[]&&1)}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+		DO: None
 	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[8,`Essence of Dravann`]}
-		DO:	DoAll
-				Chat {/ub use Essence of Dravann}
-				SetWatchdog 3 5 {PickingUpItem}
-	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[8,`Essence of Dravann`]==0)}
-		DO: SetState {WaitForRespawn}
-~~ }
-STATE: {WaitForRespawn} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Waiting for Respawn`,19]}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
-		DO:	SetState {KillingDravann}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	DoAll
-				Chat {/ub close corpse}
-				SetState {WaitForRespawn}
+			SecsInStateGE 30
+			Expr {wobjectfindnearestbynameandobjectclass[27,`Dravann`]==0}
+			Expr {wobjectfindnearestbynameandobjectclass[5,`Dravann`]==0}
+		DO:	EmbedNav navGoToLastBoss {navGoToLastBoss}
 ~~ }
 STATE: {TurnInEssence} ~~ {
 	IF:	Always
