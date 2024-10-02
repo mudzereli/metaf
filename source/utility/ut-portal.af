@@ -51,19 +51,17 @@ STATE: {*SetupOptions*} ~~{
 				DoExpr {dictadditem[getvar[portal_dictionary],`Beasthoss`,listcreate[`jaw`,`bellas`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Steve Austin`,listcreate[`bdc`,`rynthid`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Bobby Flay`,listcreate[`eo outside`,`colo`]]}
-				~~DoExpr {dictadditem[getvar[portal_dictionary],`Funnelcake`,listcreate[`nothing`,`nothing`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Dan K Memes`,listcreate[`candeth`,`wai jhou`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Mashadar`,listcreate[`swamp gardens`,`obs rim`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Mudzereli`,listcreate[`xarabydun`,`desert march`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Spraynard Kruger`,listcreate[`beach fort`,`quarry`]]}
-				~~DoExpr {dictadditem[getvar[portal_dictionary],`Free Hugs`,listcreate[`nothing`,`nothing`]]}
 				DoExpr {dictadditem[getvar[portal_dictionary],`Bob Dobalina`,listcreate[`bdc`,`rynthid`]]}
 				SetState {ListDestinations}
 ~~}
 STATE: {WaitingForCommands} ~~{
 	IF:	Expr {wobjectfindnearestbynameandobjectclass[14,`Gateway`]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
 		DO:	ChatExpr {getvar[callback_command]}
-	IF:	ChatMatch {^.* (say|says)\, \"whereto\"}
+	IF:	ChatMatch {^.* (say|says)\, \"!whereto\"}
 		DO: SetState {ListDestinations}
 	IF:	All
 			Expr {dicthaskey[getvar[portal_dictionary],getcharstringprop[1]]}
@@ -96,11 +94,17 @@ STATE: {ProcessCommand} ~~{
 		DO:	SetState {WaitingForCommands}
 ~~}
 STATE: {SummonPortal} ~~{
-	IF:	Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
+	IF:	All
+			Expr {$nearestportal=wobjectfindnearestbynameandobjectclass[14,`Gateway`]}
+			Expr {$nearestportalcoords=wobjectgetphysicscoordinates[$nearestportal]}
+			Expr {coordinatedistancewithz[$nearestportalcoords,getplayercoordinates[]]<=5}
 		DO:	DoAll
 				ChatExpr {`/`+getvar[chat_channel]+` Portal Opened -> `+listgetitem[dictgetitem[getvar[portal_dictionary],getcharstringprop[1]],iif[getvar[portal_type]==157,0,1]]}
 				SetState {WaitingForCommands}
-	IF:	Not Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[14,`Gateway`]],getplayercoordinates[]]<=5}
+	IF:	Any
+			Not Expr {$nearestportal=wobjectfindnearestbynameandobjectclass[14,`Gateway`]}
+			Not Expr {$nearestportalcoords=wobjectgetphysicscoordinates[$nearestportal]}
+			Not Expr {coordinatedistancewithz[$nearestportalcoords,getplayercoordinates[]]<=5}
 		DO:	DoAll
 				DoExpr {actiontrycastbyid[getvar[portal_type]]}
 				SetState {SummonPortal}
