@@ -42,7 +42,9 @@ STATE: {Default} ~~{
 ~~}
 STATE: {*SetupOptions*} ~~{
 	IF:	Always
-		DO:	DoExpr {setvar[ncs-cmd-load-window-profile,`/vwt apply def`]}
+		DO:	DoAll
+				DoExpr {setvar[ncs-cmd-load-window-profile,`/vwt apply def`]}
+				DoExpr {setvar[ncs-use-mudsort,1]}
 	IF:	Always
 		DO:	DoAll
 				ChatExpr {getvar[ncs-cmd-load-window-profile]}
@@ -183,8 +185,14 @@ STATE: {TalkToMonroe} ~~{
 		DO:	DoExpr {echo[`[META]: Talking to Monroe`,3]}
 	IF:	Always
 		DO:	EmbedNav navTalkToMonroe {TalkToMonroe}
-	IF:	NavEmpty
+	IF:	All
+			NavEmpty
+			Expr {getvar[ncs-use-mudsort]==1}
 		DO:	SetState {SortBags}
+	IF:	All
+			NavEmpty
+			Expr {getvar[ncs-use-mudsort]==0}
+		DO:	SetState {AllDone}
 ~~}
 STATE: {SortBags} ~~{
 	IF:	Always
@@ -196,7 +204,12 @@ STATE: {SortBags} ~~{
 ~~}
 STATE: {AllDone} ~~{
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: New Character Setup Complete!`,3]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: New Character Setup Complete!`,3]}
+				SetOpt {Recharge-Norm-Mana} {50}
+				SetOpt {Recharge-Norm-HitP} {85}
+				SetOpt {Recharge-Norm-Stam} {50}
+				SetOpt {OpenDoors} {false}
 ~~}
 
 NAV: navGoToJonathan once ~~ {
