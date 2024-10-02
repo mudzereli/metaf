@@ -56,7 +56,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {CorpseApproachRange-Min} {0}
 				SetOpt {CorpseApproachRange-Max} {0}
 				SetOpt {NavPriorityBoost} {true}
-				SetOpt {LootOnlyRares} {true}
+				SetOpt {LootOnlyRareCorpses} {true}
 				SetOpt {IdlePeaceMode} {false}
 				EmbedNav navNothing {Nothing}
 				SetState {QuestProgressCheck}
@@ -118,7 +118,6 @@ STATE: {EnteredHive} ~~ {
 		DO:	DoAll
 				SetOpt {OpenDoors} {false}
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {NavPriorityBoost} {false}
 				SetOpt {AttackDistance} {0.02}
