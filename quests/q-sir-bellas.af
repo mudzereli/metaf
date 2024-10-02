@@ -82,11 +82,17 @@ STATE: {KillSirBellas} ~~ {
 		DO:	DoAll
 				SetOpt {EnableCombat} {true}
 				SetOpt {CorpseApproachRange-Max} {0.03}
-				SetOpt {EnableLooting} {true}
-				SetOpt {LootAllCorpses} {true}
-				SetOpt {LootFellowCorpses} {true}
+				SetOpt {EnableLooting} {false}
 	IF:	ChatMatch {^You have solved this quest too recently\!}
 		DO:	SetState {RecallLifestoneSending}
+	IF: All
+			Expr {$corpsename=`Sir Bellas`}
+			Expr {$itemloot=`Blank Augmentation Gem`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||wobjectgetopencontainer[]&&1)}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+		DO: None
 ~~ }
 STATE: {RecallLifestoneSending} ~~ {
 	IF:	Always
