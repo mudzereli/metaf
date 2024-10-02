@@ -1,8 +1,8 @@
 # Porkchop's Asheron's Call Metas
 
-This is a compilation of Metas for Asheron's Call. Most of these are written by me. 
+This is a compilation of Metas for Asheron's Call.
 
-*A few of them are written by others with modifications by me (noted in the documentation below).*
+*All Metas here are written by me unless otherwise noted in the documentation below.*
 
 Compiled Metas (.met) are in the `compiled` folder. 
 
