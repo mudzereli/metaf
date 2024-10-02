@@ -56,8 +56,7 @@ STATE: {*SetupOptions*} ~~ {
 		DO:	DoExpr {setvar[qrlf-chat-channel,`f`]}
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[qrlf-status,iif[getqueststatus[arantahkill1]==0,`This Character has already gained a skill point from Aun Ralirea.`,`This Character has NOT gained a skill point from Aun Ralirea.`]]}
-				ChatExpr {\/vt echo +getvar[qrlf-status]}
+				DoExpr {echo[iif[getqueststatus[arantahkill1]==0,`This Character has already gained a skill point from Aun Ralirea.`,`This Character has NOT gained a skill point from Aun Ralirea.`],31]}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -123,7 +122,8 @@ STATE: {FoundRalirea} ~~ {
 	IF:	Always
 		DO:	DoAll
 				SetOpt {EnableNav} {false}
-				ChatExpr {\/+getvar[qrlf-chat-channel]+\ Aun Ralirea found\! \(\+1 Skill Credit\) Location \- Timaru \(Town Network \- Annex\) \@ +coordinatetostring[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[5,`Aun Ralirea`]]]}
+				DoExpr {echo[`Aun Ralirea found! (+1 Skill Credit) Location - Timaru (Town Network - Annex) @ ` +coordinatetostring[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[5,`Aun Ralirea`]]],31]}
+				ChatExpr {`/`+getvar[qrlf-chat-channel]+` Aun Ralirea found! (+1 Skill Credit) Location - Timaru (Town Network - Annex) @ ` +coordinatetostring[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[5,`Aun Ralirea`]]]}
 	IF: SecsInStateGE 900
 		DO:	SetState {LookingForRalirea}
 ~~ }
