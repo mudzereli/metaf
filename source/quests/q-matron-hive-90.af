@@ -49,14 +49,14 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
+				SetOpt {EnableLooting} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {ApproachDistance} {0}
 				SetOpt {CorpseApproachRange-Min} {0}
 				SetOpt {CorpseApproachRange-Max} {0}
 				SetOpt {NavPriorityBoost} {true}
-				SetOpt {LootOnlyRares} {false}
+				SetOpt {LootOnlyRares} {true}
 				SetOpt {IdlePeaceMode} {false}
 				EmbedNav navNothing {Nothing}
 				SetState {QuestProgressCheck}
@@ -164,52 +164,15 @@ STATE: {KillingMatron} ~~ {
 				SetOpt {NavCloseStopRange} {0.003}
 	IF:	ItemCountGE 1 {Brood Matron Crest}
 		DO:	SetState {RecallLifestoneSending}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]&&1}
-		DO:	SetState {LootingMatron}
-~~ }
-STATE: {LootingMatron} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Opening Olthoi Brood Matron Corpse`,19]}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
-		DO: SetState {KillingMatron}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	SetState {PickingUpItem}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	DoAll
-				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]]}
-				SetWatchdog 3 3 {LootingMatron}
-~~ }
-STATE: {PickingUpItem} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Looting Olthoi Brood Matron`,19]}
-	IF:	Any
-			ItemCountGE 1 {Brood Matron Crest}
-			ChatMatch {^You have solved this quest too recently\!}
-		DO:	DoAll
-				Chat {/ub close corpse}
-				SetState {RecallLifestoneSending}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
-		DO: SetState {KillingMatron}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	SetState {LootingMatron}
 	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[8,`Brood Matron Crest`]}
-		DO:	DoAll
-				Chat {/ub use Brood Matron Crest}
-				SetWatchdog 3 3 {PickingUpItem}
-	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[8,`Brood Matron Crest`]==0)}
-		DO: SetState {WaitForRespawn}
-~~ }
-STATE: {WaitForRespawn} ~~ {
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
-		DO:	SetState {KillingMatron}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	DoAll
-				Chat {/ub close corpse}
-				SetState {WaitForRespawn}
+			Expr {$corpsename=`Olthoi Brood Matron`}
+			Expr {$itemloot=`Brood Matron Crest`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||(wobjectgetopencontainer[]&&1))}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Never
+		DO: None
 ~~ }
 STATE: {RecallLifestoneSending} ~~ {
 	IF:	Always
