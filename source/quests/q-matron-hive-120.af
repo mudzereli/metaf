@@ -50,7 +50,8 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {EnableNav} {true}
 				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
+				SetOpt {EnableLooting} {true}
+				SetOpt {LootOnlyRareCorpses} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {NavCloseStopRange} {0.00833}
 				SetOpt {ApproachDistance} {0}
@@ -165,56 +166,20 @@ STATE: {KillingMatron} ~~ {
 				SetOpt {NavCloseStopRange} {0.003}
 	IF:	ItemCountGE 1 {Brood Matron Carapace}
 		DO:	SetState {RecallLifestoneSending}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]&&1}
-		DO:	SetState {LootingMatron}
-~~ }
-STATE: {LootingMatron} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Opening Olthoi Brood Matron Corpse`,19]}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
-		DO: SetState {KillingMatron}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	SetState {PickingUpItem}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	DoAll
-				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]]}
-				SetWatchdog 3 3 {LootingMatron}
-~~ }
-STATE: {PickingUpItem} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Looting Olthoi Brood Matron`,19]}
-	IF:	Any
-			ItemCountGE 1 {Brood Matron Carapace}
-			ChatMatch {^You have solved this quest too recently\!}
-		DO:	DoAll
-				Chat {/ub close corpse}
-				SetState {RecallLifestoneSending}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
-		DO: SetState {KillingMatron}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	SetState {LootingMatron}
-	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[8,`Brood Matron Carapace`]}
-		DO:	DoAll
-				Chat {/ub use Brood Matron Carapace}
-				SetWatchdog 3 3 {PickingUpItem}
-	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[8,`Brood Matron Carapace`]==0)}
-		DO: SetState {WaitForRespawn}
-~~ }
-STATE: {WaitForRespawn} ~~ {
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Olthoi Brood Matron`]==0}
-		DO:	SetState {KillingMatron}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	DoAll
-				Chat {/ub close corpse}
-				SetState {WaitForRespawn}
+	IF: All
+			Expr {$corpsename=`Olthoi Brood Matron`}
+			Expr {$itemloot=`Brood Matron Carapace`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||wobjectgetopencontainer[]&&1)}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+		DO: None
 ~~ }
 STATE: {RecallLifestoneSending} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Recalling with Lifestone Sending`,19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Recalling with Lifestone Sending`,19]}
+				Chat {/ub close corpse}
 	IF:	IntoPortal
 		DO:	SetState {AllDone}
 	IF:	Expr {actiontrycastbyid[1636]}
