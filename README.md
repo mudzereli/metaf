@@ -4,7 +4,9 @@ This is a compilation of Metas for Asheron's Call. Most of these are written by 
 
 *A few of them are written by others with modifications by me (noted in the documentation below).*
 
-Compiled Metas (.met) are in the `compiled` folder. All other files are in [MetaF](https://github.com/JJEII/metaf) syntax (.af).
+Compiled Metas (.met) are in the `compiled` folder. 
+
+Source files are in [MetaF](https://github.com/JJEII/metaf) syntax (.af) and located in the `source` folder.
 
 ## General Requirements
 > [!CAUTION]
