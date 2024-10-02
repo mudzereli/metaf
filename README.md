@@ -7,7 +7,7 @@ Compiled Metas (.met) are in the `compiled` folder.
 Source files are in [MetaF](https://github.com/JJEII/metaf) syntax (.af) and located in the `source` folder.
 
 > [!NOTE]
-> * Some Metas in the `source` folder are written by other authors and updated by me.
+> * Some Metas in the `source` folder are written by other authors and updated by myself.
 > * I am documenting the metas as they go into the `compiled` folder and credit will be given in the documentation below.
 
 ## General Requirements
