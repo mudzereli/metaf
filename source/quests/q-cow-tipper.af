@@ -38,54 +38,91 @@
 ~~ }																					
 
 STATE: {Default} ~~ {
-	~~ At Dwennon
-	IF:	CellE A9B40016
-		DO:	EmbedNav nav0 {[none]}
+	IF: Always
+		DO: DoExpr {echo[`[META]: Starting Cow Tipper Meta`,19]}
+	IF:	Any
+			CellE A9B40016
+			CellE A9B40017
+			CellE A9B4001E
+		DO:	SetState {NearDwennon}
+	IF:	All
+			Not CellE A9B40016
+			Not CellE A9B40017
+			Not CellE A9B4001E
+		DO: DoExpr {echo[`[META]: You must be near Dwennon in Holtburg to begin!`,19]}
+~~ }
+STATE: {NearDwennon} ~~ {
+	IF: Always
+		DO: DoExpr {echo[`[META]: Talking to Dwennon`,19]}
 	IF:	Always
-		DO:	DoAll
-				Chat {/vt opt set enablenav true}
-				Chat {/vt opt set enablecombat false}
-	IF:	NavEmpty
-		DO:	SetState {StartTipping}
+		DO: DoAll
+				SetOpt {EnableNav} {true}
+				SetOpt {EnableCombat} {false}
+				EmbedNav navTalkToDwennon {TalkToDwennon}
+	IF: NavEmpty
+		DO: SetState {GoToCow}
+~~ }
+STATE: {GoToCow} ~~ {
+	IF: Always
+		DO: DoExpr {echo[`[META]: Going to the Cow`,19]}
+	IF:	Always
+		DO:	EmbedNav navGoToCow {GoToCow}
+	IF: NavEmpty
+		DO: SetState {StartTipping}
 ~~ }
 STATE: {StartTipping} ~~ {
-	IF:	Always
-		DO:	EmbedNav nav1 {[none]}
+	IF: Not Expr {isrefreshingquests[]}
+		DO: DoExpr {echo[`[META]: Tipping the Cow - # Times Tipped: `+getquestktprogress[cowtipcounter]+`/300`,19]}
 	IF:	ChatMatch {It seems to you like you have done enough tipping for now}
 		DO:	SetState {TurnIn}
+	IF:	All
+			Expr {actiontryuseitem[wobjectfindnearestmonster[]]}
+			Never
+		DO:	None
+	IF: SecsInStateGE 30
+		DO: DoAll
+				Chat {/myquests}
+				SetState {StartTipping}
 ~~ }
 STATE: {TurnIn} ~~ {
+	IF: Always
+		DO: DoExpr {echo[`[META]: Turning in Cow Tipper Quest to Dwennon`,19]}
 	IF:	Always
-		DO:	EmbedNav nav2 {[none]}
+		DO:	EmbedNav navGoToDwennon {GoToDwennon}
 	IF:	ItemCountGE 1 {Tipped Pack Cow}
-		DO:	Chat {/say Success!}
+		DO:	SetState {AllDone}
+~~ }
+STATE: {AllDone} ~~ {
+	IF: Always
+		DO: DoExpr {echo[`[META]: Cow Tipper Quest Completed!`,19]}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
-NAV: nav0 once ~~ {
-	cht 33.5485716501872 42.6262542088826 0.275020853678385 {/vt mexec actiontryuseitem[wobjectfindnearestbyobjectclass[37]]}
-	pau 33.5485716501872 42.6262542088826 0.275020853678385 5000
-	pnt 33.5413508415222 42.6413269678752 0.275020885467529
-	pnt 33.5862735748291 42.6516310373942 0.275020885467529
-	pnt 33.7146016756694 42.6697924296061 0.275020853678385
-	pnt 33.7143259048462 42.6789916356405 0.275020853678385
-	pnt 33.7158749580383 42.7068576176961 0.275020853678385
+NAV: navTalkToDwennon once ~~ {
+	tlk 33.5527055104574 42.6369963328044 0.275020853678385 33.5541374842326 42.6268374760946 0.275020867586136 37 {Dwennon}
 ~~ }
-NAV: nav1 circular ~~ {
-	cht 33.7143542607625 42.6999402364095 0.275020853678385 {/vt mexec actiontryuseitem[wobjectfindnearestmonster[]]}
-	pau 33.7143542607625 42.6999402364095 0.275020853678385 300
+NAV: navGoToCow once ~~ {
+	pnt 33.558189868927 42.6413785934448 0.275020853678385
+	pnt 33.5816442807515 42.645938428243 0.275020853678385
+	pnt 33.6058575630188 42.6506457010905 0.275020853678385
+	pnt 33.6298881530762 42.6543458302816 0.275020853678385
+	pnt 33.6568944613139 42.6642609914144 0.275020853678385
+	pnt 33.6833059310913 42.6643732070923 0.275020853678385
+	pnt 33.7022384961446 42.6705560684204 0.275020853678385
+	pnt 33.7122159639994 42.6817711512248 0.275020853678385
+	pnt 33.7148749987284 42.6921283086141 0.275020853678385
+	pnt 33.715883286794 42.7035751342773 0.275020853678385
 ~~ }
-NAV: nav2 once ~~ {
-	pnt 33.7127427101135 42.6928442637126 0.275020853678385
-	pnt 33.7141303698222 42.6813269933065 0.275020853678385
-	pnt 33.7085323651632 42.6756362915039 0.275020853678385
-	pnt 33.6856720924377 42.6601072311401 0.275020853678385
-	pnt 33.6544480959574 42.6572741190592 0.275020853678385
-	pnt 33.6083400090535 42.6567629496257 0.275020853678385
-	pnt 33.5691470464071 42.653848139445 0.275020853678385
-	pnt 33.5520884831746 42.6417586008708 0.275020853678385
-	pnt 33.5490166664124 42.6326881408691 0.275020853678385
-	cht 33.5482685089111 42.6276220321655 0.275020853678385 {/vt mexec actiontryuseitem[wobjectfindnearestbyobjectclass[37]]}
-	cht 33.5482685089111 42.6276220321655 0.275020853678385 {/mt use dwennon}
+NAV: navGoToDwennon once ~~ {
+	pnt 33.7149665514628 42.7034597396851 0.275020853678385
+	pnt 33.7130046844482 42.6858823140462 0.275020853678385
+	pnt 33.6978758176168 42.67146581014 0.275020853678385
+	pnt 33.6690067927043 42.6619444529216 0.275020853678385
+	pnt 33.637736415863 42.6574562072754 0.275020853678385
+	pnt 33.6106376647949 42.6548658370972 0.275020853678385
+	pnt 33.581246471405 42.6492726008097 0.275020853678385
+	pnt 33.5564454396566 42.6395338694255 0.275020853678385
+	pnt 33.5498045921326 42.6295201619466 0.275020853678385
+	tlk 33.5527055104574 42.6369963328044 0.275020853678385 33.5541374842326 42.6268374760946 0.275020867586136 37 {Dwennon}
 ~~ }
