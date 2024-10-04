@@ -11,7 +11,7 @@ n
 n
 n
 n
-81
+82
 i
 1
 i
@@ -501,31 +501,9 @@ GoToColo
 i
 1
 i
-3
+4
 i
 0
-TABLE
-2
-K
-V
-n
-n
-2
-i
-7
-TABLE
-2
-k
-v
-n
-n
-1
-s
-e
-s
-echo[`[META]: Waiting for Commands`,19]
-i
-4
 ba
 254
 TalkMasterArbitrator
@@ -549,6 +527,112 @@ True
 -101.783333333333
 38.05
 3.12502197630238E-05
+s
+WaitingForCommands
+i
+2
+i
+3
+TABLE
+2
+K
+V
+n
+n
+2
+i
+7
+i
+0
+i
+6
+i
+4
+TABLE
+2
+K
+V
+n
+n
+6
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+echo[`[META]: Waiting for Commands`,19]
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+echo[`[META]: Following commands are available:`,19]
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+echo[`[META]: !start - start the colo run`,19]
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+echo[`[META]: !startl - start the colo run, but loop & keep going after finishing`,19]
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+echo[`[META]: !tickets - buy colo tickets`,19]
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+echo[`[META]: !rings - use keys & loot colo rings`,19]
 s
 WaitingForCommands
 i
@@ -1308,7 +1392,7 @@ K
 V
 n
 n
-2
+3
 i
 7
 TABLE
@@ -1322,6 +1406,19 @@ s
 e
 s
 actiontryuseitem[$portal]
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+$qcolo_roomnumber=5
 i
 9
 TABLE
@@ -1533,7 +1630,7 @@ K
 V
 n
 n
-4
+3
 i
 7
 TABLE
@@ -1547,19 +1644,6 @@ s
 e
 s
 echo[`[META]: Synchronized `+listcount[&qcolo_charsbuffed]+` Characters @ Finished Buffing`,19]
-i
-7
-TABLE
-2
-k
-v
-n
-n
-1
-s
-e
-s
-setvar[qcolo_roomnumber,5]
 i
 2
 s
@@ -1586,7 +1670,7 @@ n
 s
 e
 s
-echo[`[META]: Setting up for Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],19]
+echo[`[META]: Setting up for Colosseum Room: `+cstr[$qcolo_roomnumber+1],19]
 s
 StartCurrentRoom
 i
@@ -1614,7 +1698,7 @@ n
 s
 e
 s
-setvar[qcolo_roomnumber,getvar[qcolo_roomnumber]+1]
+setvar[qcolo_roomnumber,$qcolo_roomnumber+1]
 i
 12
 TABLE
@@ -1675,7 +1759,7 @@ n
 s
 e
 s
-echo[`[META]: Starting Battle in Colosseum Room: `+getvar[qcolo_roomnumber],19]
+echo[`[META]: Starting Battle in Colosseum Room: `+$qcolo_roomnumber,19]
 s
 KillingCurrentRoom
 i
@@ -1703,7 +1787,7 @@ n
 s
 e
 s
-echo[`[META]: Died in Colosseum Room: `+getvar[qcolo_roomnumber],19]
+echo[`[META]: Died in Colosseum Room: `+$qcolo_roomnumber,19]
 i
 1
 s
@@ -1762,7 +1846,7 @@ n
 s
 e
 s
-echo[`[META]: Moving to Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],19]
+echo[`[META]: Moving to Colosseum Room: `+cstr[$qcolo_roomnumber+1],19]
 s
 MoveToNextRoom
 i

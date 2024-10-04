@@ -90,11 +90,19 @@ STATE: {GoToColo} ~~ {
 			Never
 		DO: None
 ~~ }
-STATE: {WaitingForCommands} ~~ {
+STATE: {WaitingForCommands} ~~ 
 	IF:	Always
+		DO: EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
+	IF:	All
+			NavEmpty
+			SecsInStateGE 4
 		DO:	DoAll
 				DoExpr {echo[`[META]: Waiting for Commands`,19]}
-				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
+				DoExpr {echo[`[META]: Following commands are available:`,19]}
+				DoExpr {echo[`[META]: !start - start the colo run`,19]}
+				DoExpr {echo[`[META]: !startl - start the colo run, but loop & keep going after finishing`,19]}
+				DoExpr {echo[`[META]: !tickets - buy colo tickets`,19]}
+				DoExpr {echo[`[META]: !rings - use keys & loot colo rings`,19]}
 	~~ this condition is used to manually start the script [!startl in fellow] (with looping)
 	IF:	ChatMatch {\[Fellowship\] (You say|.* says)\, \"\!startl\"}
 		DO:	DoAll
@@ -198,6 +206,7 @@ STATE: {EnterFirstRoom} ~~ {
 			Expr {$portal=listgetitem[wobjectfindalllandscapebytemplatetype[34728],0]}
 		DO: DoAll
 				DoExpr {actiontryuseitem[$portal]}
+				DoExpr {$qcolo_roomnumber=5}
 				SetWatchdog 2 2 {MoveToNextRoom}
 	~~ ok we zoned into the arena, and we're actually going to start buffing
 	IF:	ExitPortal
@@ -229,17 +238,16 @@ STATE: {SynchronizeAfterBuffing} ~~ {
 	IF: Expr {listcount[&qcolo_charsbuffed]>=listcount[&qcolo_chars]}
 		DO:	DoAll
 				DoExpr {echo[`[META]: Synchronized `+listcount[&qcolo_charsbuffed]+` Characters @ Finished Buffing`,19]}
-				DoExpr {setvar[qcolo_roomnumber,5]}
 				Chat {/ub myquests}
 				SetState {StartCurrentRoom}
 ~~ }
 STATE: {StartCurrentRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Setting up for Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],19]}
+		DO:	DoExpr {echo[`[META]: Setting up for Colosseum Room: `+cstr[$qcolo_roomnumber+1],19]}
 	~~ ring the bell, start killing & looting
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[qcolo_roomnumber,getvar[qcolo_roomnumber]+1]}
+				DoExpr {setvar[qcolo_roomnumber,$qcolo_roomnumber+1]}
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {true}
 				Chat {/ub usel Arena Bell}
@@ -247,10 +255,10 @@ STATE: {StartCurrentRoom} ~~ {
 ~~ }
 STATE: {KillingCurrentRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Starting Battle in Colosseum Room: `+getvar[qcolo_roomnumber],19]}
+		DO:	DoExpr {echo[`[META]: Starting Battle in Colosseum Room: `+$qcolo_roomnumber,19]}
 	IF: Death
 		DO: DoAll
-				DoExpr {echo[`[META]: Died in Colosseum Room: `+getvar[qcolo_roomnumber],19]}
+				DoExpr {echo[`[META]: Died in Colosseum Room: `+$qcolo_roomnumber,19]}
 				SetState {ProgressCheck}
 	IF:	Any
 			ChatMatch {A Door appears on the North wall.}
@@ -260,7 +268,7 @@ STATE: {KillingCurrentRoom} ~~ {
 ~~ }
 STATE: {MoveToNextRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Moving to Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],19]}
+		DO:	DoExpr {echo[`[META]: Moving to Colosseum Room: `+cstr[$qcolo_roomnumber+1],19]}
 	~~ once we enter the portal, don't try to use it anymore	~~ if we try to start the room, but we finished the run, then wait for our timer
 	IF:	Any
 			CellE 00AF0118
