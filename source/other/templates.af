@@ -1,36 +1,6 @@
-~~ Colo Done = getqueststatus[color18completed]==0 
-~~ Mukkir Slayer
-Shadow Vault Key drops from Commander Jared Kurth unlocks Shadow Vault
-~~ Town Network Annex
-CellE 00070145
-~~ Plateau Drop
-CellE 49B70021
-~~ Virindi Research Facility Drop
-CellE 56550318
-~~ Lifestone Sending
-actiontrycastbyid[1636]
-~~ Recall Aphus Lassel
-actiontrycastbyid[2931]
-~~ Summong Primary Portal I
-actiontrycastbyid[157]
-
-
-
-~~ RECALLING
-STATE: {RecallState} ~~ {
-	IF:	Any
-			IntoPortal
-			CellE __destination_landcell
-		DO:	SetState {__destination}
-	IF:	Expr {actiontrycastbyid[__recall_spell_id]}
-		DO:	DoAll
-				SetOpt {EnableLooting} {false}
-				SetOpt {EnableCombat} {false}
-				SetState {RecallState}
-~~ }
 ~~ REGULAR NAV
 STATE: {GoToArea} ~~ {
-	IF:	CellE __destination_landcell
+	IF:	CellE DesintationLandCell
 		DO:	SetState {GoToNextArea}
 	IF:	Always
 		DO:	EmbedNav navGoToArea {GoToArea}
@@ -38,18 +8,22 @@ STATE: {GoToArea} ~~ {
 ~~ SUMMONING A PORTAL
 STATE: {SummonPortalToNexus} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Summoning a Portal to Nexus`,19]}
+		DO:	DoExpr {echo[`[META]: Summoning a Portal`,19]}
 	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
-		DO:	SetState {SummonPortalToNexusSummoned}
-	IF:	Expr {actiontrycastbyid[157]}
-		DO:	SetState {SummonPortalToNexus}
+		DO:	SetState {PortalHasBeenSummoned}
+	IF:	All
+			Expr {actiontryequipanywand[]}
+			Expr {actiontrycastbyid[157]}
+			Never
+		DO: None
 ~~ }
+~~ LOOTING A SPECIFIC ITEM
 STATE: {LootASpecificItem} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Looting Essence of Dravann from Corpse of Dravann`,19]}
+		DO:	DoExpr {echo[`[META]: Looting An Item`,19]}
 	IF: All
-			Expr {$corpsename=`Dravann`}
-			Expr {$itemloot=`Essence of Dravann`}
+			Expr {$corpsename=`CorpseName`}
+			Expr {$itemloot=`ItemToLoot`}
 			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
 			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
 			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
@@ -57,10 +31,13 @@ STATE: {LootASpecificItem} ~~ {
 			Never
 		DO: None
 ~~ }
+~~ USE A RECALL SPELL
 STATE: {RecallSomewhere} ~~ 
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Recalling to Colosseum`,19]}
-	IF:	CellE 00AF0118
+		DO:	DoExpr {echo[`[META]: Recalling to Somewhere`,19]}
+	IF:	Any
+			IntoPortal
+			CellE DesintationLandCell
 		DO:	SetState {DoSomethingElse}
 	IF:	All
 			Expr {actiontryequipanywand[]}
@@ -71,51 +48,4 @@ STATE: {RecallSomewhere} ~~
 
 
 NAV: navNone once ~~ {
-~~ }
-NAV: navAphusLasselToTownNetwork once ~~ {
-	pnt 95.4570833206177 2.25772916475932 0.24168750445048
-	pnt 95.4576747258504 2.30202283859253 0.242775011062622
-	ptl 95.4576747258504 2.30202283859253 0.242775011062622 95.4555708567301 2.31398749351501 0.242491692304611 14 {Portal to Town Network}
-~~ }
-NAV: navTownNetworkToZaikhal once ~~ {
-	pnt -101.658333333333 -96.6833333333333 2.08333134651184E-05
-	pnt -101.678826586405 -96.6693954467773 2.08333134651184E-05
-	pnt -101.715279595057 -96.643700504303 2.08333134651184E-05
-	pnt -101.736461941401 -96.6426781654358 2.08333134651184E-05
-	pnt -101.769584973653 -96.6412449836731 2.08333134651184E-05
-	pnt -101.801038138072 -96.6409024556478 2.08333134651184E-05
-	pnt -101.844133337339 -96.6251447677612 2.08333134651184E-05
-	pnt -101.907621073723 -96.5826029936473 2.08333134651184E-05
-	ptl -101.907610054811 -96.5823128223419 2.08333134651184E-05 -101.90858749946 -96.5742208321889 -0.000262499845121056 14 {Portal to Zaikhal}
-~~ }
-NAV: navTownNetworkToHebianTo once ~~ {
-	pnt -101.658333333333 -96.6833333333333 2.08333134651184E-05
-	pnt -101.642643896739 -96.6701383590698 2.08333134651184E-05
-	pnt -101.62142051061 -96.6532965977987 2.08333134651184E-05
-	pnt -101.609608332316 -96.6461828867594 2.08333134651184E-05
-	pnt -101.595061270396 -96.641849899292 2.08333134651184E-05
-	pnt -101.559019184113 -96.6401763280233 2.08333134651184E-05
-	pnt -101.535936864217 -96.6423343340556 2.08333134651184E-05
-	pnt -101.499620469411 -96.6408909479777 2.08333134651184E-05
-	pnt -101.474268690745 -96.6359060605367 2.08333134651184E-05
-	pnt -101.443985939026 -96.6061007022858 2.08333134651184E-05
-	pnt -101.416036669413 -96.5956353346507 2.08333134651184E-05
-	pnt -101.408489545186 -96.58474706014 2.08333134651184E-05
-	ptl -101.408489545186 -96.58474706014 2.08333134651184E-05 -101.408333333333 -96.5734279155731 -0.000262499845121056 14 {Portal to Hebian-To}
-~~ }
-NAV: navTownNetworkToLinvakTukal once ~~ {
-	pnt -101.657915083567 -96.6814231872559 2.08333134651184E-05
-	pnt -101.658632119497 -96.6882947603861 2.08333134651184E-05
-	pnt -101.65938946406 -96.7021851857503 2.08333134651184E-05
-	pnt -101.659663263957 -96.7288921356201 2.08333134651184E-05
-	pnt -101.65873041153 -96.7552302042643 2.08333134651184E-05
-	pnt -101.658872954051 -96.7827102979024 2.08333134651184E-05
-	pnt -101.65902894338 -96.8127775828044 2.08333134651184E-05
-	pnt -101.659170691172 -96.8400910695394 2.08333134651184E-05
-	pnt -101.65861047109 -96.869576327006 2.08333134651184E-05
-	pnt -101.653449312846 -96.8999656041463 2.08333134651184E-05
-	pnt -101.642623996735 -96.9231093724569 2.08333134651184E-05
-	pnt -101.627718544006 -96.9449848175049 2.08333134651184E-05
-	pnt -101.605344072978 -96.9713803609212 2.08333134651184E-05
-	ptl -101.658333333333 -96.6833333333333 2.08333134651184E-05 -101.590654182434 -96.9749624888102 -0.000262499845121056 14 {Portal to Linvak Tukal}
 ~~ }
