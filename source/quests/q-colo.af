@@ -58,125 +58,122 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableNav} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {CastDispelSelf} {false}
-				DoExpr {setgvar[qcolo-looping,0]}
-				DoExpr {setgvar[qcolo-chars,listcreate[]]}
-				DoExpr {setgvar[qcolo-charswaiting,listcreate[]]}
-				DoExpr {setgvar[qcolo-charsbuffed,listcreate[]]}
-				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
-				DoExpr {setgvar[qcolo-fellowlocked,0]}
-				DoExpr {setgvar[qcolo-allowsolo,1]}
-				DoExpr {setgvar[qcolo-enablebuffing,0]}
-				DoExpr {setgvar[qcolo-adminmode,0]}
+				DoExpr {setgvar[qcolo_allowsolo,1]}
+				DoExpr {setgvar[qcolo_enablebuffing,1]}
+				DoExpr {setgvar[qcolo_chars,listcreate[]]}
+				DoExpr {setgvar[qcolo_charswaiting,listcreate[]]}
+				DoExpr {setgvar[qcolo_charsbuffed,listcreate[]]}
+				DoExpr {setgvar[qcolo_charsreadyforturnin,listcreate[]]}
+				DoExpr {setgvar[qcolo_fellowlocked,0]}
+				DoExpr {setgvar[qcolo_looping,0]}
 	IF:	SecsInStateGE 8
-		DO:	SetState {SynchronizeChars}
-~~ }
-STATE: {SynchronizeChars} ~~ {
-	IF:	All
-			Expr {getfellowshipcount[]>=3||getgvar[qcolo-allowsolo]==1}
-			Not Expr {listcontains[getgvar[qcolo-chars],getcharstringprop[1]]}
-		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronizing Colosseum Meta on all Characters`,19]}
-				DoExpr {listadd[getgvar[qcolo-chars],getcharstringprop[1]]}
-	IF:	All
-			SecsInStateGE 2
-			Expr {getfellowshipcount[]>=3||getgvar[qcolo-allowsolo]==1}
-			Not Expr {listcontains[getgvar[qcolo-chars],getcharstringprop[1]]}
-		DO:	SetState {SynchronizeChars}
-	IF:	All
-			SecsInStateGE 8
-			Expr {getfellowshipcount[]>=3||getgvar[qcolo-allowsolo]==1}
-		DO:	DoAll
-				DoExpr {echo[`[META]: Starting Colosseum with `+listcount[getgvar[qcolo-chars]]+` Characters!`,19]}
-				SetState {ProgressCheck}
+		DO:	SetState {ProgressCheck}
 ~~ }
 STATE: {ProgressCheck} ~~ {
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[37,Arena Bell] && coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[37,Arena Bell]]] <= 25}
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Checking Progress`,19]}
+	IF:	Expr {wobjectfindnearestbynameandobjectclass[37,Arena Bell]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[37,Arena Bell]]] <= 25}
 		DO:	SetState {StartCurrentRoom}
 	IF:	BlockE 00AF0000
-		DO:	SetState {SynchronizeWaitingForStart}
+		DO:	SetState {WaitingForCommands}
 	IF:	Always
 		DO:	SetState {GoToColo}
 ~~ }
 STATE: {GoToColo} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Recalling to Colosseum`,19]}
-	~~ we're here so stop casting
 	IF:	BlockE 00AF0000
 		DO:	SetState {ProgressCheck}
-	~~ just keep trying to spam the spell over and over again
-	~~ Colosseum Recall Spell ID = 4213
-	IF:	Expr {actiontrycastbyid[4213]}
-		DO: SetState {GoToColo}
-~~ }
-STATE: {SynchronizeWaitingForStart} ~~ {
-	IF: Always
-		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Waiting For Start`,19]}
-	IF:	Not Expr {listcontains[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
-		DO:	DoExpr {listadd[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
 	IF:	All
-			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qcolo-charswaiting],getcharstringprop[1]]}
-		DO:	SetState {SynchronizeWaitingForStart}
-	IF: Expr {listcount[getgvar[qcolo-charswaiting]]>=listcount[getgvar[qcolo-chars]]}
-		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo-charswaiting]]+` Characters @ Waiting For Start`,19]}
-				SetState {WaitingForStart}
+			Expr {actiontryequipanywand[]}
+			Expr {actiontrycastbyid[4213]}
+			Never
+		DO: None
 ~~ }
-STATE: {WaitingForStart} ~~ {
+STATE: {WaitingForCommands} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {echo[`[META]: Waiting For Start`,19]}
-				DoExpr {echo[`[META]: Following commands are available:`,19]}
-				DoExpr {echo[`[META]: !start - start the colo run`,19]}
-				DoExpr {echo[`[META]: !startl - start the colo run, but loop & keep going after finishing`,19]}
-				DoExpr {echo[`[META]: !tickets - buy colo tickets`,19]}
-				DoExpr {echo[`[META]: !rings - use keys & loot colo rings`,19]}
-	~~ this sets up all the initial variables when waiting to start
-	IF:	Always
-		DO:	DoAll
-				DoExpr {setgvar[qcolo-charsreadyforturnin,listcreate[]]}
-				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
+				DoExpr {echo[`[META]: Waiting for Commands`,19]}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
-	~~ this condition puts you back into the arena if you reload the script after leaving
-	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
-		DO:	DoAll
-				DoExpr {setvar[qcolo-started,1]}
-				SetState {EnterFirstRoom}
-	~~ this condition will automatically start the next run if qcolo-looping is set to 1
-	IF:	All
-			ItemCountGE 1 {Colosseum Ticket}
-			Expr {getgvar[qcolo-looping]==1}
-			Expr {listcount[getgvar[qcolo-charswaiting]]>=listcount[getgvar[qcolo-chars]]}
-			SecsInStateGE 90
-		DO:	SetState {GettingATicket}
-	~~ this condition triggers when the ticket holder receives a ticket stub
-	IF:	Any
-			Expr {getgvar[qcolo-fellowlocked]==1}
-			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
-		DO:	SetState {EnterFirstRoom}
 	~~ this condition is used to manually start the script [!startl in fellow] (with looping)
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!startl\"}
 		DO:	DoAll
-				DoExpr {setgvar[qcolo-looping,1]}
-				SetState {GettingATicket}
+				DoExpr {setgvar[qcolo_looping,1]}
+				SetState {SynchronizeChars}
 	~~ this condition is used to manually start the script [!start in fellow] (without looping)
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!start\"}
-		DO:	SetState {GettingATicket}
+		DO:	SetState {SynchronizeChars}
 	~~ this condition is used to start buying tickets
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!tickets\"}
 		DO:	SetState {BuyTickets}
 	~~ this condition is used to start turning in rings
 	IF:	ChatMatch {\[Fellowship\] .* say(s*)\, \"\!rings\"}
 		DO:	SetState {LootRings}
+	~~ this condition triggers when the ticket holder receives a ticket stub
+	IF:	Any
+			Expr {getgvar[qcolo_fellowlocked]==1}
+			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
+		DO:	SetState {EnterFirstRoom}
 ~~ }
-STATE: {GettingATicket} ~~ {
+STATE: {SynchronizeChars} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Getting a Ticket for Entry`,19]}
+		DO:	DoExpr {echo[`[META]: Synchronizing Colosseum Meta on all Characters`,19]}
+	IF:	Not Expr {getfellowshipcount[]>=3||&qcolo_allowsolo}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Must have 3 Characters in Fellow or be in Solo Mode`,19]}
+				SetState {WaitingForCommands}
+	IF:	All
+			Expr {listcontains[&qcolo_chars,getcharstringprop[1]]||listadd[&qcolo_chars,getcharstringprop[1]]}
+			Never
+		DO:	None
+	IF:	SecsInStateGE 8
+		DO:	DoAll
+				DoExpr {echo[`[META]: Starting Colosseum with `+listcount[&qcolo_chars]+` Characters!`,19]}
+				SetState {SynchronizeWaitingForStart}
+~~ }
+STATE: {SynchronizeWaitingForStart} ~~ {
+	IF: Always
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Waiting For Start`,19]}
+	IF: Expr {listcount[&qcolo_charswaiting]>=listcount[&qcolo_chars]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Synchronized `+listcount[&qcolo_charswaiting]+` Characters @ Waiting For Start`,19]}
+				SetState {WaitingForStart}
+	IF:	All
+			Expr {listcontains[&qcolo_charswaiting,getcharstringprop[1]]||listadd[&qcolo_charswaiting,getcharstringprop[1]]}
+			Never
+		DO:	None
+~~ }
+STATE: {WaitingForStart} ~~ {
+	IF: Always
+		DO:	DoExpr {echo[`[META]: Waiting For Start`,19]}
+	~~ this sets up all the initial variables when waiting to start
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setgvar[qcolo_charsreadyforturnin,listcreate[]]}
+				SetOpt {EnableCombat} {false}
+				SetOpt {EnableLooting} {false}
+				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
+	~~ this condition puts you back into the arena if you reload the script after leaving
+	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
+		DO:	SetState {EnterFirstRoom}
+	~~ this condition will automatically start the next run if qcolo_looping is set to 1
+	IF:	All
+			ItemCountGE 1 {Colosseum Ticket}
+			Expr {listcount[getgvar[qcolo_charswaiting]]>=listcount[&qcolo_chars]}
+		DO:	SetState {TicketCheck}
+	~~ this condition triggers when the ticket holder receives a ticket stub
+	IF:	Any
+			Expr {getgvar[qcolo_fellowlocked]==1}
+			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
+		DO:	SetState {EnterFirstRoom}
+~~ }
+STATE: {TicketCheck} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Checking Tickets for Entry`,19]}
 	~~ if we get a ticket stub, start buffing and notify clients that it was received
 	IF:	ItemCountGE 1 {Colosseum Ticket Stub}
 		DO:	DoAll
-				DoExpr {setgvar[qcolo-fellowlocked,1]}
+				DoExpr {setgvar[qcolo_fellowlocked,1]}
 				Chat {/f Received a Colosseum Ticket Stub. Enter the first room and start buffing!}
 				SetState {EnterFirstRoom}
 	~~ if we have a ticket but no stub, try to get a ticket
@@ -188,37 +185,34 @@ STATE: {GettingATicket} ~~ {
 	IF:	All
 			ItemCountLE 0 {Colosseum Ticket Stub}
 			ItemCountLE 0 {Colosseum Ticket}
-		DO:	SetState {AllDone}
+		DO:	SetState {WaitingForCommands}
 	~~ keep trying to get a ticket until an arena frees up
 	IF:	All
 			ItemCountLE 0 {Colosseum Ticket Stub}
 			Any
 				SecsInStateGE 10
 				ChatMatch {^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"}
-		DO:	SetState {GettingATicket}
+		DO:	SetState {TicketCheck}
 ~~ }
 STATE: {EnterFirstRoom} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Entering First Room of the Colosseum`,19]}
 	~~ first lets go into the arena, so that we can start our timer
-	IF:	NavEmpty
-		DO: DoAll
-				DoExpr {setvar[qcolo-started,1]}
-				Chat {/ub usel Advanced Colosseum Arena}
-				SetWatchdog 3 3 {EnterFirstRoom}
+	IF:	All
+			NavEmpty
+			Expr {$portal=listgetitem[wobjectfindalllandscapebytemplatetype[34728],0]}
+			Expr {actiontryuseitem[$portal]}
+			Never
+		DO: None
 	~~ ok we zoned into the arena, and we're actually going to start buffing
-	IF:	Any
-			IntoPortal
-			ExitPortal
+	IF:	ExitPortal
 		DO:	SetState {BuffingBeforeRun}
 ~~ }
 STATE: {BuffingBeforeRun} ~~ {
-	IF: Expr {getgvar[qcolo-enablebuffing]==0}
-		DO: DoAll
-				SetOpt {EnableBuffing} {false}
-				SetState {SynchronizeAfterBuffing}
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Buffing before Colosseum Run`,19]}
+	IF: Not Expr {&qcolo_enablebuffing}
+		DO: SetState {SynchronizeAfterBuffing}
 	~~ first lets go into the arena, so that we can start our timer
 	IF:	Always
 		DO:	DoAll
@@ -233,30 +227,20 @@ STATE: {BuffingBeforeRun} ~~ {
 STATE: {SynchronizeAfterBuffing} ~~ {
 	IF: Always
 		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Finished Buffing`,19]}
-	IF:	Not Expr {listcontains[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
-		DO:	DoExpr {listadd[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
 	IF:	All
-			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qcolo-charsbuffed],getcharstringprop[1]]}
-		DO:	SetState {SynchronizeAfterBuffing}
-	IF: Expr {listcount[getgvar[qcolo-charsbuffed]]>=listcount[getgvar[qcolo-chars]]}
+			Expr {listcontains[&qcolo_charsbuffed,getcharstringprop[1]]||listadd[&qcolo_charsbuffed,getcharstringprop[1]]}
+			Never
+		DO:	None
+	IF: Expr {listcount[&qcolo_charsbuffed]>=listcount[&qcolo_chars]}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo-charsbuffed]]+` Characters @ Finished Buffing`,19]}
-				SetState {StartFirstRoom}
-~~ }
-STATE: {StartFirstRoom} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Starting the First Room of Colosseum`,19]}
-	~~ do this special setup for starting the first room
-	IF:	Always
-		DO:	DoAll
-				DoExpr {setvar[qcolo-roomnumber,5]}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo_charsbuffed]]+` Characters @ Finished Buffing`,19]}
+				DoExpr {setvar[qcolo_roomnumber,5]}
 				Chat {/ub myquests}
 				SetState {StartCurrentRoom}
 ~~ }
 STATE: {StartCurrentRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Setting up for Colosseum Room: `+cstr[getvar[qcolo-roomnumber]+1],19]}
+		DO:	DoExpr {echo[`[META]: Setting up for Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],19]}
 	~~ if we try to start the room, but we finished the run, then wait for our timer
 	IF:	Any
 			CellE 00AF0118
@@ -266,7 +250,7 @@ STATE: {StartCurrentRoom} ~~ {
 	~~ ring the bell, start killing & looting
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[qcolo-roomnumber,getvar[qcolo-roomnumber]+1]}
+				DoExpr {setvar[qcolo_roomnumber,getvar[qcolo_roomnumber]+1]}
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {true}
 				Chat {/ub usel Arena Bell}
@@ -274,36 +258,23 @@ STATE: {StartCurrentRoom} ~~ {
 ~~ }
 STATE: {KillingCurrentRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Starting Battle in Colosseum Room: `+getvar[qcolo-roomnumber],19]}
+		DO:	DoExpr {echo[`[META]: Starting Battle in Colosseum Room: `+getvar[qcolo_roomnumber],19]}
 	IF: Death
 		DO: DoAll
-				DoExpr {echo[`[META]: Died in Colosseum Room: `+getvar[qcolo-roomnumber],19]}
+				DoExpr {echo[`[META]: Died in Colosseum Room: `+getvar[qcolo_roomnumber],19]}
 				SetState {ProgressCheck}
-	IF: All
-			SecsInStateGE 60
-			Expr {getgvar[qcolo-adminmode]==1}
-		DO:	DoAll
-				Chat {/objsend}
-	IF: All
-			SecsInStateGE 120
-			Expr {getgvar[qcolo-adminmode]==1}
-		DO:	DoAll
-				Chat {/smite all}
-				SetState {KillingCurrentRoom}
 	IF:	Any
 			ChatMatch {A Door appears on the North wall.}
 			ChatMatch {Congratulations! You have beaten the Colosseum!}
 			Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=29}
-		DO:	DoAll
-				DoExpr {setvar[qcolo-started,1]}
-				SetState {MoveToNextRoom}
+		DO:	SetState {MoveToNextRoom}
 ~~ }
 STATE: {MoveToNextRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Moving to Colosseum Room: `+cstr[getvar[qcolo-roomnumber]+1],19]}
+		DO:	DoExpr {echo[`[META]: Moving to Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],19]}
 	~~ once we enter the portal, don't try to use it anymore
-	IF:	IntoPortal
-		DO:	SetState {MoveToNextRoomInPortal}
+	IF:	ExitPortal
+		DO:	SetState {StartCurrentRoom}
 	~~ turn off looting and use the nearest portal.. over and over until it works
 	IF:	Always
 		DO:	DoAll
@@ -311,15 +282,6 @@ STATE: {MoveToNextRoom} ~~ {
 				SetOpt {EnableCombat} {false}
 				DoExpr {actiontryuseitem[wobjectfindnearestbyobjectclass[14]]}
 				SetWatchdog 2 2 {MoveToNextRoom}
-~~ }
-STATE: {MoveToNextRoomInPortal} ~~ {
-	~~ this is only to keep us from doing stuff while we're in the portal
-	IF:	ExitPortal
-		DO:	SetState {StartCurrentRoom}
-	IF: SecsInStateGE 40
-		DO:	DoAll
-				Chat {/f Stuck In Portal!}
-				SetState {GoToColo}
 ~~ }
 STATE: {WaitingForRewards} ~~ {
 	IF:	Always
@@ -343,15 +305,13 @@ STATE: {WaitingForRewards} ~~ {
 STATE: {SynchronizeRewardTurnIn} ~~ {
 	IF: Always
 		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Reward Turn In`,19]}
-	IF:	Not Expr {listcontains[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
-		DO:	DoExpr {listadd[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
 	IF:	All
-			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qcolo-charsreadyforturnin],getcharstringprop[1]]}
-		DO:	SetState {SynchronizeRewardTurnIn}
-	IF: Expr {listcount[getgvar[qcolo-charsreadyforturnin]]>=listcount[getgvar[qcolo-chars]]}
+			Expr {listcontains[&qcolo_charsreadyforturnin,getcharstringprop[1]]||listadd[&qcolo_charsreadyforturnin,getcharstringprop[1]]}
+			Never
+		DO:	None
+	IF: Expr {listcount[&qcolo_charsreadyforturnin]>=listcount[&qcolo_chars]}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo-charsreadyforturnin]]+` Characters @ Reward Turn In`,19]}
+				DoExpr {echo[`[META]: Synchronized `+listcount[&qcolo_charsreadyforturnin]+` Characters @ Reward Turn In`,19]}
 				SetState {TurnInRewards}
 ~~ }
 STATE: {TurnInRewards} ~~ {
@@ -360,10 +320,9 @@ STATE: {TurnInRewards} ~~ {
 	~~ this actually gets us the reward
 	IF:	SecsInStateGE 3
 		DO:	DoAll
-				DoExpr {setgvar[qcolo-charsbuffed,listcreate[]]}
-				DoExpr {setgvar[qcolo-charswaiting,listcreate[]]}
-				DoExpr {setgvar[qcolo-fellowlocked,0]}
-				DoExpr {setvar[qcolo-started,0]}
+				DoExpr {setgvar[qcolo_charsbuffed,listcreate[]]}
+				DoExpr {setgvar[qcolo_charswaiting,listcreate[]]}
+				DoExpr {setgvar[qcolo_fellowlocked,0]}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
 	~~ once we get our rewards, go figure out what to do
 	IF:	ChatMatch {You\'ve earned .* experience\.}
@@ -373,7 +332,7 @@ STATE: {TurnInRewards} ~~ {
 		DO:	SetState {EnterFirstRoom}
 	~~ if we thought we did colo, but we actually didnt.. time for a fresh start
 	IF:	ChatMatch {Master Arbitrator tells you\, \"If you wish to fight as a gladiator in the Arena}
-		DO:	SetState {WaitingForStart}
+		DO:	SetState {WaitingForCommands}
 ~~ }
 STATE: {LootRings} ~~ {
 	IF: Always
@@ -424,19 +383,6 @@ STATE: {LootEmpyreanRing} ~~ {
 	IF: Expr {wobjectgetopencontainer[]==0}
 		DO: SetState {LootRings}
 ~~ }
-STATE: {FixBuggedColosseumVault} ~~ {
-	~~IF:	Always
-	~~	DO:	DoAll
-	~~			DoExpr {wobjectgetopencontainer[]&&actiontryuseitem[wobjectgetopencontainer[]]}
-	~~			SetWatchdog 3 3 {FixBuggedColosseumVault}
-	IF: Always
-		DO:	DoAll
-				EmbedNav navResetColosseumVault {ResetColosseumVault}
-	IF:	All
-			NavEmpty
-			Expr {wobjectgetopencontainer[]==0}
-		DO: SetState {OpenColosseumVault}
-~~ }
 STATE: {ApplyIvoryToColoRings} ~~ {
 	IF:	All 
 			Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`]]>0}
@@ -444,10 +390,6 @@ STATE: {ApplyIvoryToColoRings} ~~ {
 		DO:	DoAll
 				DoExpr {actiontryapplyitem[listgetitem[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`],0],listgetitem[listfilter[wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`],`wobjectgetintprop[$1,114]==1`],0]}
 				SetState {ApplyIvoryToColoRings}
-	~~IF:	Any 
-	~~		Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`]]<=0}
-	~~		Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`],`wobjectgetintprop[$1,114]==1`]]<=0}
-	~~	DO:	SetState {WaitingForStart}
 ~~ }
 STATE: {BuyTickets} ~~ {
 	IF: ItemCountLE 5 {Trade Note (250,000)}
@@ -471,8 +413,4 @@ NAV: navTalkMasterArbitrator once ~~ {
 ~~ }
 NAV: navColosseumVault once ~~ {
 	pnt -101.834077048302 38.0082315127055 2.08333134651184E-05
-~~ }
-NAV: navResetColosseumVault once ~~ {
-	pnt -101.800076643626 38.0178716758887 2.08333134651184E-05
-	pnt -101.834182055791 38.0088105320931 2.08333134651184E-05
 ~~ }
