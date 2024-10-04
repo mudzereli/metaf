@@ -89,7 +89,7 @@ STATE: {KillSirBellas} ~~ {
 			Expr {$corpsename=`Sir Bellas`}
 			Expr {$itemloot=`Blank Augmentation Gem`}
 			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
-			Expr {wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse]||wobjectgetopencontainer[]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
 			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
 			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
 			Never
