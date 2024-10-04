@@ -11,7 +11,7 @@ n
 n
 n
 n
-82
+81
 i
 1
 i
@@ -556,7 +556,7 @@ i
 i
 3
 s
-\[Fellowship\] You say\, \"\!startl\"
+\[Fellowship\] (You say|.* says)\, \"\!startl\"
 TABLE
 2
 K
@@ -588,7 +588,7 @@ i
 i
 1
 s
-\[Fellowship\] You say\, \"\!start\"
+\[Fellowship\] (You say|.* says)\, \"\!start\"
 s
 SynchronizeChars
 s
@@ -611,38 +611,6 @@ s
 \[Fellowship\] .* say(s*)\, \"\!rings\"
 s
 LootRings
-s
-WaitingForCommands
-i
-3
-i
-1
-TABLE
-2
-K
-V
-n
-n
-2
-i
-26
-TABLE
-2
-k
-v
-n
-n
-1
-s
-e
-s
-&qcolo_fellowlocked==1
-i
-4
-s
-\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"
-s
-EnterFirstRoom
 s
 WaitingForCommands
 i
@@ -1622,38 +1590,6 @@ echo[`[META]: Setting up for Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],
 s
 StartCurrentRoom
 i
-3
-i
-3
-TABLE
-2
-K
-V
-n
-n
-2
-i
-18
-i
-11469080
-i
-18
-i
-11469079
-TABLE
-2
-K
-V
-n
-n
-1
-i
-1
-s
-WaitingForRewards
-s
-StartCurrentRoom
-i
 1
 i
 3
@@ -1827,6 +1763,29 @@ s
 e
 s
 echo[`[META]: Moving to Colosseum Room: `+cstr[getvar[qcolo_roomnumber]+1],19]
+s
+MoveToNextRoom
+i
+3
+i
+1
+TABLE
+2
+K
+V
+n
+n
+2
+i
+18
+i
+11469080
+i
+18
+i
+11469079
+s
+WaitingForRewards
 s
 MoveToNextRoom
 i
