@@ -57,27 +57,25 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {CorpseApproachRange-Max} {0}
 				SetOpt {NavPriorityBoost} {true}
 				SetOpt {IdlePeaceMode} {false}
-				DoExpr {setgvar[qfdp-chars,listcreate[]]}
-				DoExpr {setgvar[qfdp-charsindungeon,listcreate[]]}
-				DoExpr {setgvar[qfdp-charsinfirstroom,listcreate[]]}
-				DoExpr {setgvar[qfdp-charsinsecondroom,listcreate[]]}
-				DoExpr {setgvar[qfdp-charsdone,0]}
+				DoExpr {setgvar[qfdp_chars,listcreate[]]}
+				DoExpr {setgvar[qfdp_charsindungeon,listcreate[]]}
+				DoExpr {setgvar[qfdp_charsinfirstroom,listcreate[]]}
+				DoExpr {setgvar[qfdp_charsinsecondroom,listcreate[]]}
+				DoExpr {setgvar[qfdp_charsdone,0]}
 				EmbedNav navNone {None}
 	IF:	SecsInStateGE 8
 		DO:	SetState {SynchronizeChars}
 ~~ }
 STATE: {SynchronizeChars} ~~{
-	IF:	Not Expr {listcontains[getgvar[qfdp-chars],getcharstringprop[1]]}
-		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronizing Falatacot Depot meta on All Characters`,19]}
-				DoExpr {listadd[getgvar[qfdp-chars],getcharstringprop[1]]}
+	IF: Always
+		DO:	DoExpr {echo[`[META]: Synchronizing Falatacot Depot meta on All Characters`,19]}
 	IF:	All
-			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qfdp-chars],getcharstringprop[1]]}
-		DO:	SetState {SynchronizeChars}
+			Expr {listcontains[&qfdp_chars,getcharstringprop[1]]||listadd[&qfdp_chars,getcharstringprop[1]]}
+			Never
+		DO:	None
 	IF:	SecsInStateGE 8
 		DO:	DoAll
-				DoExpr {echo[`[META]: Starting Falatacot Depot with `+listcount[getgvar[qfdp-chars]]+` Characters!`,19]}
+				DoExpr {echo[`[META]: Starting Falatacot Depot with `+listcount[getgvar[qfdp_chars]]+` Characters!`,19]}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -114,16 +112,17 @@ STATE: {RecallAphusLassel} ~~ {
 	IF:	Always
 		DO:	DoAll
 				DoExpr {echo[`[META]: Recalling to Aphus Lassel`,19]}
-				SetWatchdog 3 3 {RecallAphusLassel}
+				SetOpt {NavCloseStopRange} {0.00833}
+				SetOpt {EnableCombat} {false}
 	IF:	Any
 			IntoPortal
 			CellE F6820033
 		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontrycastbyid[2931]}
-		DO:	DoAll
-				SetOpt {NavCloseStopRange} {0.00833}
-				SetOpt {EnableCombat} {false}
-				SetState {RecallAphusLassel}
+	IF:	All
+			Expr {actiontryequipanywand[]}
+			Expr {actiontrycastbyid[2931]}
+			Never
+		DO: None
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	Always
@@ -177,15 +176,15 @@ STATE: {EnteredFalatacotDepot} ~~ {
 STATE: {SynchronizeCharsInDungeon} ~~{
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Dungeon Entrance`,19]}
-	IF:	Not Expr {listcontains[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
-		DO:	DoExpr {listadd[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
+	IF:	Not Expr {listcontains[getgvar[qfdp_charsindungeon],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qfdp_charsindungeon],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qfdp-charsindungeon],getcharstringprop[1]]}
+			Not Expr {listcontains[getgvar[qfdp_charsindungeon],getcharstringprop[1]]}
 		DO:	SetState {SynchronizeCharsInDungeon}
-	IF: Expr {listcount[getgvar[qfdp-charsindungeon]]>=listcount[getgvar[qfdp-chars]]}
+	IF: Expr {listcount[getgvar[qfdp_charsindungeon]]>=listcount[getgvar[qfdp_chars]]}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp-chars]]+` Characters @ Dungeon Entrance`,19]}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp_chars]]+` Characters @ Dungeon Entrance`,19]}
 				SetState {GoToForgeGuardian}
 ~~ }
 STATE: {GoToForgeGuardian} ~~ {
@@ -203,15 +202,15 @@ STATE: {GoToForgeGuardian} ~~ {
 STATE: {SynchronizeCharsInFirstRoom} ~~{
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Forge Guardian Room`,19]}
-	IF:	Not Expr {listcontains[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
-		DO:	DoExpr {listadd[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
+	IF:	Not Expr {listcontains[getgvar[qfdp_charsinfirstroom],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qfdp_charsinfirstroom],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qfdp-charsinfirstroom],getcharstringprop[1]]}
+			Not Expr {listcontains[getgvar[qfdp_charsinfirstroom],getcharstringprop[1]]}
 		DO:	SetState {SynchronizeCharsInFirstRoom}
-	IF: Expr {listcount[getgvar[qfdp-charsinfirstroom]]>=listcount[getgvar[qfdp-chars]]}
+	IF: Expr {listcount[getgvar[qfdp_charsinfirstroom]]>=listcount[getgvar[qfdp_chars]]}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp-chars]]+` Characters @ Forge Guardian Room`,19]}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp_chars]]+` Characters @ Forge Guardian Room`,19]}
 				SetState {KillingForgeGuardian}
 ~~ }
 STATE: {KillingForgeGuardian} ~~ {
@@ -243,15 +242,15 @@ STATE: {GoToTiatusOverseer} ~~ {
 STATE: {SynchronizeCharsInSecondRoom} ~~{
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Tiatus Overseer Room`,19]}
-	IF:	Not Expr {listcontains[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
-		DO:	DoExpr {listadd[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
+	IF:	Not Expr {listcontains[getgvar[qfdp_charsinsecondroom],getcharstringprop[1]]}
+		DO:	DoExpr {listadd[getgvar[qfdp_charsinsecondroom],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qfdp-charsinsecondroom],getcharstringprop[1]]}
+			Not Expr {listcontains[getgvar[qfdp_charsinsecondroom],getcharstringprop[1]]}
 		DO:	SetState {SynchronizeCharsInSecondRoom}
-	IF: Expr {listcount[getgvar[qfdp-charsinsecondroom]]>=listcount[getgvar[qfdp-chars]]}
+	IF: Expr {listcount[getgvar[qfdp_charsinsecondroom]]>=listcount[getgvar[qfdp_chars]]}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp-chars]]+` Characters @ Tiatus Overseer Room`,19]}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qfdp_chars]]+` Characters @ Tiatus Overseer Room`,19]}
 				SetState {KillingTiatusOverseer}
 ~~ }
 STATE: {KillingTiatusOverseer} ~~ {
@@ -290,56 +289,21 @@ STATE: {KillingZrikux} ~~ {
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
-	IF:	ItemCountGE 1 {Orders for Zrikux}
-		DO:	SetState {RecallAphusLassel}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]&&1}
-		DO:	SetState {LootingZrikux}
-~~ }
-STATE: {LootingZrikux} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Opening Corpse of Zrikux`,19]}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
-		DO: SetState {KillingZrikux}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	SetState {PickingUpItem}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	DoAll
-				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,`Zrikux`]]}
-				SetWatchdog 3 3 {LootingZrikux}
-~~ }
-STATE: {PickingUpItem} ~~ {
-	IF:	Always
-		DO:	DoExpr {echo[`[META]: Looting Corpse of Zrikux`,19]}
 	IF:	Any
 			ItemCountGE 1 {Orders for Zrikux}
 			ChatMatch {^You have solved this quest too recently\!}
 		DO:	DoAll
 				Chat {/ub close corpse}
 				SetState {RecallAphusLassel}
-	IF: Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
-		DO: SetState {KillingZrikux}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	SetState {LootingZrikux}
-	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]}
-		DO:	DoAll
-				Chat {/ub use Orders for Zrikux}
-				SetWatchdog 3 3 {PickingUpItem}
-	IF:	All
-			SecsInStateGE 2
-			Expr {wobjectgetopencontainer[]&&(wobjectfindnearestbynameandobjectclass[33,`Orders for Zrikux`]==0)}
-		DO: SetState {WaitForRespawn}
-~~ }
-STATE: {WaitForRespawn} ~~ {
-	IF:	Always
-		DO:	EmbedNav navReleaseCorpse {ReleaseCorpse}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[27,`Zrikux`]==0}
-		DO:	SetState {KillingZrikux}
-	IF:	Expr {wobjectgetopencontainer[]&&1}
-		DO:	DoAll
-				Chat {/ub close corpse}
-				SetState {WaitForRespawn}
+	IF: All
+			Expr {$corpsename=`Zrikux`}
+			Expr {$itemloot=`Orders for Zrikux`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Never
+		DO: None
 ~~ }
 STATE: {GoToHebianTo} ~~ {
 	IF:	Always
@@ -389,8 +353,8 @@ STATE: {AllDone} ~~ {
 		DO:	DoExpr {echo[`[META]: Quest Completed: Falatacot Depot`,19]}
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setgvar[qfdp-charsdone,getgvar[qfdp-charsdone]+1]}
-				ChatExpr {`/f Falatacot Depot Completed! (`+getgvar[qfdp-charsdone]+`)`}
+				DoExpr {setgvar[qfdp_charsdone,getgvar[qfdp_charsdone]+1]}
+				ChatExpr {`/f Falatacot Depot Completed! (`+getgvar[qfdp_charsdone]+`)`}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
@@ -688,13 +652,4 @@ NAV: navGoToZrikux once ~~ {
 	pnt -29.8211859385173 -27.2083401679993 2.08333134651184E-05
 	pnt -29.8376134236654 -27.2116664250692 2.08333134651184E-05
 	pnt -29.8655724843343 -27.2191162745158 2.08333134651184E-05
-~~ }
-NAV: navReleaseCorpse once ~~ {
-	pnt -29.8211859385173 -27.2083401679993 2.08333134651184E-05
-	pnt -29.8376134236654 -27.2116664250692 2.08333134651184E-05
-	pnt -29.8655724843343 -27.2191162745158 2.08333134651184E-05
-	pnt -29.8855724843343 -27.2191162745158 2.08333134651184E-05
-	pnt -29.8655724843343 -27.2191162745158 2.08333134651184E-05
-	pnt -29.8376134236654 -27.2116664250692 2.08333134651184E-05
-	pnt -29.8211859385173 -27.2083401679993 2.08333134651184E-05
 ~~ }
