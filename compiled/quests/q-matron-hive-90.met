@@ -1451,7 +1451,7 @@ n
 s
 e
 s
-((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||(wobjectgetopencontainer[]&&1))
+wobjectgetopencontainer[]||actiontryuseitem[$corpse]
 i
 26
 TABLE
