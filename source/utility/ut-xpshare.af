@@ -43,7 +43,7 @@ STATE: {Default} ~~ {
 ~~ }
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Loading Script: Brood Matron XP Share`,19]}
+		DO:	DoExpr {echo[`[META]: Loading Script: XP Share`,19]}
 	IF:	Always
 		DO:	DoAll
 				Chat {/mt fellow quit}
@@ -53,16 +53,50 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableNav} {true}
 				SetOpt {NavCloseStopRange} {0.008333}
 				SetOpt {EnableBuffing} {false}
+				DoExpr {$xptype=`nothing`}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(N|n)eelic\"}
+		DO:	DoAll
+				DoExpr {$xptype=`neelic`}
+				SetState {CheckLocation}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(O|o)lthoi\"}
+		DO:	DoAll
+				DoExpr {$xptype=`olthoi`}
 				SetState {CheckLocation}
 ~~ }
 STATE: {CheckLocation} ~~ {
-	IF:	CellE 00070145
-		DO:	SetState {GoToArwic}
-	IF:	CellE C6A90009
-		DO:	SetState {GoToOlthoiHunter}
-	IF:	CellE C5A6010C
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Checking Location`,19]}
+	IF:	All
+			CellE 00070145
+			Expr {$xptype==`neelic`}
+		DO:	SetState {GoToLinvakTukal}
+	IF:	All
+			CellE A21E001A
+			Expr {$xptype==`neelic`}
+		DO:	SetState {GoToNeelic}
+	IF:	All
+			CellE A21E0026
+			Expr {$xptype==`neelic`}
 		DO:	SetState {WaitingForInvite}
-	IF:	CellE 00070145
+	IF:	All
+			CellE 00070145
+			Expr {$xptype==`neelic`}
+		DO:	SetState {GoToLinvakTukal}
+	IF:	All
+			CellE 00070145
+			Expr {$xptype==`olthoi`}
+		DO:	SetState {GoToArwic}
+	IF:	All
+			CellE C6A90009
+			Expr {$xptype==`olthoi`}
+		DO:	SetState {GoToOlthoiHunter}
+	IF:	All
+			CellE C5A6010C
+			Expr {$xptype==`olthoi`}
+		DO:	SetState {WaitingForInvite}
+	IF:	All
+			CellE 00070145
+			Expr {$xptype==`olthoi`}
 		DO:	SetState {GoToArwic}
 	IF:	CellE 00070143
 		DO:	SetState {GoToTownNetwork}
@@ -77,16 +111,19 @@ STATE: {CheckLocation} ~~ {
 ~~ }
 STATE: {RecallAphusLassel} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Recalling to Aphus Lassel`,19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Recalling to Aphus Lassel`,19]}
+				SetOpt {EnableLooting} {false}
+				SetOpt {EnableCombat} {false}
 	IF:	Any
 			IntoPortal
 			CellE F6820033
 		DO:	SetState {GoToTownNetwork}
-	IF:	Expr {actiontrycastbyid[2931]}
-		DO:	DoAll
-				SetOpt {EnableLooting} {false}
-				SetOpt {EnableCombat} {false}
-				SetState {RecallAphusLassel}
+	IF:	All
+			Expr {actiontryequipanywand[]}
+			Expr {actiontrycastbyid[2931]}
+			Never
+		DO: None
 ~~ }
 STATE: {UseTownNetworkPortal} ~~ {
 	IF:	Always
@@ -98,23 +135,41 @@ STATE: {UseTownNetworkPortal} ~~ {
 	IF:	CellE 00070156
 		DO:	EmbedNav navGoToAnnexFromSho {GoToAnnexFromSho}
 	IF:	CellE 00070145
-		DO:	SetState {GoToArwic}
+		DO:	SetState {CheckLocation}
 	IF:	Always
 		DO:	Chat {/ub usel Portal to Town Network}
 ~~ }
 STATE: {GoToTownNetwork} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Going to Town Network`,19]}
+	IF:	CellE 00070145
+		DO:	SetState {CheckLocation}
 	IF:	CellE 00070143
 		DO:	EmbedNav navGoToAnnexFromAluvian {GoToAnnexFromAluvian}
 	IF:	CellE 00070133
 		DO:	EmbedNav navGoToAnnexFromGharundim {GoToAnnexFromGharundim}
 	IF:	CellE 00070156
 		DO:	EmbedNav navGoToAnnexFromSho {GoToAnnexFromSho}
-	IF:	CellE 00070145
-		DO:	SetState {GoToArwic}
 	IF:	Always
 		DO:	EmbedNav navAphusLasselToTownNetwork {GoToTownNetwork}
+~~ }
+STATE: {GoToLinvakTukal} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Linvak Tukal`,19]}
+	IF:	CellE A21E001A
+		DO:	SetState {GoToNeelic}
+	IF:	Always
+		DO:	EmbedNav navTownNetworkToLinvakTukal {GoToLinvakTukal}
+~~ }
+STATE: {GoToNeelic} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Neelic`,19]}
+	IF:	All
+			NavEmpty
+			CellE A21E0026
+		DO:	SetState {WaitingForInvite}
+	IF:	Always
+		DO:	EmbedNav navGoToNeelic {GoToNeelic}
 ~~ }
 STATE: {GoToArwic} ~~ {
 	IF:	Always
@@ -138,6 +193,11 @@ STATE: {WaitingForInvite} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Waiting for Fellowship Invite`,19]}
 	IF:	All
+			Expr {$xptype==`neelic`}
+			ItemCountLE 0 {Translated Orders for Zrikux}
+		DO:	SetState {DoneTurningIn}
+	IF:	All
+			Expr {$xptype==`olthoi`}
 			ItemCountLE 0 {Brood Matron Carapace}
 			ItemCountLE 0 {Brood Matron Crest}
 		DO:	SetState {DoneTurningIn}
@@ -146,12 +206,25 @@ STATE: {WaitingForInvite} ~~ {
 ~~ }
 STATE: {TurningInItem} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Turning in Brood Matron Parts`,19]}
-	IF:	ItemCountGE 1 {Brood Matron Carapace}
+		DO:	DoExpr {echo[`[META]: Turning in XP Items`,19]}
+	IF:	All
+			Expr {$xptype==`neelic`}
+			ItemCountGE 1 {Translated Orders for Zrikux}
+		DO:	Chat {/ub give Translated Orders for Zrikux to Neelic}
+	IF:	All
+			Expr {$xptype==`neelic`}
+			ItemCountLE 0 {Translated Orders for Zrikux}
+		DO:	SetState {DoneTurningIn}
+	IF:	All
+			Expr {$xptype==`olthoi`}
+			ItemCountGE 1 {Brood Matron Carapace}
 		DO:	Chat {/ub give Brood Matron Carapace to Olthoi Hunter}
-	IF:	ItemCountGE 1 {Brood Matron Crest}
+	IF:	All
+			Expr {$xptype==`olthoi`}
+			ItemCountGE 1 {Brood Matron Crest}
 		DO:	Chat {/ub give Brood Matron Crest to Olthoi Hunter}
 	IF:	All
+			Expr {$xptype==`olthoi`}
 			ItemCountLE 0 {Brood Matron Carapace}
 			ItemCountLE 0 {Brood Matron Crest}
 		DO:	SetState {DoneTurningIn}
@@ -160,24 +233,34 @@ STATE: {TurningInItem} ~~ {
 ~~ }
 STATE: {DoneTurningIn} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Done Turning in Brood Matron Parts`,19]}
+		DO:	DoExpr {echo[`[META]: Done Turning in Quest Items`,19]}
 	IF:	ChatMatch {^You\'ve earned .* experience\.}
 		DO:	DoAll
 				Chat {/ub jumpx}
 				Chat {/mt fellow quit}
-				Chat {/say Done Turning in Brood Matron Parts!}
+				Chat {/say Done turning in XP Items!}
 				SetState {DropItems}
 ~~ }
 STATE: {DropItems} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Dropping Extra Quest Items`,19]}
+	IF:	ItemCountGE 1 {Forging Gloves}
+		DO:	Chat {/mt drop Forging Gloves}
+	IF:	All
+			Expr {listcount[wobjectfindallinventorybytemplatetype[47192]]==0}
+			ItemCountGE 1 {Translated Orders for Zrikux}
+		DO:	Chat {/mt drop Translated Orders for Zrikux}
 	IF:	ItemCountGE 1 {Asheron's Supreme Raiment}
 		DO:	Chat {/mt drop Asheron's Supreme Raiment}
 	IF:	ItemCountGE 1 {Asheron's Greater Raiment}
 		DO:	Chat {/mt drop Asheron's Greater Raiment}
 	IF:	All
-			ItemCountLE 1 {Asheron's Supreme Raiment}
+			ItemCountLE 0 {Asheron's Supreme Raiment}
 			ItemCountLE 0 {Asheron's Greater Raiment}
+			ItemCountLE 0 {Forging Gloves}
+			Any
+				Expr {listcount[wobjectfindallinventorybytemplatetype[47192]]>0}
+				ItemCountLE 0 {Translated Orders for Zrikux}
 		DO:	SetState {AllDone}
 	IF:	SecsInStateGE 1
 		DO:	SetState {DropItems}
@@ -201,6 +284,53 @@ NAV: navGoToAnnexFromAluvian once ~~ {
 	pnt -101.657822354635 -96.5997297604879 2.08333134651184E-05
 	pnt -101.699744319916 -96.6413258552551 2.08333134651184E-05
 	pnt -101.658815161387 -96.6835212071737 2.08333134651184E-05
+~~ }
+NAV: navTownNetworkToLinvakTukal once ~~ {
+	pnt -101.657915083567 -96.6814231872559 2.08333134651184E-05
+	pnt -101.658632119497 -96.6882947603861 2.08333134651184E-05
+	pnt -101.65938946406 -96.7021851857503 2.08333134651184E-05
+	pnt -101.659663263957 -96.7288921356201 2.08333134651184E-05
+	pnt -101.65873041153 -96.7552302042643 2.08333134651184E-05
+	pnt -101.658872954051 -96.7827102979024 2.08333134651184E-05
+	pnt -101.65902894338 -96.8127775828044 2.08333134651184E-05
+	pnt -101.659170691172 -96.8400910695394 2.08333134651184E-05
+	pnt -101.65861047109 -96.869576327006 2.08333134651184E-05
+	pnt -101.653449312846 -96.8999656041463 2.08333134651184E-05
+	pnt -101.642623996735 -96.9231093724569 2.08333134651184E-05
+	pnt -101.627718544006 -96.9449848175049 2.08333134651184E-05
+	pnt -101.605344072978 -96.9713803609212 2.08333134651184E-05
+	ptl -101.658333333333 -96.6833333333333 2.08333134651184E-05 -101.590654182434 -96.9749624888102 -0.000262499845121056 14 {Portal to Linvak Tukal}
+~~ }
+NAV: navGoToNeelic once ~~ {
+	pnt 27.9964659372965 -77.7913446903229 2.33483225504557
+	pnt 28.0124994913737 -77.7831841945648 2.33454081217448
+	pnt 28.0379382769267 -77.768693224589 2.33385848999023
+	pnt 28.0517727851868 -77.757010491689 2.33341445922852
+	pnt 28.0706952730815 -77.739847056071 2.33343887329102
+	pnt 28.0925099054972 -77.7200725078583 2.33360366821289
+	pnt 28.1103485107422 -77.6983138561249 2.33368479410807
+	pnt 28.1333566665649 -77.6734331130981 2.33349304199219
+	pnt 28.1394425392151 -77.668702061971 2.33344243367513
+	pnt 28.149746354421 -77.6577946345011 2.33361511230469
+	pnt 28.1658316612244 -77.6406144777934 2.33374710083008
+	pnt 28.1740890820821 -77.6122530619303 2.33421579996745
+	pnt 28.170451482137 -77.5848999341329 2.33408584594727
+	pnt 28.1618703524272 -77.5469646135966 2.33345667521159
+	pnt 28.1596629460653 -77.5321092287699 2.33613255818685
+	pnt 28.1604513168335 -77.5082029660543 2.34589411417643
+	pnt 28.1597045262655 -77.4867616971334 2.35464935302734
+	pnt 28.1684081395467 -77.4736851056417 2.35418752034505
+	pnt 28.1790867805481 -77.4574155807495 2.35418752034505
+	pnt 28.1793061892192 -77.4454643885295 2.35418752034505
+	pnt 28.1664063771566 -77.4354481379191 2.35418752034505
+	pnt 28.1495315233866 -77.4230744043986 2.35418752034505
+	pnt 28.1249465624491 -77.4190920829773 2.35418752034505
+	pnt 28.1101453781128 -77.420264116923 2.35542271931966
+	pnt 28.089763100942 -77.4221667607625 2.36448160807292
+	pnt 28.0772606531779 -77.4217626253764 2.37003809611003
+	pnt 28.0672972679138 -77.4187831560771 2.37085418701172
+	pnt 28.0651704152425 -77.4000354131063 2.37085418701172
+	~~tlk 28.0651704152425 -77.4000354131063 2.37085418701172 28.0639695803324 -77.3959124883016 2.37087512016296 37 {Neelic}
 ~~ }
 NAV: navGoToArwic once ~~ {
 	pnt -101.658333333333 -96.6833333333333 2.08333134651184E-05
