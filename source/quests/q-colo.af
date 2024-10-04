@@ -90,7 +90,7 @@ STATE: {GoToColo} ~~ {
 			Never
 		DO: None
 ~~ }
-STATE: {WaitingForCommands} ~~ 
+STATE: {WaitingForCommands} ~~ {
 	IF:	Always
 		DO: EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
 	IF:	All
@@ -156,19 +156,15 @@ STATE: {WaitingForStart} ~~ {
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableLooting} {false}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
-	~~ this condition puts you back into the arena if you reload the script after leaving
-	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
-		DO:	SetState {EnterFirstRoom}
-	~~ this condition will automatically start the next run if qcolo_looping is set to 1
-	IF:	All
-			ItemCountGE 1 {Colosseum Ticket}
-			Expr {listcount[&qcolo_charswaiting]>=listcount[&qcolo_chars]}
-		DO:	SetState {TicketCheck}
 	~~ this condition triggers when the ticket holder receives a ticket stub
 	IF:	Any
 			Expr {&qcolo_fellowlocked}
 			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
+			ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
 		DO:	SetState {EnterFirstRoom}
+	~~ this condition will automatically start the next run if qcolo_looping is set to 1
+	IF:	ItemCountGE 1 {Colosseum Ticket}
+		DO:	SetState {TicketCheck}
 ~~ }
 STATE: {TicketCheck} ~~ {
 	IF:	Always
