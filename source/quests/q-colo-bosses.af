@@ -37,190 +37,235 @@
 ~~		prt (deprecated in VTank)														
 ~~ }																					
 
-STATE: {AllDone} ~~ {
-	IF:	Always
-		DO:	DoAll
-				SetOpt {LootFellowCorpses} {false}
-				SetOpt {AttackDistance} {0.02}
-				Chat {/f Colo Bosses Done!}
-~~ }
-STATE: {CheckLocation} ~~ {
-	IF:	CellE 00AF0118
-		DO:	SetState {CheckTokens}
-	IF:	Always
-		DO:	SetState {RecallToColosseum}
-~~ }
-STATE: {CheckTokens} ~~ {
-	IF:	Any
-			ItemCountGE 1 {Stone Fists Token}
-			Expr {getqueststatus[pickedupstonefiststoken]==0}
-		DO:	DoExpr {setvar[stonefists,0]}
-	IF:	Any
-			ItemCountGE 1 {Azaxis Token}
-			Expr {getqueststatus[pickedupazaxistoken]==0}
-		DO:	DoExpr {setvar[azaxis,0]}
-	IF:	Any
-			ItemCountGE 1 {Crowley's Champion Token}
-			Expr {getqueststatus[pickedupcrowleyschampiontoken]==0}
-		DO:	DoExpr {setvar[killagurg,0]}
-	IF:	Any
-			ItemCountGE 1 {Demon Swarm Matron Token}
-			Expr {getqueststatus[pickedupdemonswarmmatrontoken]==0}
-		DO:	DoExpr {setvar[dsmatron,0]}
-	IF:	Any
-			ItemCountGE 1 {The Master Token}
-			Expr {getqueststatus[pickedupthemastertoken]==0}
-		DO:	DoExpr {setvar[themaster,0]}
-	IF:	Expr {getvar[stonefists]==1}
-		DO:	SetState {GoToStoneFists}
-	IF:	Expr {getvar[azaxis]==1}
-		DO:	SetState {GoToAzaxis}
-	IF:	Expr {getvar[killagurg]==1}
-		DO:	SetState {GoToKillagurg}
-	IF:	Expr {getvar[dsmatron]==1}
-		DO:	SetState {GoToDSMatron}
-	IF:	Expr {getvar[themaster]==1}
-		DO:	SetState {GoToTheMaster}
-	IF:	All
-			Expr {getvar[stonefists]==0}
-			Expr {getvar[azaxis]==0}
-			Expr {getvar[killagurg]==0}
-			Expr {getvar[dsmatron]==0}
-			Expr {getvar[themaster]==0}
-		DO:	SetState {TurnInTokens}
-~~ }
 STATE: {Default} ~~ {
 	IF:	Always
-		DO:	SetState {SetupOptions}
-~~ }
-STATE: {DiscardItems} ~~ {
+		DO:	DoExpr {echo[`[META]: Loading Colo Bosses Meta`,19]}
 	IF:	Always
-		DO:	EmbedNav nav0 { [None].nav}
-	IF:	ItemCountGE 1 {Fists of Stone}
-		DO:	Chat {/mt give Fists of Stone to Garbage Barrel}
-	IF:	ItemCountGE 1 {Sickle of Azaxis}
-		DO:	Chat {/mt give Sickle of Azaxis to Garbage Barrel}
-	IF:	ItemCountGE 1 {Club of Killagurg}
-		DO:	Chat {/mt give Club of Killagurg to Garbage Barrel}
-	IF:	ItemCountGE 1 {Demon Swarm Sword}
-		DO:	Chat {/mt give Demon Swarm Sword to Garbage Barrel}
-	IF:	ItemCountGE 1 {Colosseum Master's Robe}
-		DO:	Chat {/mt give Colosseum Master's Robe to Garbage Barrel}
-	IF:	All
-			ItemCountLE 0 {Fists of Stone}
-			ItemCountLE 0 {Sickle of Azaxis}
-			ItemCountLE 0 {Club of Killagurg}
-			ItemCountLE 0 {Demon Swarm Sword}
-			ItemCountLE 0 {Colosseum Master's Robe}
-			NavEmpty
-		DO:	SetState {AllDone}
-	IF:	All
-			NavEmpty
-			SecsInStateGE 1
-		DO:	SetState {DiscardItems}
+		DO:	SetState {*SetupOptions*}
 ~~ }
-STATE: {GoToAzaxis} ~~ {
-	IF:	CellE 00B60126
-		DO:	DoAll
-				SetOpt {EnableLooting} {true}
-				SetState {KillingAndLootingAzaxis}
-				SetOpt {EnableCombat} {true}
+STATE: {*SetupOptions*} ~~ {
 	IF:	Always
-		DO:	EmbedNav nav1 { [None].nav}
-~~ }
-STATE: {GoToDSMatron} ~~ {
-	IF:	CellE 00B60129
-		DO:	DoAll
-				SetOpt {EnableLooting} {true}
-				SetState {KillingAndLootingDSMatron}
-				SetOpt {EnableCombat} {true}
-	IF:	Always
-		DO:	EmbedNav nav2 { [None].nav}
-~~ }
-STATE: {GoToKillagurg} ~~ {
-	IF:	CellE 00B6010E
-		DO:	DoAll
-				SetOpt {EnableLooting} {true}
-				SetState {KillingAndLootingKillagurg}
-				SetOpt {EnableCombat} {true}
-	IF:	Always
-		DO:	EmbedNav nav3 { [None].nav}
-~~ }
-STATE: {GoToStoneFists} ~~ {
-	IF:	CellE 00B60114
-		DO:	DoAll
-				SetOpt {EnableLooting} {true}
-				SetState {KillingAndLootingStoneFists}
-				SetOpt {EnableCombat} {true}
-	IF:	Always
-		DO:	EmbedNav nav4 { [None].nav}
-~~ }
-STATE: {GoToTheMaster} ~~ {
-	IF:	CellE 00B60111
-		DO:	DoAll
-				SetOpt {EnableLooting} {true}
-				SetState {KillingAndLootingTheMaster}
-				SetOpt {EnableCombat} {true}
-	IF:	Always
-		DO:	EmbedNav nav5 { [None].nav}
-~~ }
-STATE: {KillingAndLootingAzaxis} ~~ {
-	IF:	ItemCountGE 1 {Azaxis Token}
-		DO:	SetState {RecallToColosseum}
-~~ }
-STATE: {KillingAndLootingDSMatron} ~~ {
-	IF:	ItemCountGE 1 {Demon Swarm Matron Token}
-		DO:	SetState {RecallToColosseum}
-~~ }
-STATE: {KillingAndLootingKillagurg} ~~ {
-	IF:	ItemCountGE 1 {Crowley's Champion Token}
-		DO:	SetState {RecallToColosseum}
-~~ }
-STATE: {KillingAndLootingStoneFists} ~~ {
-	IF:	ItemCountGE 1 {Stone Fists Token}
-		DO:	SetState {RecallToColosseum}
-~~ }
-STATE: {KillingAndLootingTheMaster} ~~ {
-	IF:	ItemCountGE 1 {The Master Token}
-		DO:	SetState {RecallToColosseum}
-~~ }
-STATE: {RecallToColosseum} ~~ {
+		DO:	DoExpr {echo[`[META]: Setting Up Options for Colo Bosses`,19]}
 	IF:	Always
 		DO:	DoAll
-				Chat {/myquests}
-				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
-				DoExpr {actiontryuseitem[wobjectgetopencontainer[]]}
-				SetWatchdog 5 3 {CheckLocation}
-	IF:	Expr {actiontryequipanywand[]==1}
-		DO:	DoAll
-				Chat {/mt cast colosseum recall}
-~~ }
-STATE: {SetupOptions} ~~ {
-	IF:	Always
-		DO:	DoAll
-				DoExpr {setvar[stonefists,1]}
-				DoExpr {setvar[azaxis,1]}
-				DoExpr {setvar[killagurg,1]}
-				DoExpr {setvar[dsmatron,1]}
-				DoExpr {setvar[themaster,1]}
+				DoExpr {setvar[kill_stonefists,1]}
+				DoExpr {setvar[kill_azaxis,1]}
+				DoExpr {setvar[kill_killagurg,1]}
+				DoExpr {setvar[kill_dsmatron,1]}
+				DoExpr {setvar[kill_themaster,1]}
+				DoExpr {setvar[keepreward_stonefists,1]}
+				DoExpr {setvar[keepreward_azaxis,0]}
+				DoExpr {setvar[keepreward_killagurg,0]}
+				DoExpr {setvar[keepreward_dsmatron,0]}
+				DoExpr {setvar[keepreward_themaster,0]}
 				DoAll
 					SetOpt {EnableCombat} {true}
 					SetOpt {EnableBuffing} {false}
 					SetOpt {EnableNav} {true}
 					SetOpt {AttackDistance} {0.3}
-					SetOpt {LootFellowCorpses} {true}
 					SetOpt {ApproachDistance} {0.3}
 					SetOpt {CorpseApproachRange-Max} {0.3}
 					SetOpt {CorpseApproachRange-Min} {0.00833}
-					SetOpt {EnableLooting} {true}
+					SetOpt {EnableLooting} {false}
 					SetOpt {IdlePeaceMode} {false}
 					SetOpt {LootOnlyRareCorpses} {false}
-				EmbedNav nav6 { [None].nav}
+				EmbedNav navNone {None}
 	IF:	Always
 		DO:	SetState {CheckLocation}
 ~~ }
+STATE: {CheckLocation} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Checking Location`,19]}
+	IF:	CellE 00AF0118
+		DO:	SetState {CheckTokens}
+	IF:	Always
+		DO:	SetState {RecallToColosseum}
+~~ }
+STATE: {RecallToColosseum} ~~ 
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Recalling to Colosseum`,19]}
+	IF:	CellE 00AF0118
+		DO:	SetState {CheckTokens}
+	IF:	Always
+		DO:	DoAll
+				Chat {/myquests}
+				SetOpt {EnableCombat} {false}
+				SetOpt {EnableLooting} {false}
+	IF:	All
+			Expr {actiontryequipanywand[]}
+			Expr {actiontrycastbyid[4213]}
+			Never
+		DO: None
+~~ }
+STATE: {CheckTokens} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Checking Tokens`,19]}
+	IF:	Any
+			ItemCountGE 1 {Stone Fists Token}
+			Expr {getqueststatus[pickedupstonefiststoken]==0}
+		DO:	DoExpr {$kill_stonefists=0}
+	IF:	Any
+			ItemCountGE 1 {Azaxis Token}
+			Expr {getqueststatus[pickedupazaxistoken]==0}
+		DO:	DoExpr {$kill_azaxis=0}
+	IF:	Any
+			ItemCountGE 1 {Crowley's Champion Token}
+			Expr {getqueststatus[pickedupcrowleyschampiontoken]==0}
+		DO:	DoExpr {$kill_killagurg=0}
+	IF:	Any
+			ItemCountGE 1 {Demon Swarm Matron Token}
+			Expr {getqueststatus[pickedupdemonswarmmatrontoken]==0}
+		DO:	DoExpr {$kill_dsmatron=0}
+	IF:	Any
+			ItemCountGE 1 {The Master Token}
+			Expr {getqueststatus[pickedupthemastertoken]==0}
+		DO:	DoExpr {$kill_themaster=0}
+	IF:	Expr {$kill_stonefists==1}
+		DO:	SetState {GoToStoneFists}
+	IF:	Expr {$kill_azaxis==1}
+		DO:	SetState {GoToAzaxis}
+	IF:	Expr {$kill_killagurg==1}
+		DO:	SetState {GoToKillagurg}
+	IF:	Expr {$kill_dsmatron==1}
+		DO:	SetState {GoToDSMatron}
+	IF:	Expr {$kill_themaster==1}
+		DO:	SetState {GoToTheMaster}
+	IF:	All
+			Expr {$kill_stonefists==0}
+			Expr {$kill_azaxis==0}
+			Expr {$kill_killagurg==0}
+			Expr {$kill_dsmatron==0}
+			Expr {$kill_themaster==0}
+		DO:	SetState {TurnInTokens}
+~~ }
+STATE: {GoToAzaxis} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Azaxis`,19]}
+	IF:	CellE 00B60126
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetState {KillingAndLootingAzaxis}
+	IF:	Always
+		DO:	EmbedNav navGoToAzaxis {GoToAzaxis}
+~~ }
+STATE: {GoToDSMatron} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Demon Swarm Matron`,19]}
+	IF:	CellE 00B60129
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetState {KillingAndLootingDSMatron}
+	IF:	Always
+		DO:	EmbedNav navGoToDSMatron {GoToDSMatron}
+~~ }
+STATE: {GoToKillagurg} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Killagurg`,19]}
+	IF:	CellE 00B6010E
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetState {KillingAndLootingKillagurg}
+	IF:	Always
+		DO:	EmbedNav navGoToKillagurg {GoToKillagurg}
+~~ }
+STATE: {GoToStoneFists} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Stone Fists`,19]}
+	IF:	CellE 00B60114
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetState {KillingAndLootingStoneFists}
+	IF:	Always
+		DO:	EmbedNav navGoToStoneFists {GoToStoneFists}
+~~ }
+STATE: {GoToTheMaster} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to The Master`,19]}
+	IF:	CellE 00B60111
+		DO:	DoAll
+				SetOpt {EnableCombat} {true}
+				SetState {KillingAndLootingTheMaster}
+	IF:	Always
+		DO:	EmbedNav navGoToTheMaster {GoToTheMaster}
+~~ }
+STATE: {KillingAndLootingAzaxis} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing and Looting Azaxis`,19]}
+	IF:	ItemCountGE 1 {Azaxis Token}
+		DO:	SetState {RecallToColosseum}
+	IF: All
+			Expr {$corpsename=`Azaxis`}
+			Expr {$itemloot=`Azaxis Token`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Never
+		DO: None
+~~ }
+STATE: {KillingAndLootingDSMatron} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing and Looting Demon Swarm Matron`,19]}
+	IF:	ItemCountGE 1 {Demon Swarm Matron Token}
+		DO:	SetState {RecallToColosseum}
+	IF: All
+			Expr {$corpsename=`Demon Swarm Matron`}
+			Expr {$itemloot=`Demon Swarm Matron Token`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Never
+		DO: None
+~~ }
+STATE: {KillingAndLootingKillagurg} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing and Looting Killagurg`,19]}
+	IF:	ItemCountGE 1 {Crowley's Champion Token}
+		DO:	SetState {RecallToColosseum}
+	IF: All
+			Expr {$corpsename=`Killagurg`}
+			Expr {$itemloot=`Crowley's Champion Token`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Never
+		DO: None
+~~ }
+STATE: {KillingAndLootingStoneFists} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing and Looting Stone Fists`,19]}
+	IF:	ItemCountGE 1 {Stone Fists Token}
+		DO:	SetState {RecallToColosseum}
+	IF: All
+			Expr {$corpsename=`Stone Fists`}
+			Expr {$itemloot=`Stone Fists Token`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Never
+		DO: None
+~~ }
+STATE: {KillingAndLootingTheMaster} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Killing and Looting The Master`,19]}
+	IF:	ItemCountGE 1 {The Master Token}
+		DO:	SetState {RecallToColosseum}
+	IF: All
+			Expr {$corpsename=`The Master`}
+			Expr {$itemloot=`The Master Token`}
+			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$corpse]}
+			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Never
+		DO: None
+~~ }
 STATE: {TurnInTokens} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Turning in Tokens`,19]}
 	IF:	ItemCountGE 1 {Stone Fists Token}
 		DO:	Chat {/mt give Stone Fists Token to Master Arbitrator}
 	IF:	ItemCountGE 1 {Azaxis Token}
@@ -241,20 +286,74 @@ STATE: {TurnInTokens} ~~ {
 			ItemCountLE 0 {The Master Token}
 		DO:	SetState {DiscardItems}
 ~~ }
+STATE: {DiscardItems} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Discarding Items`,19]}
+	IF:	Always
+		DO:	EmbedNav navColoDrop {ColoDrop}
+	IF:	All
+			ItemCountGE 1 {Fists of Stone}
+			Expr {$keepreward_stonefists==0}
+		DO:	Chat {/mt give Fists of Stone to Garbage Barrel}
+	IF:	All
+			ItemCountGE 1 {Sickle of Azaxis}
+			Expr {$keepreward_azaxis==0}
+		DO:	Chat {/mt give Sickle of Azaxis to Garbage Barrel}
+	IF:	All
+			ItemCountGE 1 {Club of Killagurg}
+			Expr {$keepreward_killagurg==0}
+		DO:	Chat {/mt give Club of Killagurg to Garbage Barrel}
+	IF:	All
+			ItemCountGE 1 {Demon Swarm Sword}
+			Expr {$keepreward_dsmatron==0}
+		DO:	Chat {/mt give Demon Swarm Sword to Garbage Barrel}
+	IF:	All
+			ItemCountGE 1 {Colosseum Master's Robe}
+			Expr {$keepreward_themaster==0}
+		DO:	Chat {/mt give Colosseum Master's Robe to Garbage Barrel}
+	IF:	All
+			Any
+				ItemCountLE 0 {Fists of Stone}
+				Expr {$keepreward_stonefists}
+			Any
+				ItemCountLE 0 {Sickle of Azaxis}
+				Expr {$keepreward_azaxis}
+			Any
+				ItemCountLE 0 {Club of Killagurg}
+				Expr {$keepreward_killagurg}
+			Any
+				ItemCountLE 0 {Demon Swarm Sword}
+				Expr {$keepreward_dsmatron}
+			Any
+				ItemCountLE 0 {Colosseum Master's Robe}
+				Expr {$keepreward_themaster}
+			NavEmpty
+		DO:	SetState {AllDone}
+	IF:	All
+			NavEmpty
+			SecsInStateGE 1
+		DO:	SetState {DiscardItems}
+~~ }
+STATE: {AllDone} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Colo Bosses Completed!`,19]}
+	IF:	Always
+		DO:	SetOpt {AttackDistance} {0.02}
+~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
-NAV: nav0 once ~~ {
+NAV: navColoDrop once ~~ {
 	pnt -101.795337835948 38.0027668277423 2.08333134651184E-05
 ~~ }
-NAV: nav1 once ~~ {
+NAV: navGoToAzaxis once ~~ {
 	pnt -101.783804559708 37.9962467948596 2.08333134651184E-05
 	pnt -101.783241717021 37.9679485003154 2.08333134651184E-05
 	pnt -101.783382908503 37.9243274609248 2.08333134651184E-05
 	pau -101.783382908503 37.9243274609248 2.08333134651184E-05 2000
 	ptl -101.783382908503 37.9243274609248 2.08333134651184E-05 -101.772916666667 37.925 0.000241666537476704 14 {Azaxis}
 ~~ }
-NAV: nav2 once ~~ {
+NAV: navGoToDSMatron once ~~ {
 	pnt -101.783804559708 37.9962467948596 2.08333134651184E-05
 	pnt -101.783241717021 37.9679485003154 2.08333134651184E-05
 	pnt -101.783382908503 37.9243274609248 2.08333134651184E-05
@@ -262,20 +361,20 @@ NAV: nav2 once ~~ {
 	pau -101.783124748866 37.8417056242625 2.08333134651184E-05 2000
 	ptl -101.783124748866 37.8417056242625 2.08333134651184E-05 -101.79375 37.8416666666667 0 14 {Demon Swarm Matron}
 ~~ }
-NAV: nav3 once ~~ {
+NAV: navGoToKillagurg once ~~ {
 	pnt -101.783804559708 37.9962467948596 2.08333134651184E-05
 	pnt -101.783241717021 37.9679485003154 2.08333134651184E-05
 	pnt -101.783382908503 37.9243274609248 2.08333134651184E-05
 	pau -101.783382908503 37.9243274609248 2.08333134651184E-05 2000
 	ptl -101.783382908503 37.9243274609248 2.08333134651184E-05 -101.79375 37.925 4.58329923276324E-05 14 {Killagurg}
 ~~ }
-NAV: nav4 once ~~ {
+NAV: navGoToStoneFists once ~~ {
 	pnt -101.783804559708 37.9962467948596 2.08333134651184E-05
 	pnt -101.783241717021 37.9679485003154 2.08333134651184E-05
 	pau -101.783196401596 37.9673453966777 2.08333134651184E-05 2000
 	ptl -101.783196401596 37.9673453966777 2.08333134651184E-05 -101.772916666667 37.9666666666667 5.83330802328419E-05 14 {Stone Fists}
 ~~ }
-NAV: nav5 once ~~ {
+NAV: navGoToTheMaster once ~~ {
 	pnt -101.783804559708 37.9962467948596 2.08333134651184E-05
 	pnt -101.783241717021 37.9679485003154 2.08333134651184E-05
 	pnt -101.783382908503 37.9243274609248 2.08333134651184E-05
@@ -284,5 +383,5 @@ NAV: nav5 once ~~ {
 	pau -101.783892742793 37.7585698127747 2.08333134651184E-05 2000
 	ptl -101.783892742793 37.7585698127747 2.08333134651184E-05 -101.772916666667 37.7583333333333 0 37 {The Master}
 ~~ }
-NAV: nav6 once ~~ {
+NAV: navNone once ~~ {
 ~~ }
