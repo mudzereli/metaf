@@ -207,7 +207,7 @@ STATE: {EnterFirstRoom} ~~ {
 		DO: DoAll
 				DoExpr {actiontryuseitem[$portal]}
 				DoExpr {$qcolo_roomnumber=5}
-				SetWatchdog 2 2 {MoveToNextRoom}
+				SetWatchdog 2 2 {EnterFirstRoom}
 	~~ ok we zoned into the arena, and we're actually going to start buffing
 	IF:	ExitPortal
 		DO:	SetState {BuffingBeforeRun}
