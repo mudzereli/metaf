@@ -593,7 +593,7 @@ n
 s
 e
 s
-wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse]||wobjectgetopencontainer[]
+wobjectgetopencontainer[]||actiontryuseitem[$corpse]
 i
 26
 TABLE
