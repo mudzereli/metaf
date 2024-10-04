@@ -6,7 +6,7 @@ STATE: {GoToArea} ~~ {
 		DO:	EmbedNav navGoToArea {GoToArea}
 ~~ }
 ~~ SUMMONING A PORTAL
-STATE: {SummonPortalToNexus} ~~ {
+STATE: {SummonAPortal} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Summoning a Portal`,19]}
 	IF:	Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=5}
