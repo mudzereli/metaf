@@ -111,7 +111,7 @@ STATE: {WaitingForCommands} ~~ {
 		DO:	SetState {LootRings}
 	~~ this condition triggers when the ticket holder receives a ticket stub
 	IF:	Any
-			Expr {getgvar[qcolo_fellowlocked]==1}
+			Expr {&qcolo_fellowlocked==1}
 			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
 		DO:	SetState {EnterFirstRoom}
 ~~ }
@@ -159,11 +159,11 @@ STATE: {WaitingForStart} ~~ {
 	~~ this condition will automatically start the next run if qcolo_looping is set to 1
 	IF:	All
 			ItemCountGE 1 {Colosseum Ticket}
-			Expr {listcount[getgvar[qcolo_charswaiting]]>=listcount[&qcolo_chars]}
+			Expr {listcount[&qcolo_charswaiting]>=listcount[&qcolo_chars]}
 		DO:	SetState {TicketCheck}
 	~~ this condition triggers when the ticket holder receives a ticket stub
 	IF:	Any
-			Expr {getgvar[qcolo_fellowlocked]==1}
+			Expr {&qcolo_fellowlocked}
 			ChatMatch {\[Fellowship\].* says\, \"Received a Colosseum Ticket Stub\. Enter the first room and start buffing\!"}
 		DO:	SetState {EnterFirstRoom}
 ~~ }
@@ -201,9 +201,9 @@ STATE: {EnterFirstRoom} ~~ {
 	IF:	All
 			NavEmpty
 			Expr {$portal=listgetitem[wobjectfindalllandscapebytemplatetype[34728],0]}
-			Expr {actiontryuseitem[$portal]}
-			Never
-		DO: None
+		DO: DoAll
+				DoExpr {actiontryuseitem[$portal]}
+				SetWatchdog 2 2 {MoveToNextRoom}
 	~~ ok we zoned into the arena, and we're actually going to start buffing
 	IF:	ExitPortal
 		DO:	SetState {BuffingBeforeRun}
@@ -233,7 +233,7 @@ STATE: {SynchronizeAfterBuffing} ~~ {
 		DO:	None
 	IF: Expr {listcount[&qcolo_charsbuffed]>=listcount[&qcolo_chars]}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[qcolo_charsbuffed]]+` Characters @ Finished Buffing`,19]}
+				DoExpr {echo[`[META]: Synchronized `+listcount[&qcolo_charsbuffed]+` Characters @ Finished Buffing`,19]}
 				DoExpr {setvar[qcolo_roomnumber,5]}
 				Chat {/ub myquests}
 				SetState {StartCurrentRoom}
