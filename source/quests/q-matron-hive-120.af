@@ -120,7 +120,6 @@ STATE: {EnteredHive} ~~ {
 		DO:	DoAll
 				SetOpt {OpenDoors} {false}
 				SetOpt {EnableCombat} {true}
-				SetOpt {EnableLooting} {false}
 				SetOpt {NavCloseStopRange} {0.003}
 				SetOpt {NavPriorityBoost} {false}
 				SetOpt {AttackDistance} {0.02}
@@ -183,8 +182,11 @@ STATE: {RecallLifestoneSending} ~~ {
 				Chat {/ub close corpse}
 	IF:	IntoPortal
 		DO:	SetState {AllDone}
-	IF:	Expr {actiontrycastbyid[1636]}
-		DO: SetWatchdog 3 3 {RecallLifestoneSending}
+	IF:	All
+			Expr {actiontryequipanywand[]}
+			Expr {actiontrycastbyid[1636]}
+			Never
+		DO: None
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
