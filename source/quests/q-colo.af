@@ -52,7 +52,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {AttackDistance} {0.13333}
 				SetOpt {ApproachDistance} {0.13333}
-				SetOpt {NavCloseStopRange} {0.021}
+				SetOpt {NavCloseStopRange} {0.01}
 				SetOpt {EnableCombat} {false}
 				SetOpt {PetRangeMode} {0}
 				SetOpt {EnableNav} {true}
@@ -104,9 +104,11 @@ STATE: {WaitingForCommands} ~~ {
 				DoExpr {echo[`[META]: !tickets - buy colo tickets`,19]}
 				DoExpr {echo[`[META]: !rings - use keys & loot colo rings`,19]}
 	~~ this condition is used to manually start the script [!startl in fellow] (with looping)
-	IF:	ChatMatch {\[Fellowship\] (You say|.* says)\, \"\!startl\"}
+	IF:	Any
+			ChatMatch {\[Fellowship\] (You say|.* says)\, \"\!startl\"}
+			Expr {&qcolo_looping}
 		DO:	DoAll
-				DoExpr {setgvar[qcolo_looping,1]}
+				DoExpr {&qcolo_looping=1}
 				SetState {SynchronizeChars}
 	~~ this condition is used to manually start the script [!start in fellow] (without looping)
 	IF:	ChatMatch {\[Fellowship\] (You say|.* says)\, \"\!start\"}
@@ -321,14 +323,13 @@ STATE: {TurnInRewards} ~~ {
 				DoExpr {setgvar[qcolo_charswaiting,listcreate[]]}
 				DoExpr {setgvar[qcolo_fellowlocked,0]}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
-	~~ once we get our rewards, go figure out what to do
-	IF:	ChatMatch {You\'ve earned .* experience\.}
-		DO:	SetState {ProgressCheck}
 	~~ if we think we're done but we're not, well keep on going.
 	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
 		DO:	SetState {EnterFirstRoom}
-	~~ if we thought we did colo, but we actually didnt.. time for a fresh start
-	IF:	ChatMatch {Master Arbitrator tells you\, \"If you wish to fight as a gladiator in the Arena}
+	~~ these conditions trigger a restart
+	IF:	Any
+			ChatMatch {Master Arbitrator tells you\, \"If you wish to fight as a gladiator in the Arena}
+			ChatMatch {You\'ve earned .* experience\.}
 		DO:	SetState {WaitingForCommands}
 ~~ }
 STATE: {LootRings} ~~ {
@@ -344,41 +345,49 @@ STATE: {GoToColosseumVault} ~~ {
 		DO: DoAll
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableLooting} {false}
-				Chat {/mt combatstate peace}
 	IF: All
 			NavEmpty
 			Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
-		DO:	SetState {UnlockColosseumVault}
+		DO:	DoAll
+				Chat {/mt combatstate peace}
+				SetState {UnlockColosseumVault}
 	IF:	Not Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
 		DO: EmbedNav navColosseumVault {ColosseumVault}
 ~~ }
 STATE: {UnlockColosseumVault} ~~ {
-	IF: Always
-		DO:	DoAll
-				Chat {/mt use Colosseum Vault Key on Colosseum Vault}
-				SetWatchdog 3 3 {UnlockColosseumVault}
+	IF:	ItemCountLE 0 {Colosseum Vault Key}
+		DO: SetState {WaitingForCommands}
 	IF:	ChatMatch {^The Colosseum Vault has been unlocked\.}
-		DO:	SetState {OpenColosseumVault}
+		DO:	SetState {LootColosseumRings}
+	IF: All
+			Not Expr {wobjectgetopencontainer[]}
+			Expr {$key=wobjectfindininventorybytemplatetype[34448]}
+			Expr {$vault=wobjectfindnearestbytemplatetype[34608]}
+			Expr {actiontryapplyitem[$key,$vault]}
+			Never
+		DO:	None
 ~~ }
-STATE: {OpenColosseumVault} ~~ {
-	IF:	SecsInStateGE 1
-		DO:	DoAll
-				Chat {/mt use Colosseum Vault}
-				SetWatchdog 3 3 {UnlockColosseumVault}
-	IF: Expr {wobjectgetopencontainer[]&&1}
-		DO: SetState {LootEmpyreanRing}
+STATE: {LootColosseumRings} ~~ {
+	IF:	All
+			Expr {$ring=`.* Empyrean Ring`}
+			Expr {$vault=wobjectfindnearestbytemplatetype[34608]}
+			Expr {wobjectgetopencontainer[]||actiontryuseitem[$vault]}
+			Expr {$vaultitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],$ring]`]}
+			Expr {listcount[$vaultitems]>0&&$lootitem=listgetitem[$vaultitems,0]}
+			Expr {actiontryuseitem[$lootitem]}
+			Never
+		DO: None
+	IF:	SecsInStateGE 3
+		DO:	SetState {CloseColosseumVault}
 ~~ }
-STATE: {LootEmpyreanRing} ~~ {
-	IF:	All
-			SecsInStateGE 2
-			Expr {listcount[listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],\`.* Empyrean Ring\`]`]] > 0}
-		DO: DoExpr {actiontryuseitem[listgetitem[listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],\`.* Empyrean Ring\`]`],0]]}
-	IF:	All
-			SecsInStateGE 4
-			Not Expr {listcount[listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],\`.* Empyrean Ring\`]`]] > 0}
-		DO: DoExpr {wobjectgetopencontainer[]&&actiontryuseitem[wobjectgetopencontainer[]]}
-	IF: Expr {wobjectgetopencontainer[]==0}
-		DO: SetState {LootRings}
+STATE: {CloseColosseumVault} ~~ {
+	IF: Not Expr {wobjectgetopencontainer[]}
+		DO:	SetState {UnlockColosseumVault}
+	IF: All
+			Expr {$vault=wobjectfindnearestbytemplatetype[34608]}
+			Expr {actiontryuseitem[$vault]}
+			Never
+		DO:	None
 ~~ }
 STATE: {ApplyIvoryToColoRings} ~~ {
 	IF:	All 
