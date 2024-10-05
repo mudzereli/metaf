@@ -37,55 +37,58 @@
 ~~		prt (deprecated in VTank)														
 ~~ }																					
 
+STATE: {Default} ~~ {
+	IF:	Always
+		DO:	SetState {*SetupOptions}
+~~ }
 STATE: {*SetupOptions} ~~ {
 	IF:	Always
 		DO:	DoAll
-				Chat {/f #action follow}
-				Chat {/bc /vt opt set NavCloseStopRange 0.00833}
-				Chat {/bc /vt opt set EnableNav true}
-				Chat {/bc /vt opt set EnableLooting true}
-				Chat {/bc /vt opt set NavPriorityBoost true}
-				Chat {/bc /vt opt set AttackDistance 0.063}
-	IF:	SecsInStateGE 1
-		DO:	DoAll
-				SetOpt {NavPriorityBoost} {false}
-				SetOpt {AttackDistance} {0.029}
-				SetState {CheckLocation}
 				SetOpt {NavCloseStopRange} {0.003}
+				SetOpt {EnableCombat} {true}
+				SetOpt {EnableNav} {true}
+				SetOpt {EnableLooting} {false}
+				SetOpt {AttackDistance} {0.029}
+				SetOpt {NavCloseStopRange} {0.003}
+				DoExpr {setgvar[qrtw-NumToonsRunning,0]}
+				DoExpr {setgvar[qrtw-GoTo1-RunUpHill,0]}
+				DoExpr {setgvar[qrtw-GoTo2-PlatformJump,0]}
+	IF:	SecsInStateGE 3
+		DO:	DoAll
+				DoExpr {setgvar[qrtw-NumToonsRunning,getgvar[qrtw-NumToonsRunning]+1]}
+				SetState {CheckLocation}
 ~~ }
 STATE: {CheckLocation} ~~ {
 	IF:	CellE 2C32003D
 		DO:	SetState {GoTo-1-RunUpHill}
 ~~ }
-STATE: {Default} ~~ {
-	IF:	Always
-		DO:	SetState {*SetupOptions}
-~~ }
 STATE: {GoTo-1-RunUpHill} ~~ {
 	IF:	Always
-		DO:	EmbedNav nav0 {qrtw-plains-to-catacombs.nav}
+		DO:	EmbedNav nav0 {GoTo-1-RunUpHill}
 	IF:	NavEmpty
+		DO:	DoExpr {setgvar[qrtw-GoTo1-RunUpHill,getgvar[qrtw-GoTo1-RunUpHill]+1]}
+	IF:	Expr {getgvar[qrtw-GoTo1-RunUpHill]>=getgvar[qrtw-NumToonsRunning]}
 		DO:	SetState {GoTo-2-PlatformJump}
 ~~ }
 STATE: {GoTo-2-PlatformJump} ~~ {
 	IF:	Always
-		DO:	EmbedNav nav1 {qrtw-catacombs-to-jump.nav}
+		DO:	EmbedNav nav1 {GoTo-2-PlatformJump}
 	IF:	All
 			NavEmpty
 			NoMobsInDist 15
+		DO:	DoExpr {setgvar[qrtw-GoTo2-PlatformJump,getgvar[qrtw-GoTo2-PlatformJump]+1]}
+	IF:	Expr {getgvar[qrtw-GoTo2-PlatformJump]>=getgvar[qrtw-NumToonsRunning]}
 		DO:	DoAll
-				EmbedNav nav2 { [None].nav}
+				EmbedNav nav2 {DoPlatformJump}
 				SetState {GoTo-3-JumpToTorment}
 ~~ }
 STATE: {GoTo-3-JumpToTorment} ~~ {
-	IF:	NavEmpty
-		DO:	DoAll
-				Chat {/f #action follow}
-				EmbedNav nav3 {qrtw-jump-to-path-of-torment.nav}
+	IF: Always
+		DO:	EmbedNav nav3 {GoTo-3-JumpToTorment}
 	IF:	All
 			NavEmpty
 			NoMobsInDist 15
-		DO:	Chat {/bc /ub usep path of torment}
+		DO:	Chat {/ub usep path of torment}
 ~~ }
 STATE: {GoTo-4-PathOfTorment} ~~ {
 	IF:	CellE 5879052B
@@ -126,6 +129,13 @@ STATE: {GoTo-8-WardingCrystal2} ~~ {
 			NavEmpty
 			NoMobsInDist 15
 		DO:	SetState {GoTo-9-PortalRecall}
+~~ }
+STATE: {GoTo-9-PortalRecall} ~~ {
+	IF:	Expr {actiontryequipanywand[]>=0}
+		DO:	DoAll
+				Chat {/mt cast portal recall}
+				SetWatchdog 3 3 {GoTo-9-PortalRecall}
+				Chat {/f #navto Portal Recall}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
