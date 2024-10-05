@@ -44,120 +44,120 @@ STATE: {Default} ~~ {
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[qrex-current-gem,0]}
-				DoExpr {setvar[qrex-exchange-counter,0]}
-				DoExpr {setvar[qrex-kept-gems,listcreate[]]}
-				DoExpr {setvar[qrex-exchange-note,`Trade Note (250,000)`]}
-				DoExpr {setvar[qrex-trade-notes,getitemcountininventorybyname[getvar[qrex-exchange-note]]]}
-				DoExpr {setvar[qrex-unwanted-gems,listcreate[]]}
+				DoExpr {setvar[qrex_current_gem,0]}
+				DoExpr {setvar[qrex_exchange_counter,0]}
+				DoExpr {setvar[qrex_kept_gems,listcreate[]]}
+				DoExpr {setvar[qrex_exchange_note,`Trade Note (250,000)`]}
+				DoExpr {setvar[qrex_trade_notes,getitemcountininventorybyname[$qrex_exchange_note]]}
+				DoExpr {setvar[qrex_unwanted_gems,listcreate[]]}
 				~~ BANING
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Impenetrability`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Flame Baning`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Pierce Baning`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Blade Baning`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Bludgeon Baning`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Acid Baning`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Frost Baning`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Lightning Baning`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Impenetrability`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Flame Baning`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Pierce Baning`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Blade Baning`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Bludgeon Baning`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Acid Baning`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Frost Baning`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Lightning Baning`]}
 				~~ PROTS
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Executor's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Tusker's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Archer's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Duelist's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Astyrrian's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Olthoi's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Gelid's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Inferno's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Executor's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Tusker's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Archer's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Duelist's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Astyrrian's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Olthoi's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Gelid's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Inferno's Jewel`]}
 				~~ SECONDARY SKILLS
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Monarch's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Adherent's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Physician's Crystal`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Life Giver's Crystal`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Enchanter's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Artificer's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Converter's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Zefir's Crystal`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Vaulter's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Dodger's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Resister's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Evader's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Berzerker's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Warrior's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Rogue's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Brawler's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Knight's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Swift Killing`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Pearl of Hermetic Linking`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Monarch's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Adherent's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Physician's Crystal`]}
+				~~DoExpr {listadd[$qrex_unwanted_gems,`Life Giver's Crystal`]}
+				~~DoExpr {listadd[$qrex_unwanted_gems,`Enchanter's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Artificer's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Converter's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Zefir's Crystal`]}
+				~~DoExpr {listadd[$qrex_unwanted_gems,`Vaulter's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Dodger's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Resister's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Evader's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Berzerker's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Warrior's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Rogue's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Brawler's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Knight's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Swift Killing`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Pearl of Hermetic Linking`]}
 				~~ TRADE SKILLS
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Fletcher's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Chef's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Alchemist's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Thief's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Fletcher's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Chef's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Alchemist's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Thief's Crystal`]}
 				~~ WEAPONS
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Elysa's Crystal`]}
-				~~DoExpr {listadd[getvar[qrex-unwanted-gems],`Hieromancer's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Ben Ten's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Thorsten's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Oswald's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`T'ing's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Corruptor's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Elysa's Crystal`]}
+				~~DoExpr {listadd[$qrex_unwanted_gems,`Hieromancer's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Ben Ten's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Thorsten's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Oswald's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`T'ing's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Corruptor's Crystal`]}
 				~~ REGEN
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Warrior's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Melee's Jewel`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Mage's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Warrior's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Melee's Jewel`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Mage's Jewel`]}
 				~~ ASSESS
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Deceiver's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Hunter's Crystal`]}
-				DoExpr {listadd[getvar[qrex-unwanted-gems],`Observer's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Deceiver's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Hunter's Crystal`]}
+				DoExpr {listadd[$qrex_unwanted_gems,`Observer's Crystal`]}
 				~~ INITIATE
-				DoExpr {setvar[qrex-unchecked-gems,listcopy[getvar[qrex-unwanted-gems]]]}
-				DoExpr {setvar[qrex-current-gem,listpop[getvar[qrex-unchecked-gems]]]}
+				DoExpr {setvar[qrex_unchecked_gems,listcopy[$qrex_unwanted_gems]]}
+				DoExpr {setvar[qrex_current_gem,listpop[$qrex_unchecked_gems]]}
 				SetState {CheckInventoryForGems}
 ~~ }
 STATE: {CheckInventoryForGems} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Checking Inventory For Gem: `+getvar[qrex-current-gem],19]}
-	IF: Expr {getvar[qrex-current-gem]&&getitemcountininventorybyname[getvar[qrex-current-gem]]>0}
+		DO:	DoExpr {echo[`[META]: Checking Inventory For Gem: `+$qrex_current_gem,19]}
+	IF: Expr {$qrex_current_gem&&getitemcountininventorybyname[$qrex_current_gem]>0}
 		DO:	SetState {TurnInGem}
-	IF: Expr {getvar[qrex-current-gem]&&getitemcountininventorybyname[getvar[qrex-current-gem]]<=0&&listcount[getvar[qrex-unchecked-gems]]>0}
+	IF: Expr {$qrex_current_gem&&getitemcountininventorybyname[$qrex_current_gem]<=0&&listcount[$qrex_unchecked_gems]>0}
 		DO:	DoAll
-				DoExpr {setvar[qrex-current-gem,listpop[getvar[qrex-unchecked-gems]]]}
+				DoExpr {setvar[qrex_current_gem,listpop[$qrex_unchecked_gems]]}
 				SetState {CheckInventoryForGems}
-	IF: Expr {getvar[qrex-current-gem]&&getitemcountininventorybyname[getvar[qrex-current-gem]]<=0&&listcount[getvar[qrex-unchecked-gems]]==0}
+	IF: Expr {$qrex_current_gem&&getitemcountininventorybyname[$qrex_current_gem]<=0&&listcount[$qrex_unchecked_gems]==0}
 		DO:	SetState {AllDone}
 ~~ }
 STATE: {TurnInGem} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Turning in Gem: `+getvar[qrex-current-gem],19]}
+		DO:	DoExpr {echo[`[META]: Turning in Gem: `+$qrex_current_gem,19]}
 	IF:	Always
-		DO:	ChatExpr {`/mt give `+getvar[qrex-exchange-note]+` to Rare Exchanger`}
+		DO:	ChatExpr {`/mt give `+$qrex_exchange_note+` to Rare Exchanger`}
 	IF:	ChatMatch {^You allow Rare Exchanger to examine your Trade Note}
-		DO:	ChatExpr {`/ub give 1 `+getvar[qrex-current-gem]+` to Rare Exchanger`}
+		DO:	ChatExpr {`/ub give 1 `+$qrex_current_gem+` to Rare Exchanger`}
 	IF:	All
 			ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
-			Not Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]}
-		DO:	DoExpr {listadd[getvar[qrex-kept-gems],getvar[capturegroup_exchange_item]]}
+			Not Expr {listcontains[$qrex_unwanted_gems,$capturegroup_exchange_item]}
+		DO:	DoExpr {listadd[getvar[qrex_kept_gems],$capturegroup_exchange_item]}
 	IF:	All
 			ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
-			Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]&&(listcontains[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]==0)}
+			Expr {listcontains[$qrex_unwanted_gems,$capturegroup_exchange_item]&&(listcontains[$qrex_unchecked_gems,$capturegroup_exchange_item]==0)}
 		DO:	DoAll
-				DoExpr {setvar[qrex-exchange-counter,getvar[qrex-exchange-counter]+1]}
-				DoExpr {echo[`[META]: Adding Gem to Unchecked List: `+getvar[capturegroup_exchange_item],19]}
-				DoExpr {listadd[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]}
+				DoExpr {setvar[qrex_exchange_counter,$qrex_exchange_counter+1]}
+				DoExpr {echo[`[META]: Adding Gem to Unchecked List: `+$capturegroup_exchange_item,19]}
+				DoExpr {listadd[$qrex_unchecked_gems,$capturegroup_exchange_item]}
 				SetState {CheckInventoryForGems}
 	IF:	All
 			ChatCapture {^Rare Exchanger gives you (?<exchange_item>.*)\.} {}
-			Not Expr {listcontains[getvar[qrex-unwanted-gems],getvar[capturegroup_exchange_item]]&&(listcontains[getvar[qrex-unchecked-gems],getvar[capturegroup_exchange_item]]==0)}
+			Not Expr {listcontains[$qrex_unwanted_gems,$capturegroup_exchange_item]&&(listcontains[$qrex_unchecked_gems,$capturegroup_exchange_item]==0)}
 		DO:	DoAll
-				DoExpr {setvar[qrex-exchange-counter,getvar[qrex-exchange-counter]+1]}
+				DoExpr {setvar[qrex_exchange_counter,$qrex_exchange_counter+1]}
 				SetState {CheckInventoryForGems}
 ~~ }
 STATE: {AllDone} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {setvar[qrex-trade-notes-spent,getvar[qrex-trade-notes]-getitemcountininventorybyname[getvar[qrex-exchange-note]]]}
-				DoExpr {echo[`[META]: Spent `+getvar[qrex-trade-notes-spent]+` MMDS exchanging `+getvar[qrex-exchange-counter]+` rare gems.`,19]}
-				DoExpr {echo[`[META]: Kept Gems: `+getvar[qrex-kept-gems],19]}
+				DoExpr {setvar[qrex_trade_notes_spent,getvar[qrex_trade_notes]-getitemcountininventorybyname[$qrex_exchange_note]]}
+				DoExpr {echo[`[META]: Spent `+getvar[qrex_trade_notes_spent]+` MMDS exchanging `+$qrex_exchange_counter+` rare gems.`,19]}
+				DoExpr {echo[`[META]: Kept Gems: `+getvar[qrex_kept_gems],19]}
 ~~ }
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
