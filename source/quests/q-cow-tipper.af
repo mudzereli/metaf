@@ -81,7 +81,7 @@ STATE: {StartTipping} ~~ {
 		DO:	None
 	IF: SecsInStateGE 30
 		DO: DoAll
-				Chat {/myquests}
+				Chat {/ub myquests}
 				SetState {StartTipping}
 ~~ }
 STATE: {TurnIn} ~~ {
