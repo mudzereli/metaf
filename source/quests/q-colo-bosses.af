@@ -88,7 +88,8 @@ STATE: {RecallToColosseum} ~~
 		DO:	SetState {CheckTokens}
 	IF:	Always
 		DO:	DoAll
-				Chat {/myquests}
+				Chat {/ub close corpse}
+				Chat {/ub myquests}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableLooting} {false}
 	IF:	All

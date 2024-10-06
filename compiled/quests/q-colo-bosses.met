@@ -483,11 +483,15 @@ K
 V
 n
 n
-3
+4
 i
 2
 s
-/myquests
+/ub close corpse
+i
+2
+s
+/ub myquests
 i
 12
 TABLE
