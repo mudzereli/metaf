@@ -11,7 +11,7 @@ n
 n
 n
 n
-80
+79
 i
 1
 i
@@ -53,7 +53,7 @@ K
 V
 n
 n
-20
+21
 i
 4
 ba
@@ -354,14 +354,8 @@ s
 e
 s
 setgvar[qcolo_looping,0]
-s
-*SetupOptions*
-i
-6
 i
 1
-i
-8
 s
 ProgressCheck
 s
@@ -2521,6 +2515,16 @@ uTank2 NAV 1.2
 s
 GoToColosseumVault
 i
+4
+i
+1
+s
+^The Colosseum Vault has been unlocked\.
+s
+LootColosseumRings
+s
+UnlockColosseumVault
+i
 11
 i
 1
@@ -2541,16 +2545,6 @@ i
 0
 s
 WaitingForCommands
-s
-UnlockColosseumVault
-i
-4
-i
-1
-s
-^The Colosseum Vault has been unlocked\.
-s
-LootColosseumRings
 s
 UnlockColosseumVault
 i

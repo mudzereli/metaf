@@ -66,8 +66,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qcolo_charsreadyforturnin,listcreate[]]}
 				DoExpr {setgvar[qcolo_fellowlocked,0]}
 				DoExpr {setgvar[qcolo_looping,0]}
-	IF:	SecsInStateGE 8
-		DO:	SetState {ProgressCheck}
+				SetState {ProgressCheck}
 ~~ }
 STATE: {ProgressCheck} ~~ {
 	IF:	Always
@@ -355,10 +354,10 @@ STATE: {GoToColosseumVault} ~~ {
 		DO: EmbedNav navColosseumVault {ColosseumVault}
 ~~ }
 STATE: {UnlockColosseumVault} ~~ {
-	IF:	ItemCountLE 0 {Colosseum Vault Key}
-		DO: SetState {WaitingForCommands}
 	IF:	ChatMatch {^The Colosseum Vault has been unlocked\.}
 		DO:	SetState {LootColosseumRings}
+	IF:	ItemCountLE 0 {Colosseum Vault Key}
+		DO: SetState {WaitingForCommands}
 	IF: All
 			Not Expr {wobjectgetopencontainer[]}
 			Expr {$key=wobjectfindininventorybytemplatetype[34448]}
