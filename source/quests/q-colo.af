@@ -357,7 +357,7 @@ STATE: {UnlockColosseumVault} ~~ {
 	IF:	ChatMatch {^The Colosseum Vault has been unlocked\.}
 		DO:	SetState {LootColosseumRings}
 	IF:	ItemCountLE 0 {Colosseum Vault Key}
-		DO: SetState {WaitingForCommands}
+		DO: SetState {ApplyIvoryToColoRings}
 	IF: All
 			Not Expr {wobjectgetopencontainer[]}
 			Expr {$key=wobjectfindininventorybytemplatetype[34448]}
@@ -389,12 +389,22 @@ STATE: {CloseColosseumVault} ~~ {
 		DO:	None
 ~~ }
 STATE: {ApplyIvoryToColoRings} ~~ {
+	IF:	Always
+		DO:	DoExpr {$exitstate=0}
 	IF:	All 
-			Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`]]>0}
-			Expr {listcount[listfilter[wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`],`wobjectgetintprop[$1,114]==1`]]>0}
-		DO:	DoAll
-				DoExpr {actiontryapplyitem[listgetitem[listfilter[wobjectfindallinventorybynamerx[`Salvage \\(100\\)`],`wobjectgetintprop[$1,131]==51`],0],listgetitem[listfilter[wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`],`wobjectgetintprop[$1,114]==1`],0]}
-				SetState {ApplyIvoryToColoRings}
+			Expr {$salvagelist=wobjectfindallinventorybynamerx[`Salvage \\(100\\)`]||$exitstate=1}
+			Expr {$ivorylist=listfilter[$salvagelist,`wobjectgetintprop[$1,131]==51`]||$exitstate=1}
+			Expr {listcount[$ivorylist]>0||$exitstate=1}
+			Expr {$ringlist=wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`]||$exitstate=1}
+			Expr {$attunedringlist=listfilter[$ringlist,`wobjectgetintprop[$1,114]==1`]||$exitstate=1}
+			Expr {listcount[$attunedringlist]>0||$exitstate=1}
+			Expr {$firstivorybag=listgetitem[$ivorylist,0]||$exitstate=1}
+			Expr {$firstattunedring=listgetitem[$attunedringlist,0]||$exitstate=1}
+			Expr {actiontryapplyitem[$firstivorybag,$firstattunedring]}
+			Never
+		DO: None
+	IF:	Expr {$exitstate}
+		DO:	SetState {WaitingForCommands}
 ~~ }
 STATE: {BuyTickets} ~~ {
 	IF: ItemCountLE 5 {Trade Note (250,000)}
