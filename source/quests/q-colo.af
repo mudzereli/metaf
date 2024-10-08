@@ -349,44 +349,60 @@ STATE: {GoToColosseumVault} ~~ {
 			Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
 		DO:	DoAll
 				Chat {/mt combatstate peace}
-				SetState {UnlockColosseumVault}
+				SetState {CheckColosseumVault}
 	IF:	Not Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
 		DO: EmbedNav navColosseumVault {ColosseumVault}
 ~~ }
-STATE: {UnlockColosseumVault} ~~ {
-	IF:	ChatMatch {^The Colosseum Vault has been unlocked\.}
-		DO:	SetState {LootColosseumRings}
-	IF:	ItemCountLE 0 {Colosseum Vault Key}
-		DO: SetState {ApplyIvoryToColoRings}
-	IF: All
-			Not Expr {wobjectgetopencontainer[]}
-			Expr {$key=wobjectfindininventorybytemplatetype[34448]}
-			Expr {$vault=wobjectfindnearestbytemplatetype[34608]}
-			Expr {actiontryapplyitem[$key,$vault]}
-			Never
-		DO:	None
+STATE: {CheckColosseumVault} ~~ {
+	IF:	Expr {wobjectgetopencontainer[]}
+		DO: SetState {LootColosseumVault}
+	IF:	Expr {wobjectgetopencontainer[]==0}
+		DO:	SetState {TryOpenColosseumVault}
 ~~ }
-STATE: {LootColosseumRings} ~~ {
+STATE: {LootColosseumVault} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {clearvar[vaultitems]}
+				DoExpr {$openvault=wobjectgetopencontainer[]}
+				DoExpr {$ring=`.* Empyrean Ring`}
+				DoExpr {$vaultitems=listfilter[wobjectfindallbycontainer[$openvault],`getregexmatch[wobjectgetname[$1],$ring]`]}
 	IF:	All
-			Expr {$ring=`.* Empyrean Ring`}
+			Expr {$vaultitems}
+			Expr {listcount[$vaultitems]>0}
+			Expr {$lootitem=listgetitem[$vaultitems,0]}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[$lootitem]}
+				SetState {CheckColosseumVault}
+	IF:	All
+			Expr {$vaultitems}
+			Expr {listcount[$vaultitems]==0}
+		DO:	DoAll
+				DoExpr {actiontryuseitem[$openvault]}
+				SetState {CheckColosseumVault}
+~~ }
+STATE: {TryOpenColosseumVault} ~~ {
+	IF:	Expr {wobjectgetopencontainer[]}
+		DO: SetState {LootColosseumVault}
+	IF:	All
+			SecsInStateGE 1
 			Expr {$vault=wobjectfindnearestbytemplatetype[34608]}
 			Expr {wobjectgetopencontainer[]||actiontryuseitem[$vault]}
-			Expr {$vaultitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`getregexmatch[wobjectgetname[$1],$ring]`]}
-			Expr {listcount[$vaultitems]>0&&$lootitem=listgetitem[$vaultitems,0]}
-			Expr {actiontryuseitem[$lootitem]}
-			Never
-		DO: None
-	IF:	SecsInStateGE 3
-		DO:	SetState {CloseColosseumVault}
-~~ }
-STATE: {CloseColosseumVault} ~~ {
-	IF: Not Expr {wobjectgetopencontainer[]}
-		DO:	SetState {UnlockColosseumVault}
-	IF: All
-			Expr {$vault=wobjectfindnearestbytemplatetype[34608]}
-			Expr {actiontryuseitem[$vault]}
 			Never
 		DO:	None
+	IF:	SecsInStateGE 3
+		DO: SetState {UnlockColosseumVault}
+~~ }
+STATE: {UnlockColosseumVault} ~~ {
+	IF: ItemCountGE 1 {Colosseum Vault Key}
+		DO:	DoAll
+				DoExpr {$vault=wobjectfindnearestbytemplatetype[34608]}
+				DoExpr {$key=wobjectfindininventorybytemplatetype[34448]}
+				DoExpr {actiontryapplyitem[$key,$vault]}
+				SetState {TryOpenColosseumVault}
+	IF:	All
+			SecsInStateGE 3
+			ItemCountLE 0 {Colosseum Vault Key}
+		DO: SetState {ApplyIvoryToColoRings}
 ~~ }
 STATE: {ApplyIvoryToColoRings} ~~ {
 	IF:	Always
