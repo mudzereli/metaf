@@ -196,7 +196,9 @@ STATE: {TicketCheck} ~~ {
 ~~ }
 STATE: {EnterFirstRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Entering First Room of the Colosseum`,19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Entering First Room of the Colosseum @ `+getdatetimelocal[],19]}
+				DoExpr {$qcolo_start=getunixtime[]}
 	~~ first lets go into the arena, so that we can start our timer
 	IF:	All
 			NavEmpty
@@ -270,7 +272,12 @@ STATE: {MoveToNextRoom} ~~ {
 	IF:	Any
 			CellE 00AF0118
 			CellE 00AF0117
-		DO:	SetState {WaitingForRewards}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Completed the Colosseum @ `+getdatetimelocal[],19]}
+				DoExpr {$qcolo_finish=getunixtime[]}
+				DoExpr {$qcolo_elapsed=$qcolo_finish-$qcolo_start}
+				DoExpr {$qcolo_timetocomplete=cstr[floor[($qcolo_elapsed)/60]]+`m`+cstr[floor[($qcolo_elapsed)%60)]]+`s`}
+				SetState {WaitingForRewards}
 	IF:	ExitPortal
 		DO:	SetState {StartCurrentRoom}
 	~~ turn off looting and use the nearest portal.. over and over until it works
@@ -283,7 +290,9 @@ STATE: {MoveToNextRoom} ~~ {
 ~~ }
 STATE: {WaitingForRewards} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Waiting for Rewards Timer to Run Out`,19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Waiting for Rewards Timer to Run Out`,19]}
+				DoExpr {echo[`[META]: Total Colosseum Run Time: `+$qcolo_timetocomplete,19]}
 	~~ if we started colo and we're at this step, then lets see if we're ready for turn in
 	IF:	Always
 		DO:	Chat {/ub myquests}
