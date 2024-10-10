@@ -102,6 +102,7 @@ STATE: {WaitingForCommands} ~~ {
 				DoExpr {echo[`[META]: !startl - start the colo run, but loop & keep going after finishing`,19]}
 				DoExpr {echo[`[META]: !tickets - buy colo tickets`,19]}
 				DoExpr {echo[`[META]: !rings - use keys & loot colo rings`,19]}
+				DoExpr {echo[`[META]: !times - see time to complete rooms in last run`,19]}
 	~~ this condition is used to manually start the script [!startl in fellow] (with looping)
 	IF:	Any
 			ChatMatch {\[Fellowship\] (You say|.* says)\, \"\!startl\"}
@@ -118,6 +119,9 @@ STATE: {WaitingForCommands} ~~ {
 	~~ this condition is used to start turning in rings
 	IF:	ChatMatch {\[Fellowship\] .* say(s*)\, \"\!rings\"}
 		DO:	SetState {LootRings}
+	~~ this condition is used check room times
+	IF:	ChatMatch {\[Fellowship\] You say\, \"\!times\"}
+		DO:	SetState {AnnounceRoomTimes}
 ~~ }
 STATE: {SynchronizeChars} ~~ {
 	IF:	Always
@@ -197,8 +201,10 @@ STATE: {TicketCheck} ~~ {
 STATE: {EnterFirstRoom} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {echo[`[META]: Entering First Room of the Colosseum @ `+getdatetimelocal[],19]}
+				DoExpr {$qcolo_startlocal=getdatetimelocal[]}
 				DoExpr {$qcolo_start=getunixtime[]}
+				DoExpr {$qcolo_roomtimes=dictcreate[]}
+				DoExpr {echo[`[META]: Entering First Room of the Colosseum @ `+$qcolo_startlocal,19]}
 	~~ first lets go into the arena, so that we can start our timer
 	IF:	All
 			NavEmpty
@@ -247,6 +253,7 @@ STATE: {StartCurrentRoom} ~~ {
 	IF:	Always
 		DO:	DoAll
 				DoExpr {setvar[qcolo_roomnumber,$qcolo_roomnumber+1]}
+				DoExpr {$qcolo_roomstart=getunixtime[]}
 				SetOpt {EnableCombat} {true}
 				SetOpt {EnableLooting} {true}
 				Chat {/ub usel Arena Bell}
@@ -263,20 +270,28 @@ STATE: {KillingCurrentRoom} ~~ {
 			ChatMatch {A Door appears on the North wall.}
 			ChatMatch {Congratulations! You have beaten the Colosseum!}
 			Expr {wobjectfindnearestbyobjectclass[14]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbyobjectclass[14]]]<=29}
-		DO:	SetState {MoveToNextRoom}
+		DO:	DoAll
+				DoExpr {$qcolo_roomfinish=getunixtime[]}
+				DoExpr {$qcolo_roomelapsed=$qcolo_roomfinish-$qcolo_roomstart}
+				DoExpr {$qcolo_roomtimetocomplete=cstr[floor[($qcolo_roomelapsed)/60]]+`m`+cstr[floor[($qcolo_roomelapsed)%60)]]+`s`}
+				DoExpr {dictadditem[$qcolo_roomtimes,cstr[$qcolo_roomnumber],$qcolo_roomtimetocomplete]}
+				SetState {MoveToNextRoom}
 ~~ }
 STATE: {MoveToNextRoom} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Moving to Colosseum Room: `+cstr[$qcolo_roomnumber+1],19]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Moving to Colosseum Room: `+cstr[$qcolo_roomnumber+1],19]}
+				DoExpr {echo[`[META]: Time Spent in Room #`+cstr[$qcolo_roomnumber]+`: `+$qcolo_roomtimetocomplete,19]}
 	~~ once we enter the portal, don't try to use it anymore	~~ if we try to start the room, but we finished the run, then wait for our timer
 	IF:	Any
 			CellE 00AF0118
 			CellE 00AF0117
 		DO:	DoAll
-				DoExpr {echo[`[META]: Completed the Colosseum @ `+getdatetimelocal[],19]}
 				DoExpr {$qcolo_finish=getunixtime[]}
+				DoExpr {$qcolo_finishlocal=getdatetimelocal[]}
 				DoExpr {$qcolo_elapsed=$qcolo_finish-$qcolo_start}
 				DoExpr {$qcolo_timetocomplete=cstr[floor[($qcolo_elapsed)/60]]+`m`+cstr[floor[($qcolo_elapsed)%60)]]+`s`}
+				DoExpr {echo[`[META]: Completed the Colosseum @ `+$qcolo_finishlocal,19]}
 				SetState {WaitingForRewards}
 	IF:	ExitPortal
 		DO:	SetState {StartCurrentRoom}
@@ -442,6 +457,17 @@ STATE: {BuyTickets} ~~ {
 		DO:	DoAll
 				Chat {/ub give 1 Trade Note (250,000) to Colosseum Ticket Vendor}
 				SetState {BuyTickets}
+~~ }
+STATE: {AnnounceRoomTimes} ~~ {
+	IF:	Always
+		DO:	DoAll
+				DoExpr {echo[`[META]: Announcing Last Colo Run Times`,19]}
+				DoExpr {echo[`[META]: Started the Colosseum @ `+$qcolo_startlocal,19]}
+				DoExpr {echo[`[META]: Completed the Colosseum @ `+$qcolo_finishlocal,19]}
+				DoExpr {echo[`[META]: Total Colosseum Run Time: `+$qcolo_timetocomplete,19]}
+				DoExpr {$roomnumbers=listfromrange[1,18]}
+				DoExpr {listreduce[$roomnumbers,`dicthaskey[$qcolo_roomtimes,cstr[$1]]&&echo[\`[META]: Room # \`+$1+\` - Time : \`+dictgetitem[$qcolo_roomtimes,cstr[$1]],19]`]}
+				SetState {WaitingForCommands}
 ~~ }
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
