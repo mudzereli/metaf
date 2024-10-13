@@ -296,7 +296,7 @@ STATE: {MoveToNextRoom} ~~ {
 	IF:	ExitPortal
 		DO:	SetState {StartCurrentRoom}
 	~~ turn off looting and use the nearest portal.. over and over until it works
-	IF:	Always
+	IF:	Not Expr {isportaling[]}
 		DO:	DoAll
 				SetOpt {EnableLooting} {false}
 				SetOpt {EnableCombat} {false}
@@ -450,9 +450,9 @@ STATE: {BuyTickets} ~~ {
 	IF: ItemCountLE 5 {Trade Note (250,000)}
 		DO: DoAll
 				DoExpr {echo[`[ERROR]: Not Enough MMD Notes to Buy More Tickets!`,21]}
-				SetState {WaitingForStart}
+				SetState {WaitingForCommands}
 	IF:	ItemCountGE 12 {Colosseum Ticket}
-		DO:	SetState {WaitingForStart}
+		DO:	SetState {WaitingForCommands}
 	IF:	ItemCountLE 11 {Colosseum Ticket}
 		DO:	DoAll
 				Chat {/ub give 1 Trade Note (250,000) to Colosseum Ticket Vendor}
