@@ -369,7 +369,7 @@ STATE: {KillingDravann} ~~ {
 			Expr {$corpse=wobjectfindnearestbynameandobjectclass[27,$corpsename]}
 			Expr {((wobjectgetopencontainer[]==0&&actiontryuseitem[$corpse])||(wobjectgetopencontainer[]&&1))}
 			Expr {$corpseitems=listfilter[wobjectfindallbycontainer[wobjectgetopencontainer[]],`wobjectgetstringprop[$1,1]==$itemloot`]}
-			Expr {actiontryuseitem[listgetitem[$corpseitems,1]]}
+			Expr {actiontryuseitem[listgetitem[$corpseitems,0]]}
 			Never
 		DO: None
 	IF:	All
