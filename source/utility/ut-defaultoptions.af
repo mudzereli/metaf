@@ -39,7 +39,7 @@
 
 STATE: {Default} ~~ {
 	IF:	CellE 860201AD
-		DO:	Chat {/vt meta load utility\\ut-newcharacter}
+		DO:	Chat {/vt meta load utility\\newcharacter}
 	IF:	Always
 		DO:	SetState {SetDefaultOptions}
 ~~ }
