@@ -8,4 +8,4 @@
 *.exe
 *.html
 *.lnk
-./source/archive/*
+/source/archive/*
