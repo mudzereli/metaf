@@ -34,7 +34,7 @@ K
 V
 n
 n
-12
+13
 i
 7
 TABLE
@@ -162,7 +162,7 @@ n
 s
 e
 s
-setgvar[mnav-chars,listcreate[]]
+&mnav_chars=listcreate[]
 i
 7
 TABLE
@@ -175,7 +175,7 @@ n
 s
 e
 s
-setvar[mnav-max-distance,25]
+clearvar[mnav_leader]
 i
 7
 TABLE
@@ -188,7 +188,7 @@ n
 s
 e
 s
-setvar[mnav-chat-command,`/f`]
+$mnav_max_distance=25
 i
 7
 TABLE
@@ -201,7 +201,20 @@ n
 s
 e
 s
-setvar[mnav-nav-file,`quests\\catacombs-of-torment`]
+$mnav_chat_command=`/f`
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+$mnav_nav_folder=`navs\`
 i
 4
 ba
@@ -224,16 +237,16 @@ SynchronizeChars
 s
 *SetupOptions*
 i
-21
+2
 i
-3
+0
 TABLE
 2
 K
 V
 n
 n
-1
+2
 i
 26
 TABLE
@@ -246,81 +259,13 @@ n
 s
 e
 s
-listcontains[getgvar[mnav-chars],wobjectgetplayer[]]
-TABLE
-2
-K
-V
-n
-n
-2
+listcontains[&mnav_chars,wobjectgetplayer[]]||listadd[&mnav_chars,wobjectgetplayer[]]
 i
-7
-TABLE
-2
-k
-v
-n
-n
-1
-s
-e
-s
-echo[`[NavTogether]: Synchronizing Meta on All Characters`,19]
+0
 i
-7
-TABLE
-2
-k
-v
-n
-n
-1
-s
-e
-s
-listadd[getgvar[mnav-chars],wobjectgetplayer[]]
-s
-SynchronizeChars
+0
 i
-2
-i
-1
-TABLE
-2
-K
-V
-n
-n
-2
-i
-6
-i
-2
-i
-21
-TABLE
-2
-K
-V
-n
-n
-1
-i
-26
-TABLE
-2
-k
-v
-n
-n
-1
-s
-e
-s
-listcontains[getgvar[mnav-chars],wobjectgetplayer[]]
-s
-SynchronizeChars
+0
 s
 SynchronizeChars
 i
@@ -348,7 +293,7 @@ n
 s
 e
 s
-echo[`[NavTogether]: Starting with `+listcount[getgvar[mnav-chars]]+` Characters!`,19]
+echo[`[NavTogether]: Starting with `+listcount[&mnav_chars]+` Characters!`,19]
 i
 1
 s
@@ -388,7 +333,7 @@ n
 s
 e
 s
-getfellowshipleaderid[]!=0&&getvar[mnav-leader]==0
+getfellowshipleaderid[]!=0&&$mnav_leader==0
 TABLE
 2
 k
@@ -399,7 +344,7 @@ n
 s
 e
 s
-setvar[mnav-leader,wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]]
+$mnav_leader=wobjectgetname[wobjectfindbyid[getfellowshipleaderid[]]]
 s
 DesignateLeader
 i
@@ -416,7 +361,7 @@ n
 s
 e
 s
-getfellowshipleaderid[]==0&&getvar[mnav-leader]==0
+getfellowshipleaderid[]==0&&$mnav_leader==0
 TABLE
 2
 k
@@ -427,7 +372,7 @@ n
 s
 e
 s
-setvar[mnav-leader,getcharstringprop[1]]
+$mnav_leader=getcharstringprop[1]
 s
 DesignateLeader
 i
@@ -444,7 +389,7 @@ n
 s
 e
 s
-getvar[mnav-leader]==getcharstringprop[1]
+$mnav_leader==getcharstringprop[1]
 s
 NavigationLeadStart
 s
@@ -463,7 +408,7 @@ n
 s
 e
 s
-getvar[mnav-leader]!=0&&getvar[mnav-leader]!=getcharstringprop[1]
+$mnav_leader!=0&&$mnav_leader!=getcharstringprop[1]
 s
 NavigationFollow
 s
@@ -484,22 +429,65 @@ n
 s
 e
 s
-echo[`[NavTogether]: I Am Leader!`,19]
+echo[`[NavTogether]: I Am Leader! Say which Nav File to load in Fellowship Chat.`,19]
 s
 NavigationLeadStart
 i
-6
+28
 i
 3
-i
-3
+TABLE
+2
+k
+v
+n
+n
+2
+s
+p
+s
+\[Fellowship\] .* (say|says)\, \"(?<nav>.*)\"
+s
+c
+s
+
 TABLE
 2
 K
 V
 n
 n
+5
+i
+12
+TABLE
 2
+k
+v
+n
+n
+2
+s
+o
+s
+NavPriorityBoost
+s
+v
+s
+false
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+echo[`[NavTogether]: Loading Nav File: `+$capturegroup_nav,19]
 i
 8
 TABLE
@@ -512,7 +500,20 @@ n
 s
 e
 s
-`/vt nav load `+getvar[mnav-nav-file]
+`/vt nav load `+$mnav_nav_folder+$capturegroup_nav
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+clearvar[capturegroup_nav]
 i
 1
 s
@@ -535,7 +536,7 @@ n
 s
 e
 s
-echo[`[NavTogether]: Following Leader: `+getvar[mnav-leader]+`!`,19]
+echo[`[NavTogether]: Following Leader: `+$mnav_leader+`!`,19]
 s
 NavigationFollow
 i
@@ -554,7 +555,7 @@ n
 s
 e
 s
-`/ub follow `+getvar[mnav-leader]
+`/ub follow `+$mnav_leader
 s
 NavigationFollow
 i
@@ -573,7 +574,7 @@ n
 s
 e
 s
-setvar[mnav-chars-out-of-range,listfilter[getgvar[mnav-chars],`coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectgetplayer[]],wobjectgetphysicscoordinates[$1]]>=getvar[mnav-max-distance]`]]
+$mnav_chars_out_of_range=listfilter[&mnav_chars,`coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectgetplayer[]],wobjectgetphysicscoordinates[$1]]>=getvar[mnav_max_distance]`]
 s
 NavigationLeading
 i
@@ -590,7 +591,7 @@ n
 s
 e
 s
-listcount[getvar[mnav-chars-out-of-range]]>0
+listcount[$mnav_chars_out_of_range]>0
 TABLE
 2
 K
@@ -610,7 +611,7 @@ n
 s
 e
 s
-getvar[mnav-chat-command]+` [NavTogether]: Pausing Due to Out of Range Characters: `+listmap[getvar[mnav-chars-out-of-range],`wobjectgetstringprop[$1,1]`]
+$mnav_chat_command+` [NavTogether]: Pausing Due to Out of Range Characters: `+listmap[$mnav_chars_out_of_range,`wobjectgetstringprop[$1,1]`]
 i
 12
 TABLE
@@ -644,7 +645,7 @@ n
 s
 e
 s
-listcount[getvar[mnav-chars-out-of-range]]==0
+listcount[$mnav_chars_out_of_range]==0
 TABLE
 2
 K
@@ -664,7 +665,7 @@ n
 s
 e
 s
-getvar[mnav-chat-command]+` [NavTogether]: Continuing Navigation as Chars are all In Range!`
+$mnav_chat_command+` [NavTogether]: Continuing Navigation as Chars are all In Range!`
 i
 12
 TABLE
@@ -692,5 +693,15 @@ i
 3
 s
 NavigationLeading
+s
+NavigationLeading
+i
+7
+i
+1
+i
+0
+s
+NavigationLeadStart
 s
 NavigationLeading
