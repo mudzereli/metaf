@@ -63,8 +63,13 @@ STATE: {*SetupOptions} ~~ {
 				DoExpr {&qward_sync7=listcreate[]}
 				DoExpr {&qward_sync8=listcreate[]}
 				DoExpr {&qward_sync9=listcreate[]}
-				DoExpr {$sync_count=0}
-				DoExpr {clearvar[sync_list]}
+				DoExpr {&qward_sync10=listcreate[]}
+				DoExpr {&qward_sync11=listcreate[]}
+				DoExpr {&qward_sync12=listcreate[]}
+				DoExpr {$qward_jumper=`Porkchop`}
+				DoExpr {$qward_portal_recall=0}
+				DoExpr {$qward_sync_count=0}
+				DoExpr {clearvar[qward_sync_list]}
 	IF:	SecsInStateGE 8
 		DO:	SetState {SynchronizeChars}
 ~~ }
@@ -84,21 +89,23 @@ STATE: {SynchronizeLocation} ~~ {
 	IF: Always
 		DO:	DoAll
 				DoExpr {echo[`[META]: Synchronizing all Characters`,19]}
-				DoExpr {$sync=true}
-				DoExpr {$sync_list=`qward_sync`+$sync_count}
-	IF: Expr {$sync&&listcount[getgvar[$sync_list]]>=listcount[&qward_chars]}
+				DoExpr {$qward_sync=true}
+				DoExpr {$qward_sync_list=`qward_sync`+$qward_sync_count}
+	IF: Expr {$qward_sync&&listcount[getgvar[$qward_sync_list]]>=listcount[&qward_chars]}
 		DO:	DoAll
-				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[$sync_list]]+` Characters`,19]}
-				DoExpr {$sync=false}
-				DoExpr {$sync_count=$sync_count+1}
+				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[$qward_sync_list]]+` Characters`,19]}
+				DoExpr {$qward_sync=false}
+				DoExpr {$qward_sync_count=$qward_sync_count+1}
 				SetState {CheckLocation}
 	IF:	All
-			Expr {$sync&&(listcontains[getgvar[$sync_list],getcharstringprop[1]]||listadd[getgvar[$sync_list],getcharstringprop[1]])}
+			Expr {$qward_sync&&(listcontains[getgvar[$qward_sync_list],getcharstringprop[1]]||listadd[getgvar[$qward_sync_list],getcharstringprop[1]])}
 			Never
 		DO:	None
 ~~ }
 STATE: {CheckLocation} ~~ {
-	IF:	CellE 2C32003D
+	IF:	All
+			CellE 2C32003D
+			Expr {$qward_portal_recall==0}
 		DO:	SetState {GoTo-1-RunUpHill}
 	IF:	CellE 2D310025
 		DO:	SetState {GoTo-2-PlatformJump}
@@ -116,8 +123,25 @@ STATE: {CheckLocation} ~~ {
 		DO:	SetState {GoTo-8-PathOfRage}
 	IF:	CellE 2C300007
 		DO: SetState {GoTo-9-WardingCrystal2}
+	IF:	All
+			CellE 2C32003D
+			Expr {$qward_portal_recall==1}
+		DO:	SetState {GoTo-10-WardingCrystal3}
+	IF:	CellE 2C300040
+		DO:	SetState {GoTo-11-RunToWardingCrystal4Jump}
+	IF:	Any
+			CellE 2D30000A
+			CellE 2D30000B
+		DO:	SetState {GoTo-12-WardingCrystal4}
+	IF:	All
+			CellE 2C32003D
+			Expr {$qward_portal_recall==2}
+		DO:	SetState {AllDone}
+		
 ~~ }
 STATE: {GoTo-1-RunUpHill} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Running Up Hill`,19]}
 	IF:	Always
 		DO:	EmbedNav nav1PlainsToCatacombs {PlainsToCatacombs}
 	IF:	NavEmpty
@@ -125,13 +149,21 @@ STATE: {GoTo-1-RunUpHill} ~~ {
 ~~ }
 STATE: {GoTo-2-PlatformJump} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Running To Platform Jump`,19]}
+	IF:	Always
 		DO:	EmbedNav nav2CatacombsToPlatformJump {CatacombsToPlatformJump}
+	IF:	NavEmpty
+		DO: SetOpt {AttackDistance} {0.0625}
 	IF:	All
 			NavEmpty
 			NoMobsInDist 15
-		DO:	SetState {SynchronizeLocation}
+		DO:	DoAll
+				SetOpt {AttackDistance} {0.02}
+				SetState {SynchronizeLocation}
 ~~ }
 STATE: {GoTo-3-DoPlatformJump} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Doing Platform Jump`,19]}
 	IF:	Always
 		DO:	EmbedNav nav3PlatformJump {PlatformJump}
 	IF:	All
@@ -140,6 +172,8 @@ STATE: {GoTo-3-DoPlatformJump} ~~ {
 		DO:	SetState {SynchronizeLocation}
 ~~ }
 STATE: {GoTo-4-EnterPathOfTorment} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Path of Torment`,19]}
 	IF:	CellE 5879052B
 		DO:	SetState {SynchronizeLocation}
 	IF:	Always
@@ -150,6 +184,8 @@ STATE: {GoTo-4-EnterPathOfTorment} ~~ {
 		DO:	Chat {/ub usep path of torment}
 ~~ }
 STATE: {GoTo-5-PathOfTorment} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Running Through Path of Torment`,19]}
 	IF:	CellE 2D31002E
 		DO:	SetState {SynchronizeLocation}
 	IF:	Always
@@ -161,6 +197,8 @@ STATE: {GoTo-5-PathOfTorment} ~~ {
 ~~ }
 STATE: {GoTo-6-WardingCrystal1} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Warding Crystal #1`,19]}
+	IF:	Always
 		DO:	EmbedNav nav6WardingCrystal1 {WardingCrystal1}
 	IF:	All
 			NavEmpty
@@ -168,6 +206,8 @@ STATE: {GoTo-6-WardingCrystal1} ~~ {
 		DO:	SetState {SynchronizeLocation}
 ~~ }
 STATE: {GoTo-7-EnterPathOfRage} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Path of Rage`,19]}
 	IF:	CellE 587903EA
 		DO:	SetState {SynchronizeLocation}
 	IF:	Always
@@ -178,6 +218,8 @@ STATE: {GoTo-7-EnterPathOfRage} ~~ {
 		DO:	Chat {/ub usep path of rage}
 ~~ }
 STATE: {GoTo-8-PathOfRage} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Running Through Path of Rage`,19]}
 	IF:	CellE 2C300007
 		DO:	SetState {SynchronizeLocation}
 	IF:	Always
@@ -189,12 +231,62 @@ STATE: {GoTo-8-PathOfRage} ~~ {
 ~~ }
 STATE: {GoTo-9-WardingCrystal2} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Warding Crystal #2`,19]}
+	IF:	Always
 		DO:	EmbedNav nav9WardingCrystal2 {WardingCrystal2}
 	IF:	All
 			NavEmpty
 			NoMobsInDist 15
-		DO:	SetState {AllDone}
+		DO:	SetState {PortalRecall}
 ~~ }
+STATE: {PortalRecall} ~~ 
+	IF:	Always
+		DO:	DoAll
+				DoExpr {echo[`[META]: Using Portal Recall`,19]}
+				DoExpr {$qward_portal_recall=$qward_portal_recall+1}
+	IF:	ExitPortal
+		DO:	SetState {SynchronizeLocation}
+	IF:	All
+			Expr {actiontryequipanywand[]}
+			Expr {actiontrycastbyid[2645]}
+			Never
+		DO: None
+~~ }
+STATE: {GoTo-10-WardingCrystal3} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Going to Warding Crystal #3`,19]}
+	IF:	Always
+		DO:	EmbedNav nav10WardingCrystal3 {WardingCrystal3}
+	IF:	All
+			NavEmpty
+			NoMobsInDist 15
+		DO:	SetState {SynchronizeLocation}
+~~ }
+STATE: {GoTo-11-RunToWardingCrystal4Jump} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Running Up Hill to Big Jump`,19]}
+	IF:	Always
+		DO:	EmbedNav nav11RunUpToWardingCrystal4Jump {RunUpToWardingCrystal4Jump}
+	IF:	All
+			NavEmpty
+			NoMobsInDist 15
+		DO:	SetState {SynchronizeLocation}
+~~ }
+STATE: {GoTo-12-WardingCrystal4} ~~ {
+	IF:	Expr {wobjectgetname[wobjectgetplayer[]]==$qward_jumper}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Jumping and Killing Warding Crystal #4`,19]}
+				EmbedNav nav12WardingCrystal4 {WardingCrystal4}
+	IF:	All
+			NavEmpty
+			NoMobsInDist 15
+		DO:	SetState {PortalRecall}
+~~ }
+STATE: {AllDone} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Warding Crystal Meta Complete. Catacombs Should be OPEN!`,19]}
+~~ }
+
 
 ~~========================= ONLY NAVS APPEAR BELOW THIS LINE =========================~~
 
@@ -552,4 +644,65 @@ NAV: nav9WardingCrystal2 once ~~ {
 	pnt -66.6048523902893 -63.0982380549113 0.708392588297526
 	pnt -66.6549600760142 -63.0988545735677 0.70839589436849
 	pnt -66.6914315621058 -63.1001982688904 0.708395767211914
+~~ }
+NAV: nav10WardingCrystal3 once ~~ {
+	pnt -65.9648541768392 -61.5165833473206 0.319451395670573
+	pnt -65.9585223515828 -61.5824747085571 0.330433305104574
+	pnt -65.9820053100586 -61.682083384196 0.344361114501953
+	pnt -65.9996812820435 -61.7501075744629 0.35002981821696
+	pnt -66.0105574289958 -61.811949078242 0.355183251698812
+	pnt -66.007086054484 -61.8762554566066 0.362730089823405
+	pnt -65.9937576293945 -61.9349587043126 0.372513961791992
+	pnt -65.9830258687337 -61.9963659286499 0.378884665171305
+	pnt -65.9761372884115 -62.0633305867513 0.384465026855469
+	pnt -65.9598485310872 -62.1223833719889 0.394597371419271
+	pnt -65.9476496532559 -62.172735786438 0.402307224273682
+	pnt -65.9537718454997 -62.229931195577 0.406367460886637
+	pnt -65.9665902455648 -62.2851635615031 0.405589135487874
+	pnt -65.9820561091105 -62.3480177243551 0.403011480967204
+	pnt -66.0013624827067 -62.4078930536906 0.394969336191813
+	pnt -66.0254000981649 -62.4569362004598 0.385720094045003
+	pnt -66.030954170227 -62.4751715342204 0.378704166412353
+	pnt -66.0378377278646 -62.5184064865112 0.354218546549479
+	pnt -66.0413631439209 -62.5664779663086 0.335579713185628
+	pnt -66.0376873016357 -62.6141757965088 0.333136494954427
+	pnt -66.0315196990967 -62.6644138971965 0.327423159281413
+	pnt -66.00788230896 -62.7089358766874 0.334667905171712
+	pnt -65.9844364802043 -62.7589824040731 0.332257302602132
+~~ }
+NAV: nav11RunUpToWardingCrystal4Jump once ~~ {
+	pnt -66.0006308873494 -62.7592372258504 0.334998830159505
+	pnt -66.0429794311523 -62.7674861272176 0.346920331319173
+	pnt -66.0941836675008 -62.8040846506755 0.379775746663411
+	pnt -66.1131522496541 -62.8485805511475 0.4067658106486
+	pnt -66.1003807067871 -62.921848932902 0.409649753570557
+	pnt -66.0773013432821 -62.9936591466268 0.427602322896322
+	pnt -66.0495509465536 -63.0559017499288 0.443537139892578
+	pnt -66.0284969329834 -63.0840476036072 0.468118635813395
+	pnt -66.0011422475179 -63.0927288691203 0.494616731007894
+	pnt -65.9760222117106 -63.0906997998556 0.521830113728841
+	pnt -65.956324450175 -63.0894222895304 0.543169339497884
+	pnt -65.9331276337306 -63.1093318939209 0.550020790100098
+	pnt -65.9173789898555 -63.153967666626 0.550020790100098
+	pnt -65.8929496447245 -63.2078145027161 0.550020790100098
+	pnt -65.8696964581807 -63.2632890383403 0.550020790100098
+	pnt -65.8482054551443 -63.2844060897827 0.550020790100098
+	pnt -65.829563442866 -63.3193615118663 0.550020790100098
+	pnt -65.7997057437897 -63.3490498542786 0.550020790100098
+	pnt -65.7516957124074 -63.3501799583435 0.550020790100098
+~~ }
+NAV: nav12WardingCrystal4 once ~~ {
+	pnt -65.7535722096761 -63.3511439482371 0.550020790100098
+	cht -65.4632876714071 -63.292987092336 0.500591913859049 {/vt opt set enablecombat false}
+	pau -65.4632876714071 -63.292987092336 0.500591913859049 2000
+	cht -65.4632876714071 -63.292987092336 0.500591913859049 {/ub jumpw 110 1000}
+	pau -65.4632876714071 -63.292987092336 0.500591913859049 2000
+	pnt -65.6266063054403 -63.4006178379059 0.562562433878581
+	pnt -65.5640300432841 -63.3614394982656 0.56244068145752
+	pau -65.4632876714071 -63.292987092336 0.500591913859049 2000
+	cht -65.4632876714071 -63.292987092336 0.500591913859049 {/ub jumpw 45 0}
+	pau -65.4632876714071 -63.292987092336 0.500591913859049 2000
+	pnt -65.4787920633952 -63.2779671033223 0.500062529246012
+	pnt -65.4632876714071 -63.292987092336 0.500591913859049
+	cht -65.4632876714071 -63.292987092336 0.500591913859049 {/vt opt set enablecombat true}
 ~~ }
