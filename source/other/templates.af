@@ -41,11 +41,23 @@ STATE: {RecallSomewhere} ~~
 		DO:	SetState {DoSomethingElse}
 	IF:	All
 			Expr {actiontryequipanywand[]}
-			Expr {actiontrycastbyid[4213]}
+			Expr {actiontrycastbyid[2645]}
 			Never
 		DO: None
 ~~ }
-
+~~ SYNCHRONIZE CHARACTERS
+STATE: {SynchronizeWaitingForStart} ~~ {
+	IF: Always
+		DO:	DoExpr {echo[`[META]: Synchronizing all Characters @ Waiting For Start`,19]}
+	IF: Expr {listcount[&qcolo_charswaiting]>=listcount[&qcolo_chars]}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Synchronized `+listcount[&qcolo_charswaiting]+` Characters @ Waiting For Start`,19]}
+				SetState {WaitingForStart}
+	IF:	All
+			Expr {listcontains[&qcolo_charswaiting,getcharstringprop[1]]||listadd[&qcolo_charswaiting,getcharstringprop[1]]}
+			Never
+		DO:	None
+~~ }
 
 NAV: navNone once ~~ {
 ~~ }
