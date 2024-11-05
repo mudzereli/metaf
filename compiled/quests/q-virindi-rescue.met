@@ -3758,7 +3758,7 @@ n
 s
 e
 s
-actiontryuseitem[listgetitem[$corpseitems,1]]
+actiontryuseitem[listgetitem[$corpseitems,0]]
 i
 0
 i
