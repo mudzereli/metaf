@@ -234,18 +234,22 @@ STATE: {CheckTokens} ~~{
 				SetState {PickUpToken}
 ~~}
 STATE: {PickUpToken} ~~{
+	IF: Expr {listcount[$TokenNames]==0}
+		DO:	SetState {AllDone}
 	IF:	Always
 		DO:	DoAll
 				~~Chat {@grantluminance 1500000}
 				Chat {/ub myquests}
-				DoExpr {setvar[CurrentToken,listgetitem[$TokenNames,0]}
+				DoExpr {setvar[CurrentToken,listgetitem[$TokenNames,0]]}
 	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	SetState {TurnInToken}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[11,$CurrentToken]&&coordinatedistancewithz[wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[11,$CurrentToken]],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<20}
-		DO:	DoAll
-				ChatExpr {`/ub uselp Token of `+$CurrentToken}
-				SetWatchdog 3 3 {PickUpToken}
-	IF: SecsInStateGE 12
+	IF:	All
+			Expr {$wotoken=wobjectfindnearestbynameandobjectclass[11,$CurrentToken]}
+			Expr {coordinatedistancewithz[wobjectgetphysicscoordinates[$wotoken],wobjectgetphysicscoordinates[wobjectgetplayer[]]]<20}
+		DO:	DoExpr {actiontryuseitem[$wotoken]}
+	IF: Any
+			SecsInStateGE 12
+			Not Expr {wobjectfindnearestbynameandobjectclass[11,$CurrentToken]}
 		DO:	SetState {ResetPosition}
 ~~}
 STATE: {ResetPosition} ~~{
