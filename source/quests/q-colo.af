@@ -219,19 +219,21 @@ STATE: {EnterFirstRoom} ~~ {
 ~~ }
 STATE: {BuffingBeforeRun} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Buffing before Colosseum Run`,19]}
-	IF: Not Expr {&qcolo_enablebuffing}
-		DO: SetState {SynchronizeAfterBuffing}
+		DO:	DoAll
+				DoExpr {$qcolo_buffed=(listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000,0,getspellexpiration[$1]]`]/listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000||getspellexpiration[$1]==0,0,1]`])>3600}
+				DoExpr {echo[`[META]: Buffing before Colosseum Run`,19]}
+	~~ if we've been buffing for 3 minutes, or we finished by casting Blackmoor's Favor, or we have buffing turned off, or our buffs are going to last an hour, then we're good to go.. probably
+	IF:	Any
+			Not Expr {&qcolo_enablebuffing}
+			SecsInStateGE 180
+			ChatMatch {^You cast Blackmoor.*s Favor on yourself}
+			Expr {testvar[qcolo_buffed]&&$qcolo_buffed}
+		DO:	SetState {SynchronizeAfterBuffing}
 	~~ first lets go into the arena, so that we can start our timer
-	IF:	Always
+	IF:	Not Expr {testvar[qcolo_buffed]&&$qcolo_buffed}
 		DO:	DoAll
 				Chat {/vt forcebuff}
 				SetOpt {EnableBuffing} {true}
-	~~ if we've been buffing for 3 minutes, or we finished by casting Blackmoor's Favor, then we're good to go.. probably
-	IF:	Any
-			SecsInStateGE 180
-			ChatMatch {^You cast Blackmoor.*s Favor on yourself}
-		DO:	SetState {SynchronizeAfterBuffing}
 ~~ }
 STATE: {SynchronizeAfterBuffing} ~~ {
 	IF: Always
@@ -345,6 +347,7 @@ STATE: {TurnInRewards} ~~ {
 				DoExpr {setgvar[qcolo_charsbuffed,listcreate[]]}
 				DoExpr {setgvar[qcolo_charswaiting,listcreate[]]}
 				DoExpr {setgvar[qcolo_fellowlocked,0]}
+				DoExpr {clearvar[qcolo_buffed]}
 				EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
 	~~ if we think we're done but we're not, well keep on going.
 	IF:	ChatMatch {Master Arbitrator tells you\, \"Your fellowship\'s Arena battles still continue. }
