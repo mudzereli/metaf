@@ -213,6 +213,9 @@ STATE: {EnterFirstRoom} ~~ {
 				DoExpr {actiontryuseitem[$portal]}
 				DoExpr {$qcolo_roomnumber=5}
 				SetWatchdog 2 2 {EnterFirstRoom}
+	~~ clear the watchdog when we enter the portal so it doesn't accidentally trip right after we exit
+	IF:	IntoPortal
+		DO:	ClearWatchdog
 	~~ ok we zoned into the arena, and we're actually going to start buffing
 	IF:	ExitPortal
 		DO:	SetState {BuffingBeforeRun}
@@ -220,7 +223,7 @@ STATE: {EnterFirstRoom} ~~ {
 STATE: {BuffingBeforeRun} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {$qcolo_buffed=(listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000,0,getspellexpiration[$1]]`]/listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000||getspellexpiration[$1]==0,0,1]`])>3600}
+				DoExpr {$qcolo_buffed=((listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000,0,getspellexpiration[$1]]`]/listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000||getspellexpiration[$1]==0,0,1]`])>3600)}
 				DoExpr {echo[`[META]: Buffing before Colosseum Run`,19]}
 	~~ if we've been buffing for 3 minutes, or we finished by casting Blackmoor's Favor, or we have buffing turned off, or our buffs are going to last an hour, then we're good to go.. probably
 	IF:	Any

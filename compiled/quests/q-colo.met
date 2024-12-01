@@ -1536,7 +1536,7 @@ n
 s
 e
 s
-$qcolo_buffed=(listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000,0,getspellexpiration[$1]]`]/listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000||getspellexpiration[$1]==0,0,1]`])>3600
+$qcolo_buffed=((listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000,0,getspellexpiration[$1]]`]/listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000||getspellexpiration[$1]==0,0,1]`])>3600)
 i
 7
 TABLE
