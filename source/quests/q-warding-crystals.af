@@ -91,6 +91,10 @@ STATE: {SynchronizeLocation} ~~ {
 				DoExpr {echo[`[META]: Synchronizing all Characters`,19]}
 				DoExpr {$qward_sync=true}
 				DoExpr {$qward_sync_list=`qward_sync`+$qward_sync_count}
+	IF: ChatMatch {^.* says, "#death (?<name>.*)"}
+		DO:	DoAll
+				DoExpr {echo[`[META]: Removing `+$capturegroup_name+` from Character List`,19]}
+				DoExpr {listremove[&qward_chars,$capturegroup_name]}
 	IF: Expr {$qward_sync&&listcount[getgvar[$qward_sync_list]]>=listcount[&qward_chars]}
 		DO:	DoAll
 				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[$qward_sync_list]]+` Characters`,19]}
