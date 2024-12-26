@@ -52,6 +52,7 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableBuffing} {false}
 				SetOpt {AttackDistance} {0.13333}
 				SetOpt {ApproachDistance} {0.13333}
+				SetOpt {CorpseApproachRange-Max} {0.13333}
 				SetOpt {NavCloseStopRange} {0.01}
 				SetOpt {EnableCombat} {false}
 				SetOpt {PetRangeMode} {0}
@@ -68,7 +69,6 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qcolo_charsreadyforturnin,listcreate[]]}
 				DoExpr {setgvar[qcolo_fellowlocked,0]}
 				DoExpr {setgvar[qcolo_looping,0]}
-				DoExpr {ifthen[&qcolo_managed_encaps&&getinventorycountbytemplatetype[49485]>50,`chatbox[\`/vt opt set summonpets true\`]`,`chatbox[\`/vt opt set summonpets false\`]`]}
 				SetState {ProgressCheck}
 ~~ }
 STATE: {ProgressCheck} ~~ {
@@ -222,6 +222,7 @@ STATE: {EnterFirstRoom} ~~ {
 STATE: {BuffingBeforeRun} ~~ {
 	IF:	Always
 		DO:	DoAll
+				DoExpr {ifthen[&qcolo_managed_encaps&&getinventorycountbytemplatetype[49485]>50,`chatbox[\`/vt opt set summonpets true\`]`,`chatbox[\`/vt opt set summonpets false\`]`]}
 				DoExpr {$qcolo_buffed=((listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000,0,getspellexpiration[$1]]`]/listreduce[getknownspells[],`$2+iif[getspellexpiration[$1]>12000||getspellexpiration[$1]==0,0,1]`])>3600)}
 				DoExpr {echo[`[META]: Buffing before Colosseum Run`,19]}
 	~~ if we've been buffing for 3 minutes, or we finished by casting Blackmoor's Favor, or we have buffing turned off, or our buffs are going to last an hour, then we're good to go.. probably
