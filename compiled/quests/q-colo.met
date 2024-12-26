@@ -53,7 +53,7 @@ K
 V
 n
 n
-24
+25
 i
 4
 ba
@@ -296,7 +296,7 @@ n
 s
 e
 s
-setgvar[qcolo_managed_encaps,1]
+&qcolo_managed_encaps=1
 i
 7
 TABLE
@@ -309,7 +309,7 @@ n
 s
 e
 s
-setgvar[qcolo_allowsolo,1]
+&qcolo_allowsolo=1
 i
 7
 TABLE
@@ -322,7 +322,7 @@ n
 s
 e
 s
-setgvar[qcolo_enablebuffing,1]
+&qcolo_enablebuffing=1
 i
 7
 TABLE
@@ -335,7 +335,7 @@ n
 s
 e
 s
-setgvar[qcolo_chars,listcreate[]]
+&qcolo_chars=listcreate[]
 i
 7
 TABLE
@@ -348,7 +348,7 @@ n
 s
 e
 s
-setgvar[qcolo_charswaiting,listcreate[]]
+&qcolo_charswaiting=listcreate[]
 i
 7
 TABLE
@@ -361,7 +361,7 @@ n
 s
 e
 s
-setgvar[qcolo_charsbuffed,listcreate[]]
+&qcolo_charsbuffed=listcreate[]
 i
 7
 TABLE
@@ -374,7 +374,7 @@ n
 s
 e
 s
-setgvar[qcolo_charsreadyforturnin,listcreate[]]
+&qcolo_charsreadyforturnin=listcreate[]
 i
 7
 TABLE
@@ -387,7 +387,7 @@ n
 s
 e
 s
-setgvar[qcolo_fellowlocked,0]
+&qcolo_fellowlocked=0
 i
 7
 TABLE
@@ -400,7 +400,20 @@ n
 s
 e
 s
-setgvar[qcolo_looping,0]
+&qcolo_looping=0
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+$colosseum_recall=4213
 i
 1
 s
@@ -440,7 +453,7 @@ n
 s
 e
 s
-wobjectfindnearestbynameandobjectclass[37,Arena Bell]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[37,Arena Bell]]] <= 25
+$arenabell=wobjectfindnearestbynameandobjectclass[37,Arena Bell]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[$arenabell]] <= 25
 s
 StartCurrentRoom
 s
@@ -530,7 +543,7 @@ n
 s
 e
 s
-actiontrycastbyid[4213]
+actiontrycastbyid[$colosseum_recall]
 i
 0
 i
@@ -588,7 +601,7 @@ i
 i
 6
 i
-4
+3
 TABLE
 2
 K
@@ -1207,7 +1220,7 @@ n
 s
 e
 s
-setgvar[qcolo_fellowlocked,1]
+&qcolo_fellowlocked=1
 i
 2
 s
@@ -1526,11 +1539,33 @@ d
 s
 EnterFirstRoom
 i
-19
+3
 i
 10
+TABLE
+2
+K
+V
+n
+n
+2
+i
+19
 i
 0
+i
+26
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+isportaling[]
 TABLE
 2
 k

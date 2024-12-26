@@ -60,21 +60,22 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {CastDispelSelf} {false}
 				SetOpt {SummonPets} {true}
-				DoExpr {setgvar[qcolo_managed_encaps,1]}
-				DoExpr {setgvar[qcolo_allowsolo,1]}
-				DoExpr {setgvar[qcolo_enablebuffing,1]}
-				DoExpr {setgvar[qcolo_chars,listcreate[]]}
-				DoExpr {setgvar[qcolo_charswaiting,listcreate[]]}
-				DoExpr {setgvar[qcolo_charsbuffed,listcreate[]]}
-				DoExpr {setgvar[qcolo_charsreadyforturnin,listcreate[]]}
-				DoExpr {setgvar[qcolo_fellowlocked,0]}
-				DoExpr {setgvar[qcolo_looping,0]}
+				DoExpr {&qcolo_managed_encaps=1}
+				DoExpr {&qcolo_allowsolo=1}
+				DoExpr {&qcolo_enablebuffing=1}
+				DoExpr {&qcolo_chars=listcreate[]}
+				DoExpr {&qcolo_charswaiting=listcreate[]}
+				DoExpr {&qcolo_charsbuffed=listcreate[]}
+				DoExpr {&qcolo_charsreadyforturnin=listcreate[]}
+				DoExpr {&qcolo_fellowlocked=0}
+				DoExpr {&qcolo_looping=0}
+				DoExpr {$colosseum_recall=4213}
 				SetState {ProgressCheck}
 ~~ }
 STATE: {ProgressCheck} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Checking Progress`,19]}
-	IF:	Expr {wobjectfindnearestbynameandobjectclass[37,Arena Bell]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[wobjectfindnearestbynameandobjectclass[37,Arena Bell]]] <= 25}
+	IF:	Expr {$arenabell=wobjectfindnearestbynameandobjectclass[37,Arena Bell]&&coordinatedistancewithz[getplayercoordinates[], wobjectgetphysicscoordinates[$arenabell]] <= 25}
 		DO:	SetState {StartCurrentRoom}
 	IF:	BlockE 00AF0000
 		DO:	SetState {WaitingForCommands}
@@ -88,7 +89,7 @@ STATE: {GoToColo} ~~ {
 		DO:	SetState {ProgressCheck}
 	IF:	All
 			Expr {actiontryequipanywand[]}
-			Expr {actiontrycastbyid[4213]}
+			Expr {actiontrycastbyid[$colosseum_recall]}
 			Never
 		DO: None
 ~~ }
@@ -97,7 +98,7 @@ STATE: {WaitingForCommands} ~~ {
 		DO: EmbedNav navTalkMasterArbitrator {TalkMasterArbitrator}
 	IF:	All
 			NavEmpty
-			SecsInStateGE 4
+			SecsInStateGE 3
 		DO:	DoAll
 				DoExpr {echo[`[META]: Waiting for Commands`,19]}
 				DoExpr {echo[`[META]: Following commands are available:`,19]}
@@ -176,7 +177,7 @@ STATE: {TicketCheck} ~~ {
 	~~ if we get a ticket stub, start buffing and notify clients that it was received
 	IF:	ItemCountGE 1 {Colosseum Ticket Stub}
 		DO:	DoAll
-				DoExpr {setgvar[qcolo_fellowlocked,1]}
+				DoExpr {&qcolo_fellowlocked=1}
 				Chat {/f Received a Colosseum Ticket Stub. Enter the first room and start buffing!}
 				SetState {EnterFirstRoom}
 	~~ if we have a ticket but no stub, try to get a ticket
@@ -213,7 +214,9 @@ STATE: {EnterFirstRoom} ~~ {
 				DoExpr {$qcolo_roomnumber=5}
 				SetWatchdog 2 2 {EnterFirstRoom}
 	~~ clear the watchdog when we enter the portal so it doesn't accidentally trip right after we exit
-	IF:	IntoPortal
+	IF:	Any
+			IntoPortal
+			Expr {isportaling[]}
 		DO:	ClearWatchdog
 	~~ ok we zoned into the arena, and we're actually going to start buffing
 	IF:	ExitPortal
