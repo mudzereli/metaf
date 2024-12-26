@@ -47,7 +47,7 @@ STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
 				EmbedNav navNone {None}
-				SetOpt {LootOnlyRareCorpses} {true}
+				SetOpt {LootOnlyRareCorpses} {false}
 				SetOpt {LootPriorityBoost} {true}
 				SetOpt {EnableBuffing} {false}
 				SetOpt {AttackDistance} {0.13333}
@@ -58,6 +58,8 @@ STATE: {*SetupOptions*} ~~ {
 				SetOpt {EnableNav} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {CastDispelSelf} {false}
+				SetOpt {SummonPets} {true}
+				DoExpr {setgvar[qcolo_managed_encaps,1]}
 				DoExpr {setgvar[qcolo_allowsolo,1]}
 				DoExpr {setgvar[qcolo_enablebuffing,1]}
 				DoExpr {setgvar[qcolo_chars,listcreate[]]}
@@ -66,6 +68,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setgvar[qcolo_charsreadyforturnin,listcreate[]]}
 				DoExpr {setgvar[qcolo_fellowlocked,0]}
 				DoExpr {setgvar[qcolo_looping,0]}
+				DoExpr {ifthen[&qcolo_managed_encaps&&getinventorycountbytemplatetype[49485]>50,`chatbox[\`/vt opt set summonpets true\`]`,`chatbox[\`/vt opt set summonpets false\`]`]}
 				SetState {ProgressCheck}
 ~~ }
 STATE: {ProgressCheck} ~~ {
@@ -101,7 +104,6 @@ STATE: {WaitingForCommands} ~~ {
 				DoExpr {echo[`[META]: !start - start the colo run`,19]}
 				DoExpr {echo[`[META]: !startl - start the colo run, but loop & keep going after finishing`,19]}
 				DoExpr {echo[`[META]: !tickets - buy colo tickets`,19]}
-				DoExpr {echo[`[META]: !rings - use keys & loot colo rings`,19]}
 				DoExpr {echo[`[META]: !times - see time to complete rooms in last run`,19]}
 	~~ this condition is used to manually start the script [!startl in fellow] (with looping)
 	IF:	Any
@@ -116,9 +118,6 @@ STATE: {WaitingForCommands} ~~ {
 	~~ this condition is used to start buying tickets
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!tickets\"}
 		DO:	SetState {BuyTickets}
-	~~ this condition is used to start turning in rings
-	IF:	ChatMatch {\[Fellowship\] .* say(s*)\, \"\!rings\"}
-		DO:	SetState {LootRings}
 	~~ this condition is used check room times
 	IF:	ChatMatch {\[Fellowship\] You say\, \"\!times\"}
 		DO:	SetState {AnnounceRoomTimes}
@@ -361,97 +360,6 @@ STATE: {TurnInRewards} ~~ {
 			ChatMatch {You\'ve earned .* experience\.}
 		DO:	SetState {WaitingForCommands}
 ~~ }
-STATE: {LootRings} ~~ {
-	IF: Always
-		DO:	DoExpr {echo[`[META]: Looting Colo Rings`,19]}
-	IF:	ItemCountGE 1 {Colosseum Vault Key}
-		DO:	SetState {GoToColosseumVault}
-	IF:	ItemCountLE 0 {Colosseum Vault Key}
-		DO:	SetState {ApplyIvoryToColoRings}
-~~ }
-STATE: {GoToColosseumVault} ~~ {
-	IF: Always
-		DO: DoAll
-				SetOpt {EnableCombat} {false}
-				SetOpt {EnableLooting} {false}
-	IF: All
-			NavEmpty
-			Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
-		DO:	DoAll
-				Chat {/mt combatstate peace}
-				SetState {CheckColosseumVault}
-	IF:	Not Expr {wobjectfindnearestbytemplatetype[34608]&&coordinatedistanceflat[wobjectgetphysicscoordinates[wobjectfindnearestbytemplatetype[34608]],getplayercoordinates[]]<5}
-		DO: EmbedNav navColosseumVault {ColosseumVault}
-~~ }
-STATE: {CheckColosseumVault} ~~ {
-	IF:	Expr {wobjectgetopencontainer[]}
-		DO: SetState {LootColosseumVault}
-	IF:	Expr {wobjectgetopencontainer[]==0}
-		DO:	SetState {TryOpenColosseumVault}
-~~ }
-STATE: {LootColosseumVault} ~~ {
-	IF:	Always
-		DO:	DoAll
-				DoExpr {clearvar[vaultitems]}
-				DoExpr {$openvault=wobjectgetopencontainer[]}
-				DoExpr {$ring=`.* Empyrean Ring`}
-				DoExpr {$vaultitems=listfilter[wobjectfindallbycontainer[$openvault],`getregexmatch[wobjectgetname[$1],$ring]`]}
-	IF:	All
-			Expr {$vaultitems}
-			Expr {listcount[$vaultitems]>0}
-			Expr {$lootitem=listgetitem[$vaultitems,0]}
-		DO:	DoAll
-				DoExpr {actiontryuseitem[$lootitem]}
-				SetState {CheckColosseumVault}
-	IF:	All
-			Expr {$vaultitems}
-			Expr {listcount[$vaultitems]==0}
-		DO:	DoAll
-				DoExpr {actiontryuseitem[$openvault]}
-				SetState {CheckColosseumVault}
-~~ }
-STATE: {TryOpenColosseumVault} ~~ {
-	IF:	Expr {wobjectgetopencontainer[]}
-		DO: SetState {LootColosseumVault}
-	IF:	All
-			SecsInStateGE 1
-			Expr {$vault=wobjectfindnearestbytemplatetype[34608]}
-			Expr {wobjectgetopencontainer[]||actiontryuseitem[$vault]}
-			Never
-		DO:	None
-	IF:	SecsInStateGE 3
-		DO: SetState {UnlockColosseumVault}
-~~ }
-STATE: {UnlockColosseumVault} ~~ {
-	IF: ItemCountGE 1 {Colosseum Vault Key}
-		DO:	DoAll
-				DoExpr {$vault=wobjectfindnearestbytemplatetype[34608]}
-				DoExpr {$key=wobjectfindininventorybytemplatetype[34448]}
-				DoExpr {actiontryapplyitem[$key,$vault]}
-				SetState {TryOpenColosseumVault}
-	IF:	All
-			SecsInStateGE 3
-			ItemCountLE 0 {Colosseum Vault Key}
-		DO: SetState {ApplyIvoryToColoRings}
-~~ }
-STATE: {ApplyIvoryToColoRings} ~~ {
-	IF:	Always
-		DO:	DoExpr {$exitstate=0}
-	IF:	All 
-			Expr {$salvagelist=wobjectfindallinventorybynamerx[`Salvage \\(100\\)`]||$exitstate=1}
-			Expr {$ivorylist=listfilter[$salvagelist,`wobjectgetintprop[$1,131]==51`]||$exitstate=1}
-			Expr {listcount[$ivorylist]>0||$exitstate=1}
-			Expr {$ringlist=wobjectfindallinventorybynamerx[`^(?!Enhanced).* Empyrean Ring`]||$exitstate=1}
-			Expr {$attunedringlist=listfilter[$ringlist,`wobjectgetintprop[$1,114]==1`]||$exitstate=1}
-			Expr {listcount[$attunedringlist]>0||$exitstate=1}
-			Expr {$firstivorybag=listgetitem[$ivorylist,0]||$exitstate=1}
-			Expr {$firstattunedring=listgetitem[$attunedringlist,0]||$exitstate=1}
-			Expr {actiontryapplyitem[$firstivorybag,$firstattunedring]}
-			Never
-		DO: None
-	IF:	Expr {$exitstate}
-		DO:	SetState {WaitingForCommands}
-~~ }
 STATE: {BuyTickets} ~~ {
 	IF: ItemCountLE 5 {Trade Note (250,000)}
 		DO: DoAll
@@ -482,7 +390,4 @@ NAV: navNone once ~~ {
 NAV: navTalkMasterArbitrator once ~~ {
 	pnt -101.783239634832 38.0445641900102 2.08333134651184E-05
 	tlk -101.783916680018 37.9945620814959 2.08333134651184E-05 -101.783333333333 38.05 3.12502197630238E-05 37 {Master Arbitrator}
-~~ }
-NAV: navColosseumVault once ~~ {
-	pnt -101.834077048302 38.0082315127055 2.08333134651184E-05
 ~~ }
