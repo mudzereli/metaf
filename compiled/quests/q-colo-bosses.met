@@ -150,7 +150,7 @@ n
 s
 e
 s
-setvar[keepreward_stonefists,1]
+setvar[keepreward_stonefists,0]
 i
 7
 TABLE

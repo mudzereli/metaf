@@ -53,7 +53,7 @@ STATE: {*SetupOptions*} ~~ {
 				DoExpr {setvar[kill_killagurg,1]}
 				DoExpr {setvar[kill_dsmatron,1]}
 				DoExpr {setvar[kill_themaster,1]}
-				DoExpr {setvar[keepreward_stonefists,1]}
+				DoExpr {setvar[keepreward_stonefists,0]}
 				DoExpr {setvar[keepreward_azaxis,0]}
 				DoExpr {setvar[keepreward_killagurg,0]}
 				DoExpr {setvar[keepreward_dsmatron,0]}
