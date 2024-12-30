@@ -196,6 +196,7 @@ STATE: {TicketCheck} ~~ {
 			Any
 				SecsInStateGE 10
 				ChatMatch {^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"}
+				Expr {listcount[wobjectfindalllandscapebynamerx[`^Arena (One|Two|Three|Four|Five) Statue`]]}
 		DO:	SetState {TicketCheck}
 ~~ }
 STATE: {EnterFirstRoom} ~~ {
@@ -219,7 +220,11 @@ STATE: {EnterFirstRoom} ~~ {
 			Expr {isportaling[]}
 		DO:	ClearWatchdog
 	~~ ok we zoned into the arena, and we're actually going to start buffing
-	IF:	ExitPortal
+	IF:	Any
+			ExitPortal
+			All
+				CellE 00B1015C
+				Not Expr {isportaling[]}
 		DO:	SetState {BuffingBeforeRun}
 ~~ }
 STATE: {BuffingBeforeRun} ~~ {
