@@ -23,6 +23,19 @@
 
 ~~ 																						
 ~~ 				REMEMBER THAT NAV-ONLY FILES MUST CONTAIN EXACTLY ONE NAV!				
+~~ }																					
+STATE: {Default} ~~ {
+	IF: Always
+		DO:	EmbedNav navJump {navJump}
+	IF: ChatMatch {.* impact damage.*}
+		DO:	DoAll
+				ChatExpr {`/f failed on Jump #`+$jumpnum}
+				EmbedNav navNone {navNone}
+~~}
+
+NAV: navNone once ~~{
+	pau 0 0 -1000 1000000
+~~}
 
 NAV: navJump once ~~ {
 	cht 44.1969804128011 -41.5751076698303 0.487501398722331 {/vt opt set navclosestoprange 0.000416666666666667}
