@@ -55,17 +55,6 @@ STATE: {*SetupOptions} ~~ {
 				DoExpr {&qward_chars=listcreate[]}
 				DoExpr {&qward_sync0=listcreate[]}
 				DoExpr {&qward_sync1=listcreate[]}
-				DoExpr {&qward_sync2=listcreate[]}
-				DoExpr {&qward_sync3=listcreate[]}
-				DoExpr {&qward_sync4=listcreate[]}
-				DoExpr {&qward_sync5=listcreate[]}
-				DoExpr {&qward_sync6=listcreate[]}
-				DoExpr {&qward_sync7=listcreate[]}
-				DoExpr {&qward_sync8=listcreate[]}
-				DoExpr {&qward_sync9=listcreate[]}
-				DoExpr {&qward_sync10=listcreate[]}
-				DoExpr {&qward_sync11=listcreate[]}
-				DoExpr {&qward_sync12=listcreate[]}
 				DoExpr {$qward_jumper=`Porkchop`}
 				DoExpr {$qward_portal_recall=0}
 				DoExpr {$qward_sync_count=0}
@@ -99,7 +88,9 @@ STATE: {SynchronizeLocation} ~~ {
 		DO:	DoAll
 				DoExpr {echo[`[META]: Synchronized `+listcount[getgvar[$qward_sync_list]]+` Characters`,19]}
 				DoExpr {$qward_sync=false}
-				DoExpr {$qward_sync_count=$qward_sync_count+1}
+				DoExpr {$qward_sync_count=($qward_sync_count==0)}
+				DoExpr {$qward_sync_list=`qward_sync`+$qward_sync_count}
+				DoExpr {listclear[getgvar[$qward_sync_list]]}
 				SetState {CheckLocation}
 	IF:	All
 			Expr {$qward_sync&&(listcontains[getgvar[$qward_sync_list],getcharstringprop[1]]||listadd[getgvar[$qward_sync_list],getcharstringprop[1]])}
