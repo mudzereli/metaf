@@ -43,7 +43,7 @@ STATE: {Default} ~~ {
 ~~ }
 STATE: {*SetupOptions*} ~~ {
 	IF:	Expr {`///// Your Jumper / Lever Pulling Toon ///// ----->>>>>`}
-		DO:	DoExpr {setgvar[qlou-leverpuller,`Porkchop`]}
+		DO:	DoExpr {setgvar[qlou-leverpuller,`Beasthoss`]}
 	IF:	Always
 		DO:	DoAll
 				DoExpr {echo[`[META]: Starting Quest: Liberation of Uziz`,19]}
@@ -471,6 +471,7 @@ STATE: {LootingSimulacrum} ~~ {
 				SetWatchdog 3 15 {LootingSimulacrum}
 	IF:	Expr {wobjectgetopencontainer[]==0}
 		DO:	DoAll
+				SetOpt {EnableLooting} {false}
 				DoExpr {actiontryuseitem[wobjectfindnearestbynameandobjectclass[27,Simulacrum Shifter]]}
 				SetWatchdog 3 15 {LootingSimulacrum}
 ~~ }
@@ -535,11 +536,12 @@ NAV: navDoJumpPuzzle once ~~ {
 	pau -30.6331247329712 -20.0900333404541 0.0750208298365275 2000
 	pau -30.6331247329712 -20.0900333404541 0.0750208298365275 2000
 	cht -30.6331247329712 -20.0900333404541 0.0750208298365275 {/ub usel Lever}
+	pau -30.6331247329712 -20.0900333404541 0.0750208298365275 2000
 ~~ }
 NAV: navDoJumpPuzzleJumpDown once ~~ {
 	pau -30.6466749191284 -20.0733367284139 0.178963756561279 2000
 	pau -30.6466749191284 -20.0733367284139 0.178963756561279 2000
-	cht -30.6466749191284 -20.0733367284139 0.178963756561279 {/ub jumpw 190 50}
+	cht -30.6466749191284 -20.0733367284139 0.178963756561279 {/ub jumpw 150 200}
 	pau -30.6466749191284 -20.0733367284139 0.178963756561279 2000
 ~~ }
 NAV: navGoToAlArqas once ~~ {

@@ -47,7 +47,7 @@ n
 s
 e
 s
-setgvar[qlou-leverpuller,`Porkchop`]
+setgvar[qlou-leverpuller,`Beasthoss`]
 s
 *SetupOptions*
 i
@@ -3001,12 +3001,12 @@ s
 i
 4
 ba
-1593
+1663
 DoJumpPuzzle
-21
+22
 uTank2 NAV 1.2
 4
-21
+22
 0
 -30.6331247329712
 -20.0900333404541
@@ -3131,6 +3131,12 @@ uTank2 NAV 1.2
 0.0750208298365275
 0
 /ub usel Lever
+3
+-30.6331247329712
+-20.0900333404541
+0.0750208298365275
+0
+2000
 s
 DoJumpPuzzle
 i
@@ -3277,7 +3283,7 @@ i
 i
 0
 ba
-335
+336
 DoJumpPuzzleJumpDown
 4
 uTank2 NAV 1.2
@@ -3300,7 +3306,7 @@ uTank2 NAV 1.2
 -20.0733367284139
 0.178963756561279
 0
-/ub jumpw 190 50
+/ub jumpw 150 200
 3
 -30.6466749191284
 -20.0733367284139
@@ -4855,7 +4861,24 @@ K
 V
 n
 n
+3
+i
+12
+TABLE
 2
+k
+v
+n
+n
+2
+s
+o
+s
+EnableLooting
+s
+v
+s
+false
 i
 7
 TABLE
