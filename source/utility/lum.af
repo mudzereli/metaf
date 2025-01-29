@@ -236,10 +236,11 @@ STATE: {CheckTokens} ~~{
 STATE: {PickUpToken} ~~{
 	IF: Expr {listcount[$TokenNames]==0}
 		DO:	SetState {AllDone}
+	IF: Not Expr {isrefreshingquests[]}
+		DO:	Chat {/ub myquests}
 	IF:	Always
 		DO:	DoAll
 				~~Chat {@grantluminance 1500000}
-				Chat {/ub myquests}
 				DoExpr {setvar[CurrentToken,listgetitem[$TokenNames,0]]}
 	IF:	Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	SetState {TurnInToken}
@@ -254,9 +255,11 @@ STATE: {PickUpToken} ~~{
 ~~}
 STATE: {ResetPosition} ~~{
 	IF:	NavEmpty
-		DO:	DoAll
-				EmbedNav navReset {Reset}
-				SetState {PickUpToken}
+		DO:	EmbedNav navReset {Reset}
+	IF:	All
+			NavEmpty
+			Expr {wobjectfindnearestbynameandobjectclass[11,$CurrentToken]}
+		DO:	SetState {PickUpToken}
 ~~}
 STATE: {TurnInToken} ~~{
 	IF:	ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
