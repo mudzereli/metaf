@@ -1374,7 +1374,7 @@ K
 V
 n
 n
-2
+3
 i
 6
 i
@@ -1383,6 +1383,19 @@ i
 4
 s
 ^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"
+i
+26
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+listcount[wobjectfindalllandscapebynamerx[`^Arena (One|Two|Three|Four|Five) Statue`]]
 s
 TicketCheck
 s
