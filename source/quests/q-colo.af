@@ -39,30 +39,40 @@
 
 STATE: {Default} ~~ {
 	IF:	Always
+		DO:	DoExpr {echo[`[META]: Loading Colo Meta V1.0.0 by Porkchop`,19]}
+	IF:	Always
 		DO:	SetState {*SetupOptions*}
 ~~ }
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Setting up for Colosseum`,19]}
+		DO:	DoExpr {echo[`[META]: Setting up Options for Colosseum`,19]}
 	IF:	Always
 		DO:	DoAll
-				EmbedNav navNone {None}
 				SetOpt {LootOnlyRareCorpses} {false}
 				SetOpt {LootPriorityBoost} {true}
-				SetOpt {EnableBuffing} {false}
 				SetOpt {AttackDistance} {0.13333}
 				SetOpt {ApproachDistance} {0.13333}
 				SetOpt {CorpseApproachRange-Max} {0.13333}
 				SetOpt {NavCloseStopRange} {0.01}
 				SetOpt {EnableCombat} {false}
-				SetOpt {PetRangeMode} {0}
-				SetOpt {EnableNav} {true}
 				SetOpt {LootFellowCorpses} {false}
 				SetOpt {CastDispelSelf} {false}
-				SetOpt {SummonPets} {true}
 				DoExpr {&qcolo_managed_encaps=1}
 				DoExpr {&qcolo_allowsolo=1}
 				DoExpr {&qcolo_enablebuffing=1}
+				SetState {*SetupOptionsDontTouch*}
+~~ }
+STATE: {*SetupOptionsDontTouch*} ~~ {
+	IF:	Always
+		DO:	DoExpr {echo[`[META]: Setting up Additional Options for Colosseum`,19]}
+	IF:	Always
+		DO:	DoAll
+				EmbedNav navNone {None}
+				SetOpt {EnableBuffing} {false}
+				SetOpt {EnableCombat} {false}
+				SetOpt {PetRangeMode} {0}
+				SetOpt {EnableNav} {true}
+				SetOpt {SummonPets} {true}
 				DoExpr {&qcolo_chars=listcreate[]}
 				DoExpr {&qcolo_charswaiting=listcreate[]}
 				DoExpr {&qcolo_charsbuffed=listcreate[]}
