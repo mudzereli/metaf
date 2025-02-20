@@ -55,7 +55,7 @@ STATE: {*SetupOptions} ~~ {
 				DoExpr {&qward_chars=listcreate[]}
 				DoExpr {&qward_sync0=listcreate[]}
 				DoExpr {&qward_sync1=listcreate[]}
-				DoExpr {$qward_jumper=`Porkchop`}
+				DoExpr {&qward_highestjumpskill=0}
 				DoExpr {$qward_portal_recall=0}
 				DoExpr {$qward_sync_count=0}
 				DoExpr {clearvar[qward_sync_list]}
@@ -65,13 +65,19 @@ STATE: {*SetupOptions} ~~ {
 STATE: {SynchronizeChars} ~~ {
 	IF:	Always
 		DO:	DoExpr {echo[`[META]: Synchronizing Warding Crystal Meta on all Characters`,19]}
+	IF: All
+			Expr {$jumpskill=getcharskill_buffed[22]}
+			Expr {$jumpskill>&qward_highestjumpskill}
+			Expr {&qward_highestjumpskill=$jumpskill&&&qward_jumper=getcharstringprop[1]}
+			Never
+		DO: None
 	IF:	All
 			Expr {listcontains[&qward_chars,getcharstringprop[1]]||listadd[&qward_chars,getcharstringprop[1]]}
 			Never
 		DO:	None
 	IF:	SecsInStateGE 8
 		DO:	DoAll
-				DoExpr {echo[`[META]: Starting Warding Crystal with `+listcount[&qward_chars]+` Characters!`,19]}
+				DoExpr {echo[`[META]: Starting Warding Crystal with `+listcount[&qward_chars]+` Characters! Jumper = `+&qward_jumper+` (`+&qward_highestjumpskill+`)`,19]}
 				SetState {SynchronizeLocation}
 ~~ }
 STATE: {SynchronizeLocation} ~~ {
