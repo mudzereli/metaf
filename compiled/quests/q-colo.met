@@ -28,7 +28,7 @@ n
 s
 e
 s
-echo[`[META]: Loading Colo Meta V1.0.0 by Porkchop`,19]
+echo[`[META]: Loading Colo Meta V1.0.1 by Porkchop`,19]
 s
 Default
 i
@@ -1741,7 +1741,7 @@ n
 s
 e
 s
-ifthen[&qcolo_managed_encaps&&getinventorycountbytemplatetype[49485]>50,`chatbox[\`/vt opt set summonpets true\`]`,`chatbox[\`/vt opt set summonpets false\`]`]
+ifthen[&qcolo_managed_encaps==0||getinventorycountbytemplatetype[49485]>50,`chatbox[\`/vt opt set summonpets true\`]`,`chatbox[\`/vt opt set summonpets false\`]`]
 i
 7
 TABLE
