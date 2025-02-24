@@ -274,7 +274,7 @@ STATE: {GoTo-11-RunToWardingCrystal4Jump} ~~ {
 		DO:	SetState {SynchronizeLocation}
 ~~ }
 STATE: {GoTo-12-WardingCrystal4} ~~ {
-	IF:	Expr {wobjectgetname[wobjectgetplayer[]]==$qward_jumper}
+	IF:	Expr {wobjectgetname[wobjectgetplayer[]]==&qward_jumper}
 		DO:	DoAll
 				DoExpr {echo[`[META]: Jumping and Killing Warding Crystal #4`,19]}
 				EmbedNav nav12WardingCrystal4 {WardingCrystal4}
