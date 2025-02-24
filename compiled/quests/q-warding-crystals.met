@@ -3634,7 +3634,7 @@ n
 s
 e
 s
-wobjectgetname[wobjectgetplayer[]]==$qward_jumper
+wobjectgetname[wobjectgetplayer[]]==&qward_jumper
 TABLE
 2
 K
