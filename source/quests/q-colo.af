@@ -39,7 +39,7 @@
 
 STATE: {Default} ~~ {
 	IF:	Always
-		DO:	DoExpr {echo[`[META]: Loading Colo Meta V1.0.1 by Porkchop`,19]}
+		DO:	DoExpr {echo[`[META]: Loading Colo Meta V1.0.2 by Porkchop`,19]}
 	IF:	Always
 		DO:	SetState {*SetupOptions*}
 ~~ }
@@ -206,7 +206,7 @@ STATE: {TicketCheck} ~~ {
 			Any
 				SecsInStateGE 10
 				ChatMatch {^Master Arbitrator says\, \"Arena .* is now available for new warriors\!\"}
-				Expr {listcount[wobjectfindalllandscapebynamerx[`^Arena (One|Two|Three|Four|Five) Statue`]]}
+				Expr {listcount[wobjectfindalllandscapebynamerx[`^Arena (One|Two|Three|Four|Five) Statue`]]<5}
 		DO:	SetState {TicketCheck}
 ~~ }
 STATE: {EnterFirstRoom} ~~ {
