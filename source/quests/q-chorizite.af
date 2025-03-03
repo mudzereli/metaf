@@ -44,26 +44,26 @@ STATE: {Default} ~~ {
 STATE: {*SetupOptions*} ~~ {
 	IF:	Always
 		DO:	DoAll
-				DoExpr {echo[`[META]: Loading Chorizite Meta`,19]}
-				DoExpr {setgvar[qcho-chars,listcreate[]]}
-				DoExpr {setgvar[qcho-charscomplete,listcreate[]]}
-				DoExpr {setgvar[qcho-numchars,0]}
+				DoExpr {echo[`[META]: Loading Chorizite Meta v1.0.0 by Porkchop`,19]}
+				DoExpr {&qcho_chars=listcreate[]}
+				DoExpr {&qcho_charscomplete=listcreate[]}
+				DoExpr {&qcho_numchars=0}
 	IF:	SecsInStateGE 3
 		DO:	SetState {SynchronizeChars}
 ~~ }
 STATE: {SynchronizeChars} ~~ {
-	IF:	Not Expr {listcontains[getgvar[qcho-chars],getcharstringprop[1]]}
+	IF:	Not Expr {listcontains[getgvar[qcho_chars],getcharstringprop[1]]}
 		DO:	DoAll
 				DoExpr {echo[`[META]: Synchronizing Chorizite Meta on all Characters`,19]}
-				DoExpr {listadd[getgvar[qcho-chars],getcharstringprop[1]]}
+				DoExpr {listadd[getgvar[qcho_chars],getcharstringprop[1]]}
 	IF:	All
 			SecsInStateGE 2
-			Not Expr {listcontains[getgvar[qcho-chars],getcharstringprop[1]]}
+			Not Expr {listcontains[getgvar[qcho_chars],getcharstringprop[1]]}
 		DO:	SetState {SynchronizeChars}
 	IF:	SecsInStateGE 8
 		DO:	DoAll
-				DoExpr {setgvar[qcho-numchars,listcount[getgvar[qcho-chars]]}
-				DoExpr {echo[`[META]: Starting Chorizite Meta with `+listcount[getgvar[qcho-chars]]+` Characters!`,19]}
+				DoExpr {setgvar[qcho_numchars,listcount[getgvar[qcho_chars]]}
+				DoExpr {echo[`[META]: Starting Chorizite Meta with `+listcount[getgvar[qcho_chars]]+` Characters!`,19]}
 				SetState {QuestProgressCheck}
 ~~ }
 STATE: {QuestProgressCheck} ~~ {
@@ -82,19 +82,23 @@ STATE: {QuestProgressCheck} ~~ {
 	IF: All
 			CellE 42DE0004
 			Expr {listcount[wobjectfindallinventorybynamerx[`Chunk of Medium\-Grade Chorizite`]]<1&&listcount[wobjectfindallinventorybynamerx[`Refined Medium\-Grade Chorizite`]]<1}
-			Expr {listcontains[getgvar[qcho-charscomplete],getcharstringprop[1]]||listadd[getgvar[qcho-charscomplete],getcharstringprop[1]]}
+			Expr {listcontains[getgvar[qcho_charscomplete],getcharstringprop[1]]||listadd[getgvar[qcho_charscomplete],getcharstringprop[1]]}
 			SecsInStateGE 1
 		DO: SetState {AllDone}
 	IF:	All
 			CellE 02E8011F
-			Expr {listcount[wobjectfindallinventorybynamerx[`Chunk of Medium\-Grade Chorizite`]]>=1}
-			Expr {listcontains[getgvar[qcho-charscomplete],getcharstringprop[1]]||listadd[getgvar[qcho-charscomplete],getcharstringprop[1]]}
-			SecsInStateGE 1
-		DO: SetState {AllDone}
+			Expr {listcount[wobjectfindallinventorybynamerx[`Chunk of Medium\-Grade Chorizite`]]>=1&&listcount[wobjectfindallinventorybynamerx[`Lugian Pick Axe`]]>=1}
+			Expr {listcontains[getgvar[qcho_charscomplete],getcharstringprop[1]]||listadd[getgvar[qcho_charscomplete],getcharstringprop[1]]}
+			SecsInStateGE 2
+		DO: DoAll
+				ChatExpr {`/mt combatstate peace`}
+				DoExpr {listremove[getgvar[qcho_chars],getcharstringprop[1]]}
+				DoExpr {setvar[qcho_next,listgetitem[getgvar[qcho_chars],0]]}
+				SetState {PickaxeCheck}
 	IF:	All
 			CellE 02E8011F
 			Expr {listcount[wobjectfindallinventorybynamerx[`Chunk of Medium\-Grade Chorizite`]]>=1&&listcount[wobjectfindallinventorybynamerx[`Lugian Pick Axe`]]<1}
-			Expr {listcontains[getgvar[qcho-charscomplete],getcharstringprop[1]]||listadd[getgvar[qcho-charscomplete],getcharstringprop[1]]}
+			Expr {listcontains[getgvar[qcho_charscomplete],getcharstringprop[1]]||listadd[getgvar[qcho_charscomplete],getcharstringprop[1]]}
 			SecsInStateGE 1
 		DO: SetState {AllDone}
 	IF:	All
@@ -107,7 +111,7 @@ STATE: {QuestProgressCheck} ~~ {
 			SecsInStateGE 2
 		DO: DoAll
 				ChatExpr {`/mt combatstate peace`}
-				DoExpr {setvar[qcho-next,listgetitem[getgvar[qcho-chars],0]]}
+				DoExpr {setvar[qcho_next,listgetitem[getgvar[qcho_chars],0]]}
 				SetState {PickaxeCheck}
 ~~ }
 STATE: {NavLugianQuarry} ~~ {
@@ -149,7 +153,7 @@ STATE: {PickaxeCheck} ~~ {
 		DO:	SetState {GoMining}
 	IF:	Expr {listcount[wobjectfindallinventorybynamerx[`Lugian Pick Axe`]]>=1&&listcount[wobjectfindallinventorybynamerx[`Chunk of Medium\-Grade Chorizite`]]>=1}
 		DO:	DoAll
-				ChatExpr {`/ub give Lugian Pick Axe to `+getvar[qcho-next]}
+				ChatExpr {`/ub give Lugian Pick Axe to `+getvar[qcho_next]}
 				SetState {WaitingForMiner}
 	IF:	SecsInStateGE 10
 		DO:	SetState {QuestProgressCheck}
@@ -169,7 +173,7 @@ STATE: {WaitingForMiner} ~~ {
 STATE: {AllDone} ~~ {
 	IF:	SecsInStateGE 1
 		DO:	DoAll
-				ChatExpr {`/f All Done! (`+listcount[getgvar[qcho-charscomplete]]+`/`+getgvar[qcho-numchars]+`)`}
+				ChatExpr {`/f All Done! (`+listcount[getgvar[qcho_charscomplete]]+`/`+getgvar[qcho_numchars]+`)`}
 ~~ }
 
 NAV: navLugianQuarry once ~~ {

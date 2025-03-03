@@ -380,7 +380,7 @@ QuestProgressCheck
 i
 2
 i
-1
+3
 TABLE
 2
 K
@@ -404,7 +404,7 @@ n
 s
 e
 s
-listcount[wobjectfindallinventorybynamerx[`Chunk of Medium\-Grade Chorizite`]]>=1
+listcount[wobjectfindallinventorybynamerx[`Chunk of Medium\-Grade Chorizite`]]>=1&&listcount[wobjectfindallinventorybynamerx[`Lugian Pick Axe`]]>=1
 i
 26
 TABLE
@@ -421,9 +421,57 @@ listcontains[getgvar[qcho-charscomplete],getcharstringprop[1]]||listadd[getgvar[
 i
 6
 i
+2
+TABLE
+2
+K
+V
+n
+n
+4
+i
+8
+TABLE
+2
+k
+v
+n
+n
 1
 s
-AllDone
+e
+s
+`/mt combatstate peace`
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+listremove[getgvar[qcho-chars],getcharstringprop[1]]
+i
+7
+TABLE
+2
+k
+v
+n
+n
+1
+s
+e
+s
+setvar[qcho-next,listgetitem[getgvar[qcho-chars],0]]
+i
+1
+s
+PickaxeCheck
 s
 QuestProgressCheck
 i
@@ -535,7 +583,7 @@ n
 s
 e
 s
-echo[`[META]: You must be at inside Lugian Quarry or Beach Fort portal drop to Begin!`,19]
+echo[`[META]: You must be inside Lugian Quarry or at Beach Fort portal drop to Begin!`,19]
 s
 QuestProgressCheck
 i
