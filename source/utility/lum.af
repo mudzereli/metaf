@@ -47,7 +47,13 @@ STATE: {Default} ~~{
 				DoExpr {echo[`!lum   - list all learned lum flags in short form`,2]}
 				DoExpr {echo[`!flags - list status of major quest flags`,2]}
 				DoExpr {echo[`!token - start lum token grabbing meta (be at Nalicana)`,2]}
+				DoExpr {echo[`!gems  - start gem token grabbing meta (be at Nalicana)`,2]}
+				DoExpr {$PickingUpGems=0}
 				DoExpr {setvar[ulum-getaugtoken,0]}
+				~~ amount of luminance to save when grabbing gem tokens
+				DoExpr {$GemLumSave=1000000}
+				~~ amount of luminance to save when grabbing gem tokens
+				DoExpr {$GemMaxCount=10}
 				SetState {CheckAugs}
 ~~}
 STATE: {CheckAugs} ~~{
@@ -185,6 +191,10 @@ STATE: {CheckAugs} ~~{
 		DO: DoAll
 				EmbedNav navReset {Reset}
 				SetState {CheckTokens}
+	IF:	ChatMatch {^.* (think|say(s*))\, \"!(G|g)em(s*)\"}
+		DO: DoAll
+				EmbedNav navReset {Reset}
+				SetState {CheckGems}
 ~~}
 STATE: {CheckTokens} ~~{
 	IF:	Always
@@ -233,10 +243,26 @@ STATE: {CheckTokens} ~~{
 				Chat {/ub myquests}
 				SetState {PickUpToken}
 ~~}
+STATE: {CheckGems} ~~{
+	IF:	Always
+		DO: DoAll
+				DoExpr {$PickingUpGems=1}
+				DoExpr {$TokenNames=listcreate[]}
+	IF:	Expr {$TokenNames&&getitemcountininventorybynamerx[`Luminous Crystal of Rare Armor Damage Boost V`]<$GemMaxCount}
+		DO: DoExpr {listadd[$TokenNames,`Token of Rare Armor Damage Boost V`]}
+	IF:	Expr {$TokenNames&&getitemcountininventorybynamerx[`Luminous Crystal of Rare Damage Reduction V`]<$GemMaxCount}
+		DO: DoExpr {listadd[$TokenNames,`Token of Rare Damage Reduction V`]}
+	IF:	Always
+		DO:	DoAll
+				DoExpr {setvar[TokenNPC,`Nalicana`]}
+				SetOpt {NavCloseStopRange} {0.00833}
+				Chat {/mt combatstate peace}
+				SetState {PickUpToken}
+~~}
 STATE: {PickUpToken} ~~{
 	IF: Expr {listcount[$TokenNames]==0}
 		DO:	SetState {AllDone}
-	IF: Not Expr {isrefreshingquests[]}
+	IF: Expr {isrefreshingquests[]==0&&$PickingUpGems==0}
 		DO:	Chat {/ub myquests}
 	IF:	Always
 		DO:	DoAll
@@ -264,6 +290,12 @@ STATE: {ResetPosition} ~~{
 STATE: {TurnInToken} ~~{
 	IF:	ChatMatch {^.* tells you\, \"You do not have enough Luminance\.\"}
 		DO:	SetState {AllDone}
+	IF:	Expr {$PickingUpGems==1&&getcharquadprop[6]<=$GemLumSave}
+		DO:	SetState {AllDone}
+	IF:	Expr {$TokenNames&&getitemcountininventorybynamerx[`Luminous Crystal of Rare Armor Damage Boost V`]>=$GemMaxCount}
+		DO: DoExpr {listremove[$TokenNames,`Token of Rare Armor Damage Boost V`]}
+	IF:	Expr {$TokenNames&&getitemcountininventorybynamerx[`Luminous Crystal of Rare Damage Reduction V`]>=$GemMaxCount}
+		DO: DoExpr {listremove[$TokenNames,`Token of Rare Damage Reduction V`]}
 	IF:	Any
 			~~ChatMatch {^Nalicana tells you\, \"You cannot increase your .* any further\.\"}
 			ChatMatch {^You may empower another Blank Augmentation Gem again in.*"}
@@ -279,6 +311,7 @@ STATE: {TurnInToken} ~~{
 			ChatMatch {^You have gained a skill point\!}
 			ChatMatch {^You give Nalicana Token of the Aura of the World}
 			ChatMatch {^You feel a surge of energy pass through you as the Light empowers your being\.}
+			ChatMatch {^Nalicana gives you Luminous Crystal}
 		DO:	SetState {PickUpToken}
 	IF: Expr {getitemcountininventorybynamerx[$CurrentToken]>=1}
 		DO:	Chat {/ub prepclick yes 10}

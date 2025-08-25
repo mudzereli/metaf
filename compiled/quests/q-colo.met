@@ -28,7 +28,7 @@ n
 s
 e
 s
-echo[`[META]: Loading Colo Meta V1.0.2 by Porkchop`,19]
+echo[`[META]: Loading Colo Meta V1.1.0 by Porkchop`,19]
 s
 Default
 i
@@ -1645,7 +1645,7 @@ d
 s
 t
 d
-2
+4
 s
 EnterFirstRoom
 i

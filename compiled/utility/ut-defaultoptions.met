@@ -44,7 +44,15 @@ K
 V
 n
 n
-31
+33
+i
+2
+s
+/vt settings loadchar simple
+i
+2
+s
+/vt loot load LootSnobV4.utl
 i
 4
 ba

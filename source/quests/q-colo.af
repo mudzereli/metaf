@@ -227,7 +227,7 @@ STATE: {EnterFirstRoom} ~~ {
 		DO: DoAll
 				DoExpr {actiontryuseitem[$portal]}
 				DoExpr {$qcolo_roomnumber=5}
-				SetWatchdog 2 2 {EnterFirstRoom}
+				SetWatchdog 2 4 {EnterFirstRoom}
 	~~ clear the watchdog when we enter the portal so it doesn't accidentally trip right after we exit
 	IF:	Any
 			IntoPortal

@@ -46,6 +46,8 @@ STATE: {Default} ~~ {
 STATE: {SetDefaultOptions} ~~ {
 	IF:	Always
 		DO:	DoAll
+				Chat {/vt settings loadchar simple}
+				Chat {/vt loot load LootSnobV4.utl}
 				EmbedNav navNothing {Nothing}
 				SetOpt {EnableCombat} {false}
 				SetOpt {EnableBuffing} {false}
