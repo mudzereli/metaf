@@ -24,7 +24,8 @@
 ~~ 																						
 ~~ 				REMEMBER THAT NAV-ONLY FILES MUST CONTAIN EXACTLY ONE NAV!				
 
-NAV: navJump once ~~ {
+NAV: navJump circular ~~ {
+	chk 44.0964678446452 -41.2486150105794 0.483354187011719
 	cht 44.1969804128011 -41.5751076698303 0.487501398722331 {/vt opt set navclosestoprange 0.000416666666666667}
 	cht 44.1969804128011 -41.5751076698303 0.487501398722331 {/vt opt set idlepeacemode false}
 	cht 0 0 -1000 {/ub mexec $jumpnum=1}
@@ -96,5 +97,5 @@ NAV: navJump once ~~ {
 	cht 0 0 -1000 {/ub mexec $jumpnum=$jumpnum+1}
 	pau 0 0 -1000 1000
 	jmp 44.1969804128011 -41.5751076698303 0.487501398722331 120 {False} 1200
-	pau 0 0 -1000 100000
+	pau 0 0 -1000 1000000
 ~~ }
